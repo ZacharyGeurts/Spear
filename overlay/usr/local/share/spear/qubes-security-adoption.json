@@ -1,11 +1,71 @@
 {
   "schema": "spear-qubes-security-adoption/v1",
-  "title": "Spear adopts Qubes security strengths",
-  "motto": "Compartmentalize trust. Least privilege. No surprise network. Explicit data flow.",
+  "title": "Spear adopts Qubes security strengths (not full Xen/dom0)",
+  "updated": "2026-07-13",
+  "motto": "Qubes is the gold standard for compartmentalization. Spear takes the principles; Field1 + KILROY + NEXUS C2 are the field-native substrate.",
+  "honesty": {
+    "not_shipping": "Full Qubes OS / Xen / qrexec / GUI domain isolation day one",
+    "adopting": "Security model, policy shape, and operator habits that made Qubes the secure OS reference"
+  },
+  "principles": [
+    {
+      "id": "security_by_isolation",
+      "qubes": "VMs for different trust levels (work, banking, disposable)",
+      "spear": "Trust domains as first-class: field / operator / network / media / disposable session profiles"
+    },
+    {
+      "id": "least_privilege",
+      "qubes": "dom0 minimal; no general browsing in admin domain",
+      "spear": "NEXUS C2 loopback-only; autoelevate allowlist (no polkit prompt surface); no casual root shell"
+    },
+    {
+      "id": "disposable_execution",
+      "qubes": "Disposable VMs for untrusted files/links",
+      "spear": "Disposable Field session flag + Queen profile isolation + no auto-open untrusted docs"
+    },
+    {
+      "id": "split_functions",
+      "qubes": "Split GPG, split USB, network VM",
+      "spear": "Planned: split crypto (Hostess), USB gate (device whitelist), network via NEXUS gatekeeper"
+    },
+    {
+      "id": "explicit_data_flow",
+      "qubes": "qrexec policies for inter-VM copy",
+      "spear": "C2 capability gates on destructive APIs; operator token for kill/update/field-switch"
+    },
+    {
+      "id": "trusted_boot_admin",
+      "qubes": "dom0 carefully maintained, minimal attack surface",
+      "spear": "KILROY Field OS identity + NEXUS security guard; Field1 whole-disk SPEARMBR not casual vfat"
+    },
+    {
+      "id": "no_surprise_network",
+      "qubes": "NetVM / no net by default for many qubes",
+      "spear": "C2 public_internet=false; firstboot does not open browser; Queen only on operator action"
+    },
+    {
+      "id": "device_assignment",
+      "qubes": "USB/controller assignment to specific VMs",
+      "spear": "Field Drive explicit pick with model/serial; device-whitelist doctrine in NEXUS"
+    }
+  ],
   "implemented_now": [
-    "Field1 SPEARMBR detection",
-    "No auto browser on firstboot",
-    "NEXUS C2 loopback sealed",
-    "autoelevate allowlist"
-  ]
+    "Field1 claimed FFAT as security-relevant storage (not silent mount as vfat)",
+    "has-field-drive recognizes SPEARMBR/Field1 (no false 'required' when Field1 present)",
+    "firstboot: welcome only — no automatic browser/Queen",
+    "NEXUS C2: loopback 127.0.0.1:9477, always-war capabilities, fail-closed destructive routes",
+    "autoelevate allowlist instead of polkit prompt spam",
+    "Install Mint / ubiquity hidden"
+  ],
+  "next": [
+    "Disposable session profile (tmpfs home overlay, wipe on logout)",
+    "Trust-domain labels on apps (Queen=network, Field Terminal=operator, GIMP=media)",
+    "USB/device whitelist gate before hotplug use",
+    "Split crypto path via Hostess for keys",
+    "Optional full Qubes-class hypervisor track later (separate product branch)"
+  ],
+  "references": {
+    "source_disk_history": "Field1 was Qubes whole disk (FIELD_QUBES) → claimed FFAT after backup to Hostess",
+    "qubes_project": "https://www.qubes-os.org/doc/"
+  }
 }

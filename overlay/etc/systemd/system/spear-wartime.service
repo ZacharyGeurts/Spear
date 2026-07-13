@@ -1,0 +1,18 @@
+[Unit]
+Description=Spear wartime — FIELD_UDP_WAR_BLASTERS · COOKED
+After=network-online.target spear-boot-harden.service
+Wants=network-online.target
+ConditionPathExists=/usr/local/bin/spear-wartime
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/spear-wartime --interval-ms 3000
+Restart=always
+RestartSec=2
+Nice=-5
+# loopback boards only by default
+Environment=SPEAR_WARTIME=1
+Environment=SPEAR_COOKED=1
+
+[Install]
+WantedBy=multi-user.target

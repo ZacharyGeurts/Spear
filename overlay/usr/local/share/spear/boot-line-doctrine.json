@@ -1,0 +1,71 @@
+{
+  "schema": "spear-boot-line-doctrine/v1",
+  "title": "Every boot line is speed + harden surface",
+  "updated": "2026-07-13",
+  "motto": "No idle token. No surprise service. Serial always for audit. Field1 is first-class.",
+  "stages": [
+    {
+      "stage": "0_firmware",
+      "actions": ["Secure Boot enroll when ESP ready", "disable unused boot devices in firmware", "ReBAR/IOMMU on when available"]
+    },
+    {
+      "stage": "1_bootloader",
+      "paths": ["isolinux/live.cfg (casper live)", "limine.conf (KILROY product)"],
+      "rules": [
+        "timeout 0 — operator chooses (no race)",
+        "text menu.c32 handoff — no VESA rainbow",
+        "classic splash operator preference",
+        "serial always on live entries for forensics"
+      ]
+    },
+    {
+      "stage": "2_kernel_cmdline",
+      "speed": [
+        "quiet loglevel=3 systemd.show_status=error",
+        "fsck.mode=skip (live media)",
+        "raid=noautodetect",
+        "noresume",
+        "systemd.mask of printers/modem/avahi/md5/ubiquity/touchegg"
+      ],
+      "secure": [
+        "apparmor=1 security=apparmor",
+        "page_alloc.shuffle=1",
+        "randomize_kstack_offset=on",
+        "slab_nomerge",
+        "pti=on spectre_v2=on spec_store_bypass_disable=on",
+        "l1tf=flush mds=full,nosmt tsx=off",
+        "kvm.nx_huge_pages=force",
+        "spear_harden=1 userspace marker"
+      ],
+      "debug_entry": "loglevel=8 debug ignore_loglevel nosplash — same masks"
+    },
+    {
+      "stage": "3_initramfs_casper",
+      "speed": ["casper-md5check masked — do not hash whole ISO at every boot"],
+      "secure": ["uuid= pin to this media", "username/hostname spear identity"]
+    },
+    {
+      "stage": "4_systemd",
+      "speed": ["mask cups ModemManager avahi openvpn touchegg mintsystem ssl-cert"],
+      "secure": ["ufw kept", "no ubiquity", "spear-boot-harden.service early"],
+      "qubes_parallel": "least privilege: no printer/modem stack in field live image"
+    },
+    {
+      "stage": "5_session",
+      "speed": ["firstboot no browser", "field-drive detect is O(disks) SPEARMBR"],
+      "secure": ["no surprise network", "Field1 claim path explicit"]
+    },
+    {
+      "stage": "6_kilroy_init",
+      "path": "SG/Spear/boot/init",
+      "speed": ["skip interactive menu when has-field-drive", "defer chip/dict benches to debug mode only"],
+      "secure": ["field-native ensure always", "debug shell only on spear_mode=debug"]
+    }
+  ],
+  "never": [
+    "fake capacity multipliers in boot messaging",
+    "auto-open Queen/browser",
+    "phone-home crash submit (kerneloops masked)",
+    "casper-md5check on every Normal boot"
+  ]
+}

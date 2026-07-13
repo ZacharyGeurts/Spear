@@ -4,8 +4,7 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
-BUILD="${KILROY_BUILD:-/home/zachary/Desktop/SG/zpics/kilroy-qemu-build}"
-OUT="${1:-$BUILD/initramfs.cpio.gz}"
+OUT="${1:-$ROOT/out/initramfs.cpio.gz}"
 STAGE="$ROOT/out/initrd-root"
 BB="$(command -v busybox)"
 
@@ -37,7 +36,6 @@ ln -sf /init "$STAGE/bin/init"
 ln -sf /init "$STAGE/sbin/init"
 ln -sf busybox "$STAGE/bin/sh"
 
-# If dynamic spear, copy shared libs into initrd
 if ldd "$STAGE/usr/local/bin/spear" >/dev/null 2>&1; then
   while read -r lib; do
     [[ -z "$lib" || ! -f "$lib" ]] && continue

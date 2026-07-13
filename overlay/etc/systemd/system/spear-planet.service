@@ -1,0 +1,13 @@
+[Unit]
+Description=Spear LIVE_PLANET :9600
+After=network-online.target
+ConditionPathExists=/usr/local/bin/spear-planet
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/spear-planet
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

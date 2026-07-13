@@ -1,0 +1,42 @@
+{
+  "schema": "spear-field-fat/v4",
+  "title": "Field Fat — Shannon entropy pack storage (not Microsoft FAT)",
+  "motto": "FFAT\\x03ENT · measured pack ratio · guaranteed = pool · never fake ×N",
+  "not": ["FAT16", "FAT32", "vfat", "exFAT", "MSDOS5.0", "hardcoded capacity_factor 91"],
+  "yes": [
+    "Secure MBR SPEARMBR+SECURE01",
+    "Partition type 0xE0 Field Fat at LBA 2048",
+    "Superblock magic FFAT\\x03ENT (v4 entropy)",
+    "FDRV\\x01 family tag",
+    "Virtual AMMOFAT geometry for Field Die fatPack (Primer ch.08 bus only)",
+    "Frame map + pack pool: ZERO / RLE / PAK / RAW / REF",
+    "PAK peak–angle: control points + angle up/down ramps → more samples than points",
+    "Shannon H = −Σ pᵢ log₂ pᵢ per 4 KiB frame (Primer ch.04 / ch.14)",
+    "guaranteed_bytes = physical pool (worst case unique high-H RAW)",
+    "address_space_bytes = sparse map · frame_bytes (unwritten = free)",
+    "pack_ratio = logical_stored / physical_used — measured after writes only"
+  ],
+  "honesty": {
+    "fake_rejected": "physical × 91 was metadata theatre — removed",
+    "shannon": "ideal lossless size ≥ (H/8)·frame for each frame",
+    "empty_volume": "pack_ratio reports 1.000 — no free lunch claimed until data written",
+    "gain_sources": [
+      "all-zero frames (0 pool bytes)",
+      "RLE when H low",
+      "PAK peaks + angle-up/angle-down ramps (structured field signals)",
+      "content-dedup REF"
+    ],
+    "pak_note": "One PEAK/VALLEY record reconstructs many samples along both slopes — more logical data than stored points"
+  },
+  "primer": {
+    "entropy": "ch.04 ThermoAccountant vs Shannon file oracle — separate plates",
+    "die": "ch.08 fatPack slots [12–15] virtual geometry only",
+    "shannon": "ch.14 H on byte histogram — storm gauge, also pack budget"
+  },
+  "big_drive": {
+    "fdrv": "FDRV\\x01 sealed containers",
+    "capacity_factor": null,
+    "note": "doctrine no longer claims fixed ×91; use measured pack_ratio"
+  },
+  "access": "spear ffat-probe | ffat-put | ffat-get | field1-status — not mount -t vfat"
+}

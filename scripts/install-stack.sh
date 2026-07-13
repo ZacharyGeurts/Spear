@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Install C++ Spear stack into overlay + user local bin (product path ELFs).
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+SRC="$ROOT/src"
+OVER="$ROOT/overlay/usr/local/bin"
+LIB="$ROOT/overlay/usr/local/lib/spear"
+SHARE="$ROOT/overlay/usr/local/share/spear"
+VER="$(cat "$ROOT/VERSION" 2>/dev/null || echo 22.3.1-field)"
+
+make -C "$SRC" all
+
+BINS=(
+  spear
+  spear-wartime
+  spear-fleet-link
+  spear-www
+  spear-planet
+  spear-export
+  spear-hard-dispose
+  spear-kill-copilot
+  spear-copilot-monitor
+)
+
+mkdir -p "$OVER" "$LIB" "$SHARE" "$HOME/.local/bin"
+
+for b in "${BINS[@]}"; do
+  [[ -x "$SRC/$b" ]] || { echo "missing $SRC/$b"; exit 1; }
+  install -m 0755 "$SRC/$b" "$OVER/$b"
+  install -m 0755 "$SRC/$b" "$HOME/.local/bin/$b"
+done
+
+# spear primary may need setuid on real install (optional)
+if [[ -w /usr/local/bin ]]; then
+  install -m 0755 "$SRC/spear" /usr/local/bin/spear || true
+fi
+
+# doctrine + version into image share
+cp -f "$ROOT/data/"*.json "$SHARE/" 2>/dev/null || true
+mkdir -p "$SHARE/shot-certainty" "$SHARE/swallows" "$SHARE/iso-boot"
+cp -a "$ROOT/data/shot-certainty/." "$SHARE/shot-certainty/" 2>/dev/null || true
+cp -a "$ROOT/data/swallows/." "$SHARE/swallows/" 2>/dev/null || true
+cp -a "$ROOT/data/iso-boot/." "$SHARE/iso-boot/" 2>/dev/null || true
+echo "$VER" >"$SHARE/VERSION"
+echo "Spear $VER (Field) — stack of record · C++ product path · no KILROY archive" \
+  >"$ROOT/overlay/etc/spear-release"
+
+# enable wartime units by default in overlay
+SYS="$ROOT/overlay/etc/systemd/system"
+mkdir -p "$SYS/multi-user.target.wants" "$SYS/graphical.target.wants"
+for u in spear-boot-harden.service spear-wartime.service spear-fleet-link.service \
+         spear-www.service spear-planet.service; do
+  [[ -f "$SYS/$u" ]] || continue
+  ln -sfn "../$u" "$SYS/multi-user.target.wants/$u" 2>/dev/null || true
+done
+
+ln -sfn "$HOME/.local/bin/spear-planet" "$HOME/.local/bin/spear-planet-live" 2>/dev/null || true
+ln -sfn "$HOME/.local/bin/spear-fleet-link" "$HOME/.local/bin/spear-rack-guard" 2>/dev/null || true
+
+echo "install-stack OK · version=$VER · overlay=$OVER · local=$HOME/.local/bin"
+ls -la "$OVER"/spear "$OVER"/spear-wartime "$OVER"/spear-fleet-link 2>/dev/null | head -10

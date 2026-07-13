@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-License-Identifier: MIT
-# KILROY — field-native boot. Every branch optimized: no idle work, debug-only benches.
+# SPEAR — field-native boot. Every branch optimized: no idle work, debug-only benches.
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 
 # --- stage: mount essentials (fail-soft, ordered for speed) ---
@@ -31,7 +31,7 @@ done
 [ "$MODE" = "field" ] && FAST=1
 
 # Compact banner
-printf '\033[1;32mSPEAR·KILROY\033[0m mode=%s fast=%s harden=%s\n' "$MODE" "$FAST" "$HARDEN"
+printf '\033[1;32mSPEAR FIELD\033[0m mode=%s fast=%s harden=%s\n' "$MODE" "$FAST" "$HARDEN"
 if [ "$DEBUG" = "1" ]; then
   echo "  cmdline: $(cat /proc/cmdline 2>/dev/null)"
 fi
@@ -61,7 +61,7 @@ debug_banner() {
 }
 
 # Field-native ensure: always; benches only in debug
-kilroy_field_native() {
+spear_field_native() {
   echo ">>> field-native"
   if ! command -v spear >/dev/null; then
     echo "  spear missing — rebuild initrd"
@@ -69,13 +69,12 @@ kilroy_field_native() {
   fi
   # Field/fast: ensure only, minimal status (speed path)
   if [ "$FAST" = "1" ] && [ "$DEBUG" != "1" ]; then
-    spear kilroy-ensure 2>/dev/null || spear fieldmem-ensure host 2>/dev/null || true
+    spear fieldmem-ensure host 2>/dev/null || spear kilroy-ensure 2>/dev/null || true
     return 0
   fi
-  spear kilroy-ensure 2>/dev/null || {
-    spear fieldmem-ensure host 2>/dev/null || true
-    spear fieldmem-ensure gpu 2>/dev/null || true
-  }
+  spear fieldmem-ensure host 2>/dev/null || true
+  spear fieldmem-ensure gpu 2>/dev/null || true
+  spear kilroy-ensure 2>/dev/null || true
   if [ "$DEBUG" = "1" ]; then
     spear storage-status 2>/dev/null || true
     spear dict-status 2>/dev/null || true
@@ -100,7 +99,7 @@ has_fd() {
 case "$MODE" in
   debug)
     debug_banner
-    kilroy_field_native
+    spear_field_native
     echo ">>> debug shell — spear storage-status | ffat-probe /dev/vda"
     shell
     ;;
@@ -111,12 +110,12 @@ case "$MODE" in
     else
       echo "spear-field-drive missing"
     fi
-    kilroy_field_native
+    spear_field_native
     shell
     ;;
   compat)
     echo ">>> Compat (Field Drive optional)"
-    kilroy_field_native
+    spear_field_native
     shell
     ;;
   field)
@@ -126,7 +125,7 @@ case "$MODE" in
     else
       echo "  No Field Drive — Create Field Drive or attach Field1"
     fi
-    kilroy_field_native
+    spear_field_native
     # ready mark for benches
     echo "spear_ready mode=field uptime_s=$(cut -d. -f1 /proc/uptime) " >/dev/console 2>/dev/null || true
     shell
@@ -139,7 +138,7 @@ case "$MODE" in
     else
       echo "  No Field Drive — use Create Field Drive entry or Compat"
     fi
-    kilroy_field_native
+    spear_field_native
     echo "spear_ready mode=normal uptime_s=$(cut -d. -f1 /proc/uptime) " >/dev/console 2>/dev/null || true
     shell
     ;;

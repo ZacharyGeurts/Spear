@@ -7,7 +7,9 @@
 # Set SPEAR_FIELD1=0 to omit a second disk.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-ISO_DEFAULT="/home/zachary/Desktop/SG/NewLatest/Spear/out/spear-latest.iso"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ISO_DEFAULT="${ROOT}/out/spear-latest.iso"
+[[ -f "$ISO_DEFAULT" ]] || ISO_DEFAULT="/home/zachary/Desktop/SG/NewLatest/Spear/out/spear-latest.iso"
 ISO="${SPEAR_ISO:-$ISO_DEFAULT}"
 OUT="$ROOT/out"
 mkdir -p "$OUT/qemu-logs"

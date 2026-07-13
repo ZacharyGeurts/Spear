@@ -1,0 +1,13 @@
+[Unit]
+Description=Spear www deck (Big Grin / world map :9490)
+After=network-online.target
+ConditionPathExists=/usr/local/bin/spear-www
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/spear-www
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

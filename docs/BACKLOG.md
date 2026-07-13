@@ -1,34 +1,31 @@
-# Spear · KILROY · NEXUS C2 — Backlog
+# Spear backlog
 
 Updated: 2026-07-13
 
 | Track | Root |
 |-------|------|
-| Spear product | `/home/zachary/Desktop/SG/Spear` |
-| Live ISO | `NewLatest/Spear/out/spear-latest.iso` |
-| KILROY hub | `NewLatest/.pages-hub-KILROY` |
-| NEXUS C2 | `NewLatest/lib/nexus-c2-harden.py` |
+| Spear product | this repo (stack of record) |
+| Live ISO | `out/spear-latest.iso` |
+| Hostess7 | sibling Angel / library |
 
 ## Done
 
-- [x] Field1 CLAIMED; SPEARMBR/FFAT detection; no false Field Drive nag
-- [x] firstboot no browser; classic boot splash
-- [x] Qubes security adoption doctrine
-- [x] **Boot line doctrine** — every stage speed+harden (`docs/BOOT-HARDEN.md`)
-- [x] Kernel cmdline: quiet, fsck skip, raid off, AppArmor, PTI, mask cups/modem/avahi/md5
-- [x] `spear-boot-harden.service` + sysctl.d; War entry for max mitigations
-- [x] KILROY `init` slimmed (no auto wipe wizard on Normal; debug-only benches)
+- [x] Field1 CLAIMED; SPEARMBR/FFAT detection
+- [x] Boot line doctrine — speed + harden
+- [x] C++ wartime · FIELD_UDP_WAR_BLASTERS · COOKED
+- [x] Full stack layout: src + overlay + boot + iso/
+- [x] `make release` · release receipt · no KILROY dependency in pack/limine
+- [x] Wartime systemd units in overlay
 
-## Next (Qubes-informed)
+## Next
 
-1. Disposable session profile (tmpfs home, wipe on logout)  
-2. Trust-domain labels on apps (Queen=network, Terminal=operator, GIMP=media)  
-3. USB / device whitelist gate (NEXUS)  
-4. Split crypto via Hostess  
-5. ISO menu path smoke (`SPEAR_DIRECT=0`) with classic splash  
-6. KILROY TEAM ioctl/bench + secureboot enroll  
+1. Disposable session profile (tmpfs home)  
+2. USB / device whitelist gate  
+3. Secure Boot enroll for product ESP  
+4. QEMU smoke CI on `out/spear-latest.iso`  
+5. Optional: thinner squash (strip more Mint apps)
 
 ## Honesty
 
-We adopt **Qubes principles** (isolation, least privilege, no casual admin browsing).  
-We do **not** claim full Qubes/Xen/qrexec isolation in this live image yet.
+Qubes **principles** (isolation, least privilege) inform harden masks.  
+We do **not** claim full Qubes/Xen isolation in the live image yet.

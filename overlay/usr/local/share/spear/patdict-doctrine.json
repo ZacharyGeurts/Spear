@@ -1,0 +1,28 @@
+{
+  "schema": "spear-patdict/v1",
+  "title": "Shared sealed pattern dictionary — Field Memory host DRAM + GPU VRAM",
+  "kin": "Hostess H7B/3 pattern condenser (NewLatest field-h7b-brain-doctrine)",
+  "magic": "SPDB",
+  "on_disk": "/dev/shm/spear-fieldmem-dict.spdb",
+  "motto": "One sealed dictionary for both memory planes — more field memory when patterns repeat; refuse tamper",
+  "security": {
+    "seal": "SHA-256 over version||generation||entries",
+    "pack_bind": "DIC1 frames store generation + seal[0..15]; unpack refuses mismatch",
+    "mode": "0600 owner-only",
+    "train_sources": "regular files only; refuse S_IWOTH (world-writable inject)",
+    "path_guard": "unsafe paths rejected unless SPEAR_DICT_ALLOW_UNSAFE=1",
+    "no_ambient_train": "train only via spear dict-train (operator intent)"
+  },
+  "capacity": {
+    "mechanism": "longest-match substitution of repeated byte patterns (8–64 B)",
+    "shared": "host DRAM fieldmem + GPU VRAM fieldmem use the same loaded dict",
+    "measured": "pack_ratio on frames with kind=DICT; never fake ×N"
+  },
+  "cli": [
+    "spear dict-train <trusted-file> [...]",
+    "spear dict-commit [max_entries]",
+    "spear dict-save|load|verify|status|clear"
+  ],
+  "ffat_kind": 6,
+  "not": ["auto-train from network", "world-writable dict accept", "infinite free RAM claim"]
+}

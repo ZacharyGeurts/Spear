@@ -17,3 +17,22 @@ out/**/*.img
 *~
 *.swp
 .DS_Store
+
+# Stack build artifacts (rebuild with make)
+src/spear
+src/spear-*
+out/initramfs.cpio.gz
+out/initrd-root/
+out/boot-staging/
+out/spear
+out/spear-boot.img
+out/*.log
+out/qemu-logs/
+out/release-receipt.json
+out/iso-stamp.log
+# large doctrine dumps optional
+overlay/usr/local/bin/spear
+overlay/usr/local/bin/spear-*
+# keep systemd units; ignore installed binary copies of ELFs in overlay if huge
+overlay/usr/local/share/spear/shot-certainty/
+overlay/usr/local/share/spear/swallows/

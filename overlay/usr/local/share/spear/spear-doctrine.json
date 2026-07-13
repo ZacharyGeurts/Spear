@@ -1,0 +1,151 @@
+{
+  "schema": "spear-os-doctrine/v4",
+  "title": "Spear — Field OS · KILROY · NEXUS C2",
+  "version": "0.5.0",
+  "updated": "2026-07-13",
+  "motto": "Normal needs Field Drive. Four programs. KILROY field-native. NEXUS C2 local sealed.",
+  "product": {
+    "name": "Spear",
+    "pretty_name": "Spear 22.3",
+    "id": "spear",
+    "desktop": "Cinnamon · Spear graphics",
+    "programs_only": [
+      "Queen",
+      "Field Terminal",
+      "Field GIMP",
+      "AmmoCodium"
+    ]
+  },
+  "stack": {
+    "os_identity": "Spear",
+    "field_kernel": "KILROY Field OS (Linux-compatible substrate)",
+    "c2": "NEXUS C2",
+    "c2_bind": "127.0.0.1:9477",
+    "c2_doctrine": "NewLatest/data/nexus-c2-harden-doctrine.json",
+    "field_drive": "FFAT SPEARFIELD · never fake ×N",
+    "field_memory": "spear fieldmem / kilroy-ensure (DRAM+VRAM pools → logical field memory)"
+  },
+  "nexus_c2": {
+    "schema": "nexus-c2-harden/v1",
+    "motto": "C2 is the only command surface. Local, sealed, capability-gated, born with the kernel.",
+    "bind_host": "127.0.0.1",
+    "bind_port": 9477,
+    "public_internet": false,
+    "default_profile": "war",
+    "always_war": true,
+    "module": "lib/nexus-c2-harden.py",
+    "apis": [
+      "/api/c2/harden",
+      "/api/c2/posture",
+      "/api/c2/capabilities"
+    ],
+    "taskbar": "field-c2-taskbar-doctrine (Start · Files · Terminal · Queen · Broadcaster)"
+  },
+  "kilroy": {
+    "identity": "KILROY Field OS 1.0",
+    "abi": "kilroy-field-1.0",
+    "layout": "v9",
+    "proc": [
+      "/proc/kilroy_field/status",
+      "/proc/kilroy_field/boot",
+      "/proc/kilroy_field/security",
+      "/proc/kilroy_field/cache",
+      "/proc/kilroy_field/direct"
+    ],
+    "dev": "/dev/kilroy_field",
+    "hub": "NewLatest/.pages-hub-KILROY",
+    "next_runtime": [
+      "ioctl + bench on physical TEAM after rootfs refresh",
+      "grok-enroll-secureboot.sh on target ESP",
+      "btrfs @kilroy_snap when snapshot entry used",
+      "iPXE lab config for PXE entry"
+    ]
+  },
+  "boot_menu": {
+    "timeout": 0,
+    "timeout_reason": "No auto-boot until operator chooses; Field Drive is required",
+    "isolinux": "data/iso-boot/live.cfg",
+    "splash": "data/iso-boot/splash.png",
+    "vga_policy": "vga=normal on default paths to exit vesamenu FB cleanly",
+    "serial": "console=ttyS0,115200n8 on all live entries",
+    "entries": [
+      {
+        "id": "normal",
+        "label": "Normal - Spear desktop (needs Field Drive)",
+        "mode": "spear_mode=normal",
+        "note": "Full desktop when SPEARFIELD present; default menu entry"
+      },
+      {
+        "id": "fielddrive",
+        "label": "Create Field Drive - wipe disk | detailed picker",
+        "mode": "spear_mode=fielddrive",
+        "tool": "spear-field-drive"
+      },
+      {
+        "id": "compat",
+        "label": "Compat - nomodeset",
+        "mode": "spear_mode=normal",
+        "note": "Difficult hardware / broken DRM handoff"
+      },
+      {
+        "id": "debug",
+        "label": "Debug - verbose serial",
+        "mode": "spear_mode=normal",
+        "note": "loglevel=8 + serial capture"
+      },
+      {
+        "id": "splash",
+        "label": "Normal with splash (experimental)",
+        "mode": "spear_mode=normal",
+        "note": "quiet splash after vga=normal path proven"
+      }
+    ]
+  },
+  "field_drive": {
+    "label": "SPEARFIELD",
+    "mbr_magic": "SPEARMBR",
+    "type": "0xE0",
+    "superblock": "FFAT\\x03ENT",
+    "capacity_note": "field_logical from PAK/RLE/REF/CHIP die — never fake free bits",
+    "tools": ["spear", "ffat-ensure", "field1-claim"],
+    "cpp_path": "SG/Spear/src"
+  },
+  "apps": {
+    "queen": {
+      "engine": "Firefox binary",
+      "identity": "Queen",
+      "launcher": "/usr/local/bin/queen"
+    },
+    "field_terminal": {
+      "launcher": "/usr/local/bin/field-terminal"
+    },
+    "field_gimp": {
+      "launcher": "/usr/local/bin/field-gimp"
+    },
+    "ammocodium": {
+      "launcher": "/usr/local/bin/ammocodium"
+    }
+  },
+  "security": {
+    "model": "Qubes-informed compartmentalization without full Xen day-one",
+    "doctrine": "data/qubes-security-adoption.json",
+    "rules": [
+      "No surprise network: firstboot never auto-opens Queen/browser",
+      "Field1/FFAT is trusted field storage; detect SPEARMBR not only SPEARFIELD label",
+      "NEXUS C2 loopback-only with capability gates",
+      "autoelevate allowlist — not polkit prompt surface",
+      "Least privilege admin path (KILROY + C2)"
+    ]
+  },
+  "boot_branding": {
+    "isolinux_splash": "classic Mint 22.3 splash (operator preferred) — data/iso-boot/splash-classic.png",
+    "spear_splash_alt": "data/iso-boot/splash-spear-alt.png"
+  },
+  "honesty": {
+    "casper_mint_iso": "Compat live path for Cinnamon GUI testing; product boot of record remains KILROY limine+initrd",
+    "vga_corruption_2026_07_13": "vesamenu FB handoff left rainbow text — fixed with vga=normal + text menu + serial",
+    "never_fake_capacity": true,
+    "not_full_qubes": "We adopt Qubes principles; we do not claim to ship full Qubes/Xen isolation yet"
+  }
+}
+

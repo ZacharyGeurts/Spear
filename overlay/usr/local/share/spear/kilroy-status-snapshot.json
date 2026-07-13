@@ -1,0 +1,15 @@
+{
+  "updated": "2026-07-13",
+  "identity": "KILROY Field OS 1.0",
+  "abi": "kilroy-field-1.0",
+  "layout": "v9",
+  "hub": "/home/zachary/Desktop/SG/NewLatest/.pages-hub-KILROY",
+  "docs": ["FIELD_STATUS.md", "Grok/06_ACHIEVEMENTS_AND_NEXT.md"],
+  "next": [
+    "ioctl + bench on physical TEAM after rootfs refresh",
+    "grok-enroll-secureboot.sh on target ESP",
+    "btrfs @kilroy_snap when snapshot entry used",
+    "iPXE lab config for PXE entry"
+  ],
+  "spear_link": "Spear product boot of record remains KILROY limine+initrd; casper is GUI live test path"
+}

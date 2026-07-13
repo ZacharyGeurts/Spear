@@ -1,0 +1,37 @@
+{
+  "schema": "spear-fieldmem/v1",
+  "title": "Field Memory — more field-logical memory from host DRAM and GPU VRAM",
+  "motto": "Physical pool is real silicon; field_logical is MORE via sparse map + PAK",
+  "not": [
+    "fake ×N free RAM",
+    "claiming infinite VRAM",
+    "treating memory only as a disk image story"
+  ],
+  "yes": [
+    "Host DRAM → Field Memory plane (physical_pool + denser sparse address_space)",
+    "GPU DEVICE_LOCAL VRAM → Field Memory plane (same fabric)",
+    "map_divisor=8 on memory planes (denser than disk divisor=32)",
+    "pack_ratio measured (ZERO/RLE/PAK/REF) after writes",
+    "KILROY kilroy-ensure brings both planes online"
+  ],
+  "accounting": {
+    "physical_pool": "real host RAM or device-local VRAM reserved for the plane",
+    "guaranteed": "worst-case usable if all frames high-H RAW",
+    "field_logical_address_space": "sparse map — MORE addressable field memory than pool",
+    "expand": "address_space / physical_pool",
+    "pack_ratio": "logical_stored / physical_used after writes"
+  },
+  "defaults": {
+    "host_pool": "half of MemAvailable after 1 GiB headroom",
+    "gpu_pool": "half of usable DEVICE_LOCAL budget, cap 8 GiB, leave display headroom"
+  },
+  "paths": {
+    "host": "/dev/shm/spear-fieldmem-host.img",
+    "gpu": "/dev/shm/spear-fieldmem-gpu.img"
+  },
+  "cli": [
+    "spear kilroy-ensure",
+    "spear fieldmem-ensure all|host|gpu",
+    "spear storage-status"
+  ]
+}
