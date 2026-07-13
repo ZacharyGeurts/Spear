@@ -1,13 +1,16 @@
 # Spear
 
-**Field storage · wartime C++ stack · Hostess 7 / KILROY field memory.**  
+**Field storage · wartime C++ stack · field memory · LIVE_PLANET.**  
+**This is the stack of record.** No satellite archives. No KILROY public repo.  
 Repo: [ZacharyGeurts/Spear](https://github.com/ZacharyGeurts/Spear)
 
-C++ or lower. No polkit product path. No H7c for study books. SIGKILL-only wartime reapers.  
+C++ or lower. No polkit product path. No H7c for study books.  
+Hard path: **FIELD_UDP_WAR_BLASTERS** · **COOKED** to WALL_OUTLET · HATED · PISSED.  
 FFAT is **not** Microsoft FAT. Live planet + Big Grin deck + zone mesh offload.
 
-**Related:** [KILROY](https://github.com/ZacharyGeurts/KILROY) · [Hostess7](https://github.com/ZacharyGeurts/Hostess7) · [Big_Grin_Terrorist_Hunter](https://github.com/ZacharyGeurts/Big_Grin_Terrorist_Hunter)
+**Related (live only):** [Hostess7](https://github.com/ZacharyGeurts/Hostess7) · [Big_Grin_Terrorist_Hunter](https://github.com/ZacharyGeurts/Big_Grin_Terrorist_Hunter)
 
+**Gone (do not clone):** `KILROY` public repo · `KILROY_iPXE` · `ZNetwork` — no archives, no redirects required.
 ---
 
 
@@ -17,7 +20,7 @@ FFAT is **not** Microsoft FAT. Live planet + Big Grin deck + zone mesh offload.
 
 **CHIPs / Field Die:** pack pick + die L1 (`chip-status` / `chip-bench` / `chip-demo`).
 
-**Field MEMORY (KILROY):** host **DRAM** and GPU **VRAM** are physical pools; Field Memory makes **more field-logical memory** (sparse map + PAK), not fake free bits. `spear kilroy-ensure` · `spear fieldmem-ensure all` · `spear storage-status`.
+**Field MEMORY:** host **DRAM** and GPU **VRAM** are physical pools; Field Memory makes **more field-logical memory** (sparse map + PAK), not fake free bits. `spear fieldmem-ensure all` · `spear storage-status` · (legacy alias `spear kilroy-ensure` if present).
 
 ## Autoelevate (replaces polkit / sudo prompts)
 
