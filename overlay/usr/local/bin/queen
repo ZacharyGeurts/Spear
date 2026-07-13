@@ -1,0 +1,10 @@
+#!/bin/bash
+# Queen — Firefox engine, Queen identity (script wrapper; engine binary is system)
+export MOZ_APP_DISPLAYNAME=Queen
+PROFILE="${QUEEN_PROFILE:-$HOME/.queen/profile}"
+mkdir -p "$PROFILE"
+for b in /usr/bin/firefox /usr/lib/firefox/firefox; do
+  [[ -x "$b" ]] && exec "$b" --name Queen --class Queen -profile "$PROFILE" "$@"
+done
+echo "queen: firefox engine missing" >&2
+exit 1

@@ -1,0 +1,19 @@
+# Build artifacts
+src/spear
+src/spear-*
+*.o
+*.a
+out/*.img
+out/**/*.img
+*.qcow2
+*.iso
+
+# Local runtime
+/tmp/
+*.log
+*.pid
+
+# Editor
+*~
+*.swp
+.DS_Store

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <title>Copilot Threat Monitor · ACTIVE HUNT</title>
+  <link rel="stylesheet" href="big-grin-eats.css" />
+  <style>
+    body { background:#07060c; color:#e8fff4; font-family:system-ui,sans-serif; margin:0; padding:0; }
+    a { color:#7ad7ff; }
+    .banner {
+      background: linear-gradient(90deg, #3d0a12, #0a1512);
+      border-bottom: 2px solid #ff6b7a; padding:.75rem 1.4rem;
+      display:flex; flex-wrap:wrap; gap:1rem; align-items:center;
+    }
+    .banner strong { color:#ff6b7a; letter-spacing:.12em; }
+    .wrap { max-width:1100px; margin:0 auto; padding:1.2rem 1.4rem 2rem; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; }
+    @media (max-width:900px){ .grid { grid-template-columns:1fr; } }
+    .panel {
+      border:1px solid #3a2450; border-radius:14px; padding:1rem 1.1rem; background:#120c18;
+    }
+    .panel.hot { border-color:#ff5d8f; background:linear-gradient(135deg,#1a0a10,#0e0a14); }
+    .panel.ok { border-color:#2a6a4a; }
+    .panel.warn { border-color:#ffc857; }
+    h1 { color:#ff6b7a; margin:.2rem 0 .5rem; font-size:1.45rem; }
+    h2 { color:#ffc857; font-size:.95rem; margin:0 0 .5rem; }
+    .muted { color:#c9a8c0; font-size:.88rem; }
+    .big { font-size:1.6rem; font-weight:900; letter-spacing:.06em; }
+    .big.clear { color:#5dffb0; }
+    .big.hunt { color:#ff6b7a; }
+    .big.alert { color:#ffc857; }
+    .path {
+      font-family:ui-monospace,monospace; font-size:.75rem; color:#5dffb0;
+      background:#070a09; border:1px solid #3a2450; border-radius:10px;
+      padding:.65rem; white-space:pre-wrap; margin-top:.5rem;
+    }
+    .pill {
+      display:inline-block; padding:.2rem .55rem; border-radius:999px; font-size:.72rem;
+      font-weight:800; letter-spacing:.06em; margin:.15rem .25rem 0 0;
+    }
+    .pill.g { background:#143d2a; color:#5dffb0; }
+    .pill.r { background:#4a1020; color:#ff6b7a; }
+    .pill.y { background:#3d3010; color:#ffc857; }
+    .beam {
+      height:3px; background:linear-gradient(90deg,transparent,#ff6b7a,#5dffb0,transparent);
+      animation: beam 1.2s linear infinite; margin:.6rem 0 1rem;
+    }
+    @keyframes beam { from { background-position:0 0;} to { background-position:200px 0;} }
+    table { width:100%; border-collapse:collapse; font-size:.82rem; margin-top:.4rem; }
+    td, th { text-align:left; padding:.3rem .4rem; border-bottom:1px solid #2a1a38; }
+    th { color:#c9a8c0; font-weight:600; }
+    .links a {
+      display:inline-block; margin:.25rem .3rem 0 0; padding:.35rem .65rem; border-radius:8px;
+      border:1px solid #3a2450; color:#7ad7ff; text-decoration:none; background:#1a1224; font-size:.78rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="banner">
+    <strong>⚡ COPILOT THREAT MONITOR · ACTIVE HUNT</strong>
+    <span class="muted">SIGKILL only · multi-signal · angel seal · world DNS/DHCP</span>
+    <span class="muted" id="clock">—</span>
+  </div>
+  <div class="wrap">
+    <p class="muted"><a href="index.html">← Products</a> · <a href="autopilot.html">Wartime</a> · <a href="pwnership/">Pwnership</a></p>
+    <h1>Active hunt · every copilot</h1>
+    <p class="muted">Leave alone: GPT-4 · OpenAI · ChatGPT · Grok · Hostess7 · Field One · Spear</p>
+    <div class="beam"></div>
+
+    <div class="grid">
+      <div class="panel hot" id="huntPanel">
+        <h2>Hunt engine</h2>
+        <div class="big clear" id="overall">…</div>
+        <p class="muted" id="huntLine">loading…</p>
+        <div id="huntPills"></div>
+        <div class="path" id="huntPath">—</div>
+      </div>
+      <div class="panel ok" id="angelPanel">
+        <h2>Angel seal · Forever Watchguard</h2>
+        <div class="big clear" id="angelOverall">…</div>
+        <p class="muted" id="angelLine">loading…</p>
+        <div class="path" id="angelPath">—</div>
+      </div>
+      <div class="panel ok" id="dnsPanel">
+        <h2>World DNS / DHCP</h2>
+        <div class="big clear" id="dnsOverall">…</div>
+        <p class="muted" id="dnsLine">loading…</p>
+        <table id="dnsTable">
+          <thead><tr><th>Hook</th><th>Role</th><th>Blocked</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="path" id="dnsPath">—</div>
+      </div>
+      <div class="panel">
+        <h2>Wartime services</h2>
+        <div id="svcPills"></div>
+        <div class="path" id="svcPath">—</div>
+        <div class="links" style="margin-top:.7rem">
+          <a href="pwnership/kills/dogshit-zocr-copilot.html">☠ zocr_copilot</a>
+          <a href="pwnership/kills/dogshit-copilot-ironclad-fail.html">☠ Copilot</a>
+          <a href="pwnership/kills/world-dns-dhcp-collision-guard.html">Collision guard</a>
+          <a href="pwnership/kills/world-dns-dhcp-209-18-47-61.html">209.18.47.61</a>
+          <a href="copilot-threat-monitor.json">Monitor JSON</a>
+          <a href="angel-seal-status.json">Angel JSON</a>
+          <a href="world-dns-dhcp-status.json">DNS/DHCP JSON</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+  function pill(cls, t){ return '<span class="pill '+cls+'">'+t+'</span>'; }
+  function setBig(el, text, kind){
+    el.textContent = text;
+    el.className = 'big ' + (kind || 'clear');
+  }
+  async function j(url){
+    try {
+      const r = await fetch(url + '?t=' + Date.now(), {cache:'no-store'});
+      if (!r.ok) return null;
+      return await r.json();
+    } catch(e){ return null; }
+  }
+  async function tick(){
+    document.getElementById('clock').textContent = new Date().toISOString().slice(0,19)+'Z';
+    const mon = await j('copilot-threat-monitor.json');
+    const angel = await j('angel-seal-status.json');
+    const dns = await j('world-dns-dhcp-status.json');
+    const hunt = await j('copilot-hunt-engine.json');
+
+    if (mon) {
+      const o = mon.overall || '?';
+      const kind = (o==='CLEAR') ? 'clear' : (o==='HUNTING'||o==='REMNANTS') ? 'hunt' : 'alert';
+      setBig(document.getElementById('overall'), o, kind);
+      document.getElementById('huntLine').textContent =
+        'engine='+(mon.engine||'?')+' · interval='+(mon.interval_s||'?')+'s · ts='+(mon.ts||'');
+      const h = mon.hunt || {};
+      document.getElementById('huntPills').innerHTML =
+        pill(h.seen_this_cycle?'r':'g', 'seen '+ (h.seen_this_cycle||0)) +
+        pill(h.killed_this_cycle?'r':'g', 'killed '+ (h.killed_this_cycle||0)) +
+        pill(h.disk_remnants_live?'r':'g', 'disk '+ (h.disk_remnants_live||0)) +
+        pill('g', h.signal||'SIGKILL_ONLY');
+      document.getElementById('huntPath').textContent =
+        'policy: every_copilot_gone · multi_signal · no SIGTERM\n' +
+        'leave: ' + ((h.leave_alone||[]).join(' · ')) + '\n' +
+        (hunt ? ('cycle='+(hunt.cycle||'?')+' lifetime_kills='+(hunt.lifetime_kills||0)+' status='+(hunt.status||'?')) : '');
+    }
+
+    if (angel) {
+      const ok = angel.sealed && angel.status === 'SEALED_UP';
+      setBig(document.getElementById('angelOverall'), ok ? 'SEALED UP' : (angel.status||'DOWN'), ok?'clear':'alert');
+      document.getElementById('angelPanel').className = 'panel ' + (ok?'ok':'warn');
+      document.getElementById('angelLine').textContent =
+        (angel.commander||'Hostess7')+' · components '+(angel.component_count||0)+
+        ' · live '+(angel.bindings_live||0)+
+        (angel.bindings_not_live&&angel.bindings_not_live.length ? ' · not_live: '+angel.bindings_not_live.join(',') : '');
+      document.getElementById('angelPath').textContent =
+        'rank: ANGEL · event: '+(angel.event||'—')+'\n' +
+        'root_seal: '+(angel.root_seal||'—')+'\n' +
+        'dns/dhcp components: '+((angel.dns_dhcp_related||[]).join(', ')||'—')+'\n' +
+        'mandate: '+(angel.mandate_present?'present':'missing')+' '+(angel.mandate_id||'');
+    }
+
+    if (dns) {
+      const ok = dns.status === 'UP';
+      setBig(document.getElementById('dnsOverall'), dns.status||'?', ok?'clear':'alert');
+      document.getElementById('dnsPanel').className = 'panel ' + (ok?'ok':'warn');
+      const lt = dns.local_truth || {};
+      const ws = dns.wartime_services || {};
+      document.getElementById('dnsLine').textContent =
+        (dns.policy||'') + ' · local_resolve=' + !!lt.resolve_ok;
+      const hooks = dns.foreign_world_dns_hooks || {};
+      const tb = document.querySelector('#dnsTable tbody');
+      tb.innerHTML = '';
+      ['209.18.47.61','209.18.47.62','209.18.47.63'].forEach(ip => {
+        const h = hooks[ip] || {};
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td>'+ip+'</td><td>'+(h.role||'FOREIGN')+'</td><td>'+(h.blocked?'YES':'NO')+'</td>';
+        tb.appendChild(tr);
+      });
+      document.getElementById('dnsPath').textContent =
+        'stub='+!!lt.systemd_resolved_stub+' field_dns_127.0.0.1:53='+!!lt.field_dns_listen_127_0_0_1_53+
+        ' field_dhcp='+!!lt.field_dhcp_listen+'\n' +
+        'collision_guard: '+(hooks.collision_guard||'—')+'\n' +
+        'note: '+(lt.note||'');
+      document.getElementById('svcPills').innerHTML =
+        pill(ws.swallows_9490?'g':'r', ':9490 swallows') +
+        pill(ws.planet_9600?'g':'r', ':9600 planet') +
+        pill(ws.fleet_link_9500?'g':'r', ':9500 fleet') +
+        pill(dns.copilot_cloud_block_file?'g':'y', 'cloud block file');
+      document.getElementById('svcPath').textContent =
+        'foreign all_blocked='+!!hooks.all_blocked+' · rekill='+(dns.rekill||'—')+'\n' +
+        'angel_dns_components_sealed='+!!dns.angel_dns_components_sealed;
+    }
+  }
+  tick();
+  setInterval(tick, 3000);
+  </script>
+</body>
+</html>

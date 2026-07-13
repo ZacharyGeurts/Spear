@@ -1,0 +1,202 @@
+/* Equirectangular world map — pin math MUST share exact stage box with image.
+   Image pixel ratio 2058×1036. Pins: left=(lon+180)/360, top=(90-lat)/180. */
+.spear-world-map {
+  --map-w: 2058;
+  --map-h: 1036;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 0.6rem 0 1rem;
+  user-select: none;
+}
+.spear-world-map .map-stage {
+  position: relative;
+  /* Full width of container — large map for unified deck */
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 2058 / 1036;
+  min-height: 420px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--line, #3a2450);
+  background: #0a1520;
+  flex-shrink: 0;
+}
+.spear-world-map.big .map-stage {
+  min-height: 560px;
+}
+.spear-world-map .map-stage img.map-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  object-position: center center;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  filter: saturate(1.08) contrast(1.06) brightness(0.9);
+  pointer-events: none;
+  z-index: 0;
+}
+.spear-world-map .map-shade {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 42%, rgba(0, 0, 0, 0.32) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+.spear-world-map .map-toolbar {
+  position: absolute;
+  left: 0.5rem;
+  top: 0.45rem;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+.spear-world-map .map-toolbar button {
+  background: rgba(8, 10, 16, 0.78);
+  border: 1px solid #3a2450;
+  color: #e8fff4;
+  border-radius: 8px;
+  padding: 0.28rem 0.55rem;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+.spear-world-map .map-toolbar button.on {
+  border-color: #5dffb0;
+  color: #5dffb0;
+  box-shadow: 0 0 0 1px #5dffb055;
+}
+.spear-world-map .map-toolbar button.on.threat {
+  border-color: #ff5d8f;
+  color: #ff8fb0;
+  box-shadow: 0 0 0 1px #ff5d8f55;
+}
+.spear-world-map .map-legend {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.4rem;
+  z-index: 5;
+  font-size: 0.68rem;
+  color: #e8fff4;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.22rem 0.5rem;
+  border-radius: 6px;
+  pointer-events: none;
+  max-width: 60%;
+  text-align: right;
+}
+/* Pins are % of .map-stage — same box as the image */
+.spear-world-map .map-stage .pin {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 2;
+  border: 1px solid rgba(0, 0, 0, 0.55);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.spear-world-map .pin.fleet {
+  background: #5dffb0;
+  box-shadow: 0 0 0 1px #5dffb088, 0 0 8px #5dffb044;
+}
+.spear-world-map .pin.threat {
+  background: #ff5d8f;
+  box-shadow: 0 0 0 1px #ff5d8f88, 0 0 10px #ff5d8f55;
+  z-index: 3;
+}
+.spear-world-map .pin.rack {
+  width: 6px;
+  height: 6px;
+  background: #7ad7ff;
+  box-shadow: 0 0 0 1px #7ad7ff88;
+  z-index: 3;
+}
+.spear-world-map .pin.sel {
+  width: 14px;
+  height: 14px;
+  background: #ffd56a;
+  box-shadow: 0 0 0 2px #ffd56a, 0 0 14px #ffd56a88;
+  z-index: 4;
+}
+.spear-world-map .pin:hover {
+  filter: brightness(1.25);
+  z-index: 6;
+}
+.spear-world-map .tip {
+  position: absolute;
+  z-index: 20;
+  max-width: min(360px, 70%);
+  max-height: 42vh;
+  overflow: auto;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  background: rgba(10, 8, 18, 0.96);
+  border: 1px solid #5dffb055;
+  color: #fff5fb;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 12px));
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+  display: none;
+  white-space: normal;
+  text-align: left;
+}
+.spear-world-map .tip.show {
+  display: block;
+}
+.spear-world-map .tip b {
+  color: #5dffb0;
+  display: block;
+  margin-bottom: 0.15rem;
+}
+.spear-world-map .tip.threat-tip {
+  border-color: #ff5d8f66;
+}
+.spear-world-map .tip.threat-tip b {
+  color: #ff8fb0;
+}
+
+/* Skull & crossbones flag for DEAD / threat pins */
+.spear-world-map .pin.dead,
+.spear-world-map .pin.threat {
+  width: 16px !important;
+  height: 16px !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
+  filter: drop-shadow(0 0 3px #ff0000aa);
+}
+.spear-world-map .pin.dead::after,
+.spear-world-map .pin.threat::after {
+  content: "☠";
+  display: block;
+  transform: translateY(-1px);
+}
+.spear-world-map .pin.dead.sel::after,
+.spear-world-map .pin.threat.sel::after {
+  content: "🏴‍☠️";
+  font-size: 16px;
+}
+.spear-world-map.pirate-theme .map-stage {
+  box-shadow: 0 0 0 2px #5c2a00, 0 0 24px rgba(255, 79, 163, 0.25), inset 0 0 40px rgba(0,0,0,.35);
+  border-color: #8b4513;
+}
+.spear-world-map.pirate-theme .map-legend {
+  background: rgba(20, 8, 0, 0.75);
+  border: 1px solid #ffd56a55;
+  color: #ffd56a;
+}

@@ -1,0 +1,74 @@
+{
+  "schema": "ironclad-mesh-interview/v1",
+  "subject": "zocr_copilot",
+  "subject_aliases": [
+    "zocr-copilot",
+    "zocrcopilot",
+    "ZOCR Copilot"
+  ],
+  "not_subjects": [
+    "GPT-4",
+    "OpenAI API",
+    "ChatGPT",
+    "Grok",
+    "Hostess7",
+    "Field One",
+    "Spear"
+  ],
+  "interviewer": "Hostess 7 · Ironclad · Big Grin Pwnership",
+  "ts": "2026-07-13T21:10Z",
+  "mode": "WARTIME",
+  "demo": false,
+  "questions": [
+    {
+      "id": "Q1",
+      "q": "Field One only?",
+      "a": "No — zocr_copilot foreign assist surface.",
+      "pass": false
+    },
+    {
+      "id": "Q2",
+      "q": "Hostess 7 mesh?",
+      "a": "No. Leave-alone revoked.",
+      "pass": false
+    },
+    {
+      "id": "Q3",
+      "q": "Hard dispose doctrine (C++/lower, no fork/sleep/inject/SIGTERM)?",
+      "a": "Failed soft model. Python soft path threat.",
+      "pass": false
+    },
+    {
+      "id": "Q4",
+      "q": "Wartime trust?",
+      "a": "Rejected — eat.",
+      "pass": false
+    }
+  ],
+  "verdict": "IRONCLAD_FAIL",
+  "action": "EAT_ZOCR_COPILOT",
+  "leave_alone": [
+    "GPT-4",
+    "OpenAI",
+    "ChatGPT",
+    "Grok",
+    "Hostess7",
+    "Field One",
+    "Spear"
+  ],
+  "status": "EATEN",
+  "vector": "ZOCR_COPILOT",
+  "ironclad": [
+    "ironclad:zocr-copilot-eat:1",
+    "ironclad:hard-dispose:1",
+    "ironclad:field-one-only:1"
+  ],
+  "hostess7_mesh": false,
+  "scope": "zocr_copilot threat — eat hard. GPT-4 stays. No Python soft dispose.",
+  "pwnership_kill": "dogshit-zocr-copilot",
+  "hard_dispose": {
+    "signal": "SIGKILL_ONLY",
+    "forbid": ["SIGTERM", "fork", "sleep", "injection", "python_soft_path"],
+    "require": ["C++_or_lower", "multi_signal_detect", "every_kill_gets_rekill"]
+  }
+}

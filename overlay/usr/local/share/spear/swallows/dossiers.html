@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <title>Kill dossiers · map · full detail</title>
+  <link rel="stylesheet" href="big-grin-eats.css?v=dossier-map2" />
+  <link rel="stylesheet" href="assets/spear-world-map.css?v=align3" />
+  <script src="assets/spear-world-map.js?v=align3" defer></script>
+  <style>
+    .ledger-layout { display:grid; grid-template-columns:1.2fr .95fr; gap:1rem; }
+    @media (max-width:1100px){ .ledger-layout { grid-template-columns:1fr; } }
+    .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.55rem; max-height:50vh; overflow:auto; }
+    .card {
+      background:var(--panel2,#120c18); border:1px solid var(--line,#3a2450); border-radius:10px;
+      padding:.65rem .75rem; cursor:pointer; font-size:.82rem;
+    }
+    .card:hover, .card.on { border-color:#ff6b7a; background:#1a0e14; }
+    .card .tgt { font-family:ui-monospace,monospace; color:#fff5fb; word-break:break-all; }
+    .card .meta { color:var(--muted); font-size:.72rem; margin-top:.25rem; }
+    .card .gps { color:#5dffb0; font-family:ui-monospace,monospace; font-size:.72rem; }
+    .dossier {
+      position:sticky; top:.75rem; background:#100a12; border:1px solid var(--line);
+      border-radius:12px; padding:.9rem 1rem; min-height:320px; font-size:.86rem;
+    }
+    .dossier h3 { margin:0 0 .5rem; color:#ff6b7a; }
+    .dossier .row { display:grid; grid-template-columns:7.2rem 1fr; gap:.3rem; margin:.18rem 0; }
+    .dossier .k { color:var(--muted); }
+    .dossier .v { font-family:ui-monospace,monospace; font-size:.8rem; word-break:break-word; }
+    .dossier pre { white-space:pre-wrap; background:#07060a; border:1px solid var(--line); border-radius:8px; padding:.65rem; font-size:.74rem; max-height:42vh; overflow:auto; }
+    .export-bar { display:flex; flex-wrap:wrap; gap:.4rem; margin:.5rem 0 1rem; }
+    .export-bar a {
+      background:#1a1224; border:1px solid var(--line); color:inherit; border-radius:8px;
+      padding:.35rem .65rem; font-size:.78rem; text-decoration:none;
+    }
+    .toolbar { display:flex; flex-wrap:wrap; gap:.5rem; margin:.5rem 0; }
+    .toolbar input, .toolbar select { background:#0e0a14; border:1px solid var(--line); color:inherit; border-radius:8px; padding:.4rem .55rem; }
+  </style>
+</head>
+<body class="up-body">
+  <header class="up-top">
+    <div>
+      <p class="up-kicker">FULL DOSSIERS · world map · threats toggle · GPS tooltips · entropy-grade detail</p>
+      <h1>KILL <span class="bge-super">DOSSIERS</span></h1>
+      <p class="up-sub">
+        Threat pins on the same equirectangular map as fleet. Toggle fleet / threats / both.
+        <a href="up-swallows.html">World fleet</a> ·
+        <a href="swallows.html">Big Grin</a> ·
+        <a href="autopilot.html">Wartime</a>
+      </p>
+    </div>
+    <div class="up-pills" id="pills"></div>
+  </header>
+  <section class="up-statusbar">
+    <span class="ap-dot"></span>
+    <strong>DOSSIERS · MAP-SYNCED</strong>
+    <span id="apStatus">Loading…</span>
+    <span class="muted" id="clock"></span>
+  </section>
+  <main class="up-main">
+    <div class="up-grid-stats" id="stats"></div>
+    <div id="killMap" class="spear-world-map" aria-label="Threat and fleet map"></div>
+    <div class="export-bar">
+      <a href="/api/dossiers/export.csv" download>CSV · full dossiers</a>
+      <a href="/api/dossiers/export.json" download>JSON · full dossiers</a>
+      <a href="/api/map/points" target="_blank">JSON · map points</a>
+    </div>
+    <div class="toolbar">
+      <input id="q" type="search" placeholder="Filter IP, city, country, vector…" style="min-width:16rem" />
+      <select id="kind">
+        <option value="ip_kill">IP kills (GPS)</option>
+        <option value="threat">Threat cards</option>
+        <option value="">All kinds</option>
+      </select>
+    </div>
+    <div class="ledger-layout">
+      <div class="cards" id="cards"></div>
+      <aside class="dossier">
+        <h3>Selected · full dossier</h3>
+        <p class="muted" id="empty">Click map pin or card — full GPS, ISP, rekill, summary.</p>
+        <div id="body" hidden></div>
+      </aside>
+    </div>
+  </main>
+  <script>
+  const state = { kills: [], filtered: [], selected: null, map: null };
+  function esc(s){ return String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function gpsOf(k){ const g=k.gps||{}; if(g.lat!=null) return `${g.lat}, ${g.lon}`; return ""; }
+
+  function openDossier(k){
+    state.selected=k.id;
+    document.getElementById("empty").hidden=true;
+    const body=document.getElementById("body"); body.hidden=false;
+    const g=k.gps||{}, n=k.network||{};
+    const map=g.map||(g.lat!=null?`https://www.openstreetmap.org/?mlat=${g.lat}&mlon=${g.lon}#map=8/${g.lat}/${g.lon}`:"");
+    body.innerHTML=`
+      <div class="row"><span class="k">Target</span><span class="v">${esc(k.target)}</span></div>
+      <div class="row"><span class="k">Kind</span><span class="v">${esc(k.kind)} · THREAT · ${esc(k.status)}</span></div>
+      <div class="row"><span class="k">Severity</span><span class="v">${esc(k.severity)}</span></div>
+      <div class="row"><span class="k">Vector</span><span class="v">${esc(k.vector)}</span></div>
+      <div class="row"><span class="k">Reason</span><span class="v">${esc(k.reason)}</span></div>
+      <div class="row"><span class="k">Rekill</span><span class="v">${esc(k.rekill_count??"—")}</span></div>
+      <div class="row"><span class="k">GPS</span><span class="v" style="color:#5dffb0">${esc(gpsOf(k)||"—")}</span></div>
+      <div class="row"><span class="k">Location</span><span class="v">${esc([g.city,g.region,g.country].filter(Boolean).join(", ")||"—")}</span></div>
+      <div class="row"><span class="k">ISP / ASN</span><span class="v">${esc(g.isp||n.isp||"—")} / ${esc(g.as||n.asn||"—")}</span></div>
+      <div class="row"><span class="k">Map</span><span class="v">${map?`<a style="color:#7ad7ff" href="${esc(map)}" target="_blank">Open map</a>`:"—"}</span></div>
+      <div class="row"><span class="k">Sources</span><span class="v">${esc((k.sources||[]).join(", "))}</span></div>
+      <div class="row"><span class="k">Last rekill</span><span class="v">${esc(k.last_rekill_at||"—")}</span></div>
+      <div class="row"><span class="k">API</span><span class="v"><a style="color:#7ad7ff" href="/api/dossier?ip=${encodeURIComponent(k.target||"")}" target="_blank">dossier API</a></span></div>
+      <pre>${esc(k.dossier_text || JSON.stringify(k,null,2))}</pre>
+    `;
+    document.querySelectorAll(".card").forEach(c=>c.classList.toggle("on", c.dataset.id===k.id));
+  }
+
+  async function setupMap(){
+    if (typeof SpearWorldMap === "undefined") return;
+    state.map = new SpearWorldMap("#killMap", {
+      mapSrc: "assets/maps/world-equirectangular.jpg",
+      showFleet: true,
+      showThreats: true,
+      onSelect: (pt) => {
+        if (pt.threat) {
+          const k = state.kills.find(x => x.id === pt.id || x.target === pt.target);
+          if (k) openDossier(k);
+        } else if (pt.region) {
+          location.href = "up-swallows.html";
+        }
+      },
+    });
+    const pts = await SpearWorldMap.loadDefaultPoints();
+    state.map.setPoints(pts);
+  }
+
+  function render(){
+    const q=document.getElementById("q").value.trim().toLowerCase();
+    const kind=document.getElementById("kind").value;
+    state.filtered=state.kills.filter(k=>{
+      if(kind && k.kind!==kind) return false;
+      if(!q) return true;
+      const g=k.gps||{};
+      const blob=`${k.id} ${k.target} ${k.vector} ${k.reason} ${k.status} ${g.city||""} ${g.region||""} ${g.country||""} ${g.isp||""}`.toLowerCase();
+      return blob.includes(q);
+    });
+    const gpsN=state.filtered.filter(k=>(k.gps||{}).lat!=null).length;
+    document.getElementById("stats").innerHTML=`
+      <div class="stat"><div class="n">${state.filtered.length}</div><div class="l">dossiers in view</div></div>
+      <div class="stat"><div class="n" style="color:#5dffb0">${gpsN}</div><div class="l">with GPS</div></div>
+      <div class="stat"><div class="n">${state.kills.filter(k=>k.kind==="ip_kill").length}</div><div class="l">IP kills</div></div>
+      <div class="stat"><div class="n">${state.kills.filter(k=>k.kind==="threat").length}</div><div class="l">threat cards</div></div>
+    `;
+    document.getElementById("pills").innerHTML=`
+      <span class="pill">${state.kills.length} total</span>
+      <span class="pill">${gpsN} GPS pins</span>
+      <span class="pill">map toggle</span>
+    `;
+    document.getElementById("apStatus").textContent=`${state.filtered.length} shown · map-synced · tooltips on hover`;
+    document.getElementById("cards").innerHTML=state.filtered.map(k=>{
+      const g=k.gps||{};
+      return `<div class="card ${state.selected===k.id?"on":""}" data-id="${esc(k.id)}">
+        <div class="tgt">${esc(k.target)}</div>
+        <div class="meta">${esc(k.kind)} · ${esc(k.status)} · rekill ${esc(k.rekill_count??"—")} · ${esc(k.vector||"")}</div>
+        <div class="gps">${esc(gpsOf(k)||"no GPS")} ${g.city? "· "+esc([g.city,g.country].filter(Boolean).join(", ")) : ""}</div>
+      </div>`;
+    }).join("") || `<div class="muted">No dossiers match</div>`;
+    document.querySelectorAll(".card").forEach(c=>{
+      c.onclick=()=>openDossier(state.kills.find(k=>k.id===c.dataset.id));
+    });
+  }
+
+  async function load(){
+    document.getElementById("clock").textContent=new Date().toLocaleString();
+    let data;
+    try { data=await (await fetch("/api/dossiers?ts="+Date.now())).json(); }
+    catch { data=await (await fetch("kill-dossiers.json?ts="+Date.now())).json(); }
+    state.kills=data.kills||[];
+    render();
+    if (!state.map) await setupMap();
+    else state.map.setPoints(await SpearWorldMap.loadDefaultPoints());
+  }
+  document.getElementById("q").addEventListener("input", render);
+  document.getElementById("kind").addEventListener("change", render);
+  // wait for defer script
+  window.addEventListener("DOMContentLoaded", () => {
+    load().catch(e=>{ document.getElementById("apStatus").textContent="Failed: "+e; });
+  });
+  // if already loaded
+  if (document.readyState !== "loading") {
+    setTimeout(() => load().catch(()=>{}), 50);
+  }
+  setInterval(()=>{ document.getElementById("clock").textContent=new Date().toLocaleString(); },1000);
+  setInterval(()=>load().catch(()=>{}), 30000);
+  </script>
+</body>
+</html>

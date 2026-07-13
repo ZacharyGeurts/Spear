@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <title>WARTIME · detailed · no demo</title>
+  <link rel="stylesheet" href="big-grin-eats.css?v=war-detail6" />
+  <link rel="stylesheet" href="assets/spear-world-map.css?v=skull7" />
+  <script src="assets/spear-world-map.js?v=skull7" defer></script>
+  <style>
+    .war-banner {
+      background: linear-gradient(90deg, #3d0a12, #1a0a0a 40%, #0a1512);
+      border-bottom: 2px solid #ff6b7a; padding: .7rem 1.4rem;
+      display:flex; flex-wrap:wrap; gap:1rem; align-items:center;
+    }
+    .war-banner strong { color:#ff6b7a; letter-spacing:.14em; font-size:.85rem; }
+    .strike {
+      border-left: 3px solid #ff6b7a; background: #140a0c; margin:.25rem 0;
+      padding:.45rem .7rem; border-radius: 0 8px 8px 0;
+    }
+    .strike.ip { border-color: #ffb86b; }
+    .strike.threat { border-color: #ff7ab6; }
+    .strike .atk { color:#ff6b7a; font-weight:800; font-size:.78rem; letter-spacing:.08em; }
+    .strike .tgt { color:#e8fff4; font-family:ui-monospace,monospace; font-size:.9rem; }
+    .strike .meta { color:var(--muted); font-size:.75rem; margin-top:.15rem; }
+    .strike .gps { color:#5dffb0; font-size:.72rem; font-family:ui-monospace,monospace; margin-top:.12rem; }
+    .ticker { scroll-behavior: smooth; max-height: 42vh; overflow:auto; padding:.4rem; background:#070a09; border:1px solid var(--line); border-radius:12px; }
+    .beam {
+      height: 3px; background: linear-gradient(90deg, transparent, #ff6b7a, #5dffb0, transparent);
+      animation: beam 1.2s linear infinite; margin: .4rem 0 .8rem;
+    }
+    @keyframes beam { from { background-position: 0 0;} to { background-position: 200px 0;} }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin:.75rem 0; }
+    @media (max-width:900px){ .grid2 { grid-template-columns:1fr; } }
+    .panel {
+      border:1px solid var(--line); border-radius:12px; padding:.75rem .9rem; background:#0e0a14;
+      font-size:.85rem; color:var(--muted); line-height:1.45;
+    }
+    .panel h3 { margin:0 0 .4rem; color:#ffc857; font-size:.9rem; }
+    .panel b { color:#5dffb0; }
+    .panel.hot { border-color:#ff5d8f; background:linear-gradient(135deg,#1a0a10,#0e0a14); }
+    .panel.hot h3 { color:#ff6b7a; }
+    .path {
+      font-family:ui-monospace,monospace; font-size:.72rem; color:#5dffb0;
+      background:#070a09; border:1px solid #3a2450; border-radius:8px; padding:.55rem; white-space:pre-wrap; margin:.4rem 0 0;
+    }
+    .links a {
+      display:inline-block; margin:.2rem .3rem 0 0; padding:.35rem .65rem; border-radius:8px;
+      border:1px solid #3a2450; color:#7ad7ff; text-decoration:none; background:#1a1224; font-size:.78rem;
+    }
+    code { color:#7ad7ff; }
+  </style>
+</head>
+<body class="up-body">
+  <div class="war-banner">
+    <strong>⚡ WARTIME · NO DEMO · EVERY KILL GETS REKILL</strong>
+    <span class="muted" id="rule">vector_to_source · clean_through · clean_out · multi-signal kit detect · zero soft TERM</span>
+  </div>
+  <header class="up-top">
+    <div>
+      <p class="up-kicker">AUTOPILOT · FULL WARTIME DETAIL · IRONCLAD · OUST · PWNERSHIP</p>
+      <h1>FIELD <span class="bge-super">ATTACKS</span></h1>
+      <p class="up-sub" id="motto">Loading wartime status…</p>
+    </div>
+    <div class="up-pills" id="pills"></div>
+  </header>
+  <section class="up-statusbar">
+    <span class="ap-dot"></span>
+    <strong id="mode">WARTIME</strong>
+    <span id="apStatus">arming…</span>
+    <span class="muted" id="clock"></span>
+  </section>
+  <div class="beam"></div>
+  <main class="up-main">
+    <div class="up-grid-stats" id="stats"></div>
+    <div id="warMap" class="spear-world-map" aria-label="Wartime map"></div>
+
+    <div class="grid2">
+      <div class="panel hot">
+        <h3>☠ OUST · Hotdog down a Hallway</h3>
+        <p><b>Terrorist hacker kit · OUSTED · DEAD</b> · permanent list · every_kill_gets_rekill</p>
+        <p>Not text-injection theater. Kit object is sealed. Misleading “hotdog” strings in docs/browsers do <b>not</b> reclassify sacred or reader processes.</p>
+        <div class="path" id="oustPath">VECTOR → CLEAN IN → SWALLOW → CLEAN OUT → IRONCLAD SEAL
+status: OUSTED · ironclad:hotdog-hallway-oust:1
+kill: pwnership/kills/dogshit-hotdog-down-a-hallway.html</div>
+        <div class="links" style="margin-top:.5rem">
+          <a href="pwnership/kills/dogshit-hotdog-down-a-hallway.html">Kill page</a>
+          <a href="pwnership/">Pwnership hub</a>
+          <a href="/api/dossier?id=hotdog-down-a-hallway">Threat dossier API</a>
+        </div>
+      
+    
+      <div class="panel hot">
+        <h3>☠ Copilot · Ironclad mesh interview · DESTROYED</h3>
+        <p><b>Talk completed.</b> Field One? <b>NO</b>. Hostess 7 mesh? <b>NO</b>. Time to learn Ironclad? <b>FAILED</b>. Liar risk: <b>YES</b>.</p>
+        <p>Verdict: <b>IRONCLAD_FAIL → DESTROY GITHUB/MS COPILOT</b>. Permanent dogshit. Multi-signal process detect (docs mentioning “copilot” are not the process).</p>
+        <div class="path">Q1 Field One only → FAIL
+Q2 Hostess7 mesh → FAIL
+Q3 Learned Ironclad in time → FAIL
+Q4 Wartime trust → REJECTED
+action: DESTROY_COPILOT · ironclad:copilot-destroy:1
+kill: pwnership/kills/dogshit-copilot-ironclad-fail.html
+interview: /ironclad-copilot-interview.json
+signal: SIGKILL_ONLY · no SIGTERM · no fork · no sleep · no inject</div>
+        <div class="links" style="margin-top:.5rem">
+          <a href="pwnership/kills/dogshit-copilot-ironclad-fail.html">☠ Kill page</a>
+          <a href="ironclad-copilot-interview.json">Interview JSON</a>
+          <a href="/api/dossier?id=copilot-ironclad-fail">Threat dossier</a>
+        </div>
+      </div>
+      <div class="panel hot">
+        <h3>⚡ Copilot threat monitor · ACTIVE HUNT</h3>
+        <p>Continuous multi-signal hunt · SIGKILL only · angel seal + world DNS/DHCP health.</p>
+        <div class="links" style="margin-top:.5rem">
+          <a href="copilot-threat-monitor.html">Open monitor</a>
+          <a href="copilot-threat-monitor.json">Status JSON</a>
+          <a href="angel-seal-status.json">Angel seal</a>
+          <a href="world-dns-dhcp-status.json">World DNS/DHCP</a>
+        </div>
+      </div>
+      <div class="panel hot">
+        <h3>☠ zocr_copilot · THREAT · EATEN</h3>
+        <p>Former leave-alone <b>REVOKED</b>. Field One? <b>NO</b>. Hostess 7 mesh? <b>NO</b>. Soft Python path? <b>THREAT</b>.</p>
+        <p>Verdict: <b>EAT zocr_copilot</b>. Hard dispose only — <b>C++ and lower</b>. No forks · no sleeps · no injection · no SIGTERM.</p>
+        <div class="path">action: EAT_ZOCR_COPILOT · ironclad:zocr-copilot-eat:1 · ironclad:hard-dispose:1
+kill: pwnership/kills/dogshit-zocr-copilot.html
+interview: /ironclad-zocr-copilot-interview.json
+reaper: spear-hard-dispose (C++)
+signal: SIGKILL_ONLY
+forbid: SIGTERM · fork · sleep · injection · python_soft_path
+leave: GPT-4 · OpenAI · ChatGPT · Grok · Hostess7 · Field One · Spear</div>
+        <div class="links" style="margin-top:.5rem">
+          <a href="pwnership/kills/dogshit-zocr-copilot.html">☠ Kill page</a>
+          <a href="ironclad-zocr-copilot-interview.json">Interview JSON</a>
+          <a href="/api/dossier?id=zocr-copilot">Threat dossier</a>
+        </div>
+      </div>
+</div>
+      <div class="panel">
+        <h3>IRONCLAD · vector &amp; clean I/O</h3>
+        <p><b>SPOT → VECTOR_SOURCE → CLEAN_IN → SWALLOW → CLEAN_OUT → SEAL → LOG</b></p>
+        <p>Clean through: board personal PID fields · heuristics · quarantine · ledger.<br/>
+           Clean out: verify dead · rekill stamp · reopen=destroy · leave-alone Field One / Hostess racks.</p>
+        <div class="path" id="ironPath">ironclad:vector-source-clean-io:1
+ironclad:hotdog-hallway-oust:1
+demo: false · soft_term: FORBIDDEN · SIGTERM: FORBIDDEN · fork/sleep/inject: FORBIDDEN · stack: C++/lower</div>
+      </div>
+      <div class="panel">
+        <h3>LIVE PLANET · wartime surface</h3>
+        <p id="fleetLine">Loading fleet…</p>
+        <p>Area dossiers on fleet panel (all racks per area). World map · threat toggle · GPS tooltips.</p>
+        <div class="links">
+          <a href="up-swallows.html">Fleet area dossiers</a>
+          <a href="dossiers.html">Kill GPS dossiers</a>
+          <a href="swallows.html">Big Grin deck + CSV/JSON</a>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>PID personal boards</h3>
+        <p>Pest PIDs carry <b>user · uid · home · cwd · parent · cmdline · exe</b> when the host can see them. Multi-signal kit detect only — resilient to text injection.</p>
+        <div class="links">
+          <a href="/api/scan?threshold=40">Live scan + personal</a>
+          <a href="/api/pid-dossier?pid=1">Sample pid dossier</a>
+          <a href="/api/planet">Planet live</a>
+          <a href="http://127.0.0.1:9600/planet/status">Planet :9600</a>
+          <a href="/api/status">Server status</a>
+          <a href="product-surface.json">Product stamp</a>
+        </div>
+        <div class="path" id="resilienceLine">resilience: multi_signal · ignore_readers · ignore_product_stack</div>
+      </div>
+    </div>
+
+    <h2 style="margin:0.5rem 0 0.4rem;color:#ff6b7a">Live Field attacks</h2>
+    <div class="ticker" id="ticker"><div class="muted">waiting for wartime stream…</div></div>
+    <p class="foot" style="margin-top:.8rem">
+      Sources: kill-rekill-registry · field-hostile · nexus-hostile · boot-rekill · dogshit pwnership · Hotdog OUST · hostile-ai seed ·
+      <span id="demoStamp">NO DEMO</span>
+    </p>
+  </main>
+  <script>
+  let seen = new Set();
+  let warMap = null;
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function gpsLine(e) {
+    const g = e.geo || {};
+    const lat = e.lat ?? g.lat, lon = e.lon ?? g.lon;
+    if (lat == null || lon == null) return e.location ? esc(e.location) : '';
+    const loc = e.location || [g.city, g.region, g.country].filter(Boolean).join(', ');
+    return `GPS ${esc(lat)}, ${esc(lon)}` + (loc ? ` · ${esc(loc)}` : '');
+  }
+  function renderEvent(e) {
+    const id = (e.ts||'') + '|' + (e.target||'') + '|' + (e.attack||'') + '|' + (e.rekill_count||'');
+    if (seen.has(id)) return '';
+    seen.add(id);
+    const cls = e.target_type === 'ip' ? 'ip' : 'threat';
+    const how = (e.how && e.how.length) ? e.how.join('+') : (e.reason || '');
+    const gps = gpsLine(e);
+    const dossierHref = e.target_type === 'ip'
+      ? `/api/dossier?ip=${encodeURIComponent(e.target||'')}`
+      : `dossiers.html`;
+    return `<div class="strike ${cls}">
+      <div class="atk">${esc(e.attack||'FIELD_STRIKE')} · ${esc(e.phase||'SWALLOW')}</div>
+      <div class="tgt">${esc(e.target_type||'')} ${esc(e.target||'')}</div>
+      <div class="meta">${esc(e.ts||'')} · ${esc(e.vector||'')} · rekill ${e.rekill_count??'—'} · ${esc(how)} · <a style="color:#7ad7ff" href="${dossierHref}" target="_blank">dossier</a></div>
+      ${gps ? `<div class="gps">${gps}</div>` : ''}
+    </div>`;
+  }
+
+  async function ensureWarMap(){
+    if (warMap || typeof SpearWorldMap==='undefined') return;
+    warMap = new SpearWorldMap('#warMap', {
+      mapSrc:'assets/maps/world-equirectangular.jpg',
+      showFleet:true, showThreats:true,
+      onSelect:(pt)=>{
+        if(pt.threat) location.href='dossiers.html';
+        else if(pt.region || pt.id) location.href='up-swallows.html';
+      }
+    });
+    warMap.setPoints(await SpearWorldMap.loadDefaultPoints());
+  }
+
+  async function tick() {
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString();
+    try {
+      const [ap, feed, st, prod] = await Promise.all([
+        fetch('/autopilot.json?t=' + Date.now()).then(r => r.json()),
+        fetch('/live-feed.json?t=' + Date.now()).then(r => r.json()).catch(() => ({events:[]})),
+        fetch('/api/status?t=' + Date.now()).then(r => r.json()).catch(() => ({})),
+        fetch('/product-surface.json?t=' + Date.now()).then(r => r.json()).catch(() => ({})),
+      ]);
+      document.getElementById('mode').textContent = ap.mode || 'WARTIME';
+      document.getElementById('motto').textContent = ap.motto || prod.motto || 'WARTIME. No demo.';
+      document.getElementById('rule').textContent = ap.policy || ap.rule || '';
+      const t = ap.totals || {};
+      const c = ap.cycle || {};
+      document.getElementById('apStatus').textContent =
+        (c.in_progress ? 'SWALLOWING… ' : 'cycle idle · ') +
+        `ips ${c.ips_rekilled||0} · threats ${c.threats_marked||0} · lifetime rekill ${t.ips_rekilled_lifetime||0}` +
+        (ap.demo === false || ap.demo === undefined ? ' · NO DEMO' : '');
+      document.getElementById('pills').innerHTML =
+        (ap.fleets||[]).map(f => `<span class="pill">${esc(f)}</span>`).join('') +
+        `<span class="pill">zero controls</span>` +
+        `<span class="pill">NO DEMO</span>` +
+        (ap.oust ? `<span class="pill">Hotdog OUSTED</span>` : '');
+      document.getElementById('stats').innerHTML = `
+        <div class="stat"><div class="n">${t.wartime_ips||0}</div><div class="l">wartime IPs</div></div>
+        <div class="stat"><div class="n">${t.ips_rekilled_this_cycle||c.ips_rekilled||0}</div><div class="l">IP rekill this cycle</div></div>
+        <div class="stat"><div class="n">${t.ips_rekilled_lifetime||0}</div><div class="l">lifetime IP rekills</div></div>
+        <div class="stat"><div class="n">${t.threats_marked_this_cycle||c.threats_marked||0}</div><div class="l">threats this cycle</div></div>
+        <div class="stat"><div class="n">${t.threats_permanent||0}</div><div class="l">threats permanent</div></div>
+        <div class="stat"><div class="n">${t.live_events||(feed.events||[]).length}</div><div class="l">live events</div></div>
+        <div class="stat"><div class="n">${(st.up_systems||0).toLocaleString?.()||st.up_systems||'—'}</div><div class="l">fleet racks</div></div>
+        <div class="stat"><div class="n">${st.regions||'—'}</div><div class="l">fleet areas</div></div>
+      `;
+      const plive = st.planet_live ? 'LIVE' : 'offline';
+      document.getElementById('fleetLine').innerHTML =
+        `PLANET <b>${plive}</b> · <b>${(st.up_systems||0).toLocaleString?.()||st.up_systems||'—'}</b> live racks · defending <b>${(st.defending||0).toLocaleString?.()||st.defending||'—'}</b> · <b>${st.regions||'—'}</b> areas · ` +
+        `${st.racks_per_region||'—'} / area · sharded=${st.sharded} · wartime mesh live`;
+      if (ap.resilience) {
+        document.getElementById('resilienceLine').textContent =
+          'resilience: ' + JSON.stringify(ap.resilience);
+      }
+      if (ap.ironclad) {
+        document.getElementById('ironPath').textContent =
+          (Array.isArray(ap.ironclad) ? ap.ironclad.join('\\n') : String(ap.ironclad)) +
+          '\\ndemo: ' + (ap.demo === false ? 'false' : String(ap.demo)) +
+          '\\nsoft_term: FORBIDDEN';
+      }
+
+      const events = (feed.events || []).slice().reverse();
+      const box = document.getElementById('ticker');
+      let html = '';
+      for (const e of events) {
+        const piece = renderEvent(e);
+        if (piece) html += piece;
+      }
+      box.innerHTML = html || `<div class="muted">awaiting Field attacks…</div>`;
+      box.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      document.getElementById('apStatus').textContent = 'link down — wartime autopilot?';
+    }
+  }
+
+  setInterval(tick, 700);
+  tick();
+  setTimeout(()=>ensureWarMap(), 100);
+  setInterval(()=>{ if(warMap) SpearWorldMap.loadDefaultPoints().then(p=>warMap.setPoints(p)); }, 20000);
+  </script>
+</body>
+</html>

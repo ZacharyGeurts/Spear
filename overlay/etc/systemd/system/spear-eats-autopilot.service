@@ -1,0 +1,17 @@
+[Unit]
+Description=Spear Swallows AUTOPILOT — zero controls IP/threat eat
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/spear-eats-autopilot
+Restart=always
+RestartSec=5
+Environment=SPEAR_EATS_INTERVAL=12
+Environment=SPEAR_SWALLOWS_ROOT=/tmp/spear-swallows-www
+# No soft process theater — this unit is the eater
+NoNewPrivileges=false
+
+[Install]
+WantedBy=multi-user.target

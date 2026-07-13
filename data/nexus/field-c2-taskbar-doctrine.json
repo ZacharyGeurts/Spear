@@ -1,0 +1,53 @@
+{
+  "schema": "field-c2-taskbar-doctrine/v1",
+  "title": "C2 Taskbar — Start · Files · Terminal · Queen Browser · Broadcaster",
+  "motto": "Start + four pins; Lock lives in Start. Combinatorics condense, Ironclad witness, BSP reuse.",
+  "condense_group": "c2_taskbar",
+  "quint": [
+    {"id": "start", "label": "Start", "role": "tree_menu", "exec": "/field", "glyph": "start"},
+    {"id": "files", "label": "Files", "role": "queen_files", "exec": "http://127.0.0.1:9481/world/queen-files.html", "glyph": "folder", "app_id": "queen-files"},
+    {"id": "terminal", "label": "Terminal", "role": "queen_terminal", "exec": "http://127.0.0.1:9481/world/?dock=terminal", "glyph": "terminal", "app_id": "queen-terminal"},
+    {"id": "browser", "label": "Queen Browser", "role": "queen_browser", "exec": "http://127.0.0.1:9481/world/browser.html", "glyph": "browser", "app_id": "queen-browser"},
+    {"id": "broadcaster", "label": "Broadcaster", "role": "capture", "exec": "/field-broadcaster", "glyph": "broadcast", "app_id": "field-broadcaster", "live": true}
+  ],
+  "ironclad": {
+    "meld_citation": "ironclad:c2_taskbar:1",
+    "field_sanity_cite": "ironclad:field_sanity:2",
+    "books": ["c2_taskbar", "field_sanity"]
+  },
+  "bsp": {
+    "case_id": "c2_taskbar_plate",
+    "profile": "g16_field_opt",
+    "sources": [
+      "lib/field-c2-taskbar-plate.py",
+      "lib/field-shell-dock.py",
+      "lib/field-host-desktop.py",
+      "lib/field-keepass.py",
+      "lib/field-broadcaster.py"
+    ]
+  },
+  "ironclad_taskbar": {
+    "search_api": "/api/ironclad/secure-api/search",
+    "sort_api": "/api/ironclad/secure-api/sort",
+    "default_search_context": "all",
+    "default_sort_context": "registry_index",
+    "home_panel": "/field",
+    "home_queen": "http://127.0.0.1:9481/world/browser.html"
+  },
+  "combinatorics_role": "c2_surface_quint",
+  "g16": {
+    "version": "5.1.0",
+    "profile": "g16_field_opt",
+    "compiler": "Grok16/lib/g16-universal-compiler.py",
+    "poll_ms": 2500,
+    "handshake_every_n": 4
+  },
+  "monster_rescue": {
+    "module": "lib/field-monster-monitor.py",
+    "cad_chords": ["Control+Alt+Delete", "Control+Shift+Escape"],
+    "product": "Monster",
+    "tabs": ["graphs", "vision", "security", "processes", "resources", "services", "rescue"],
+    "theme": "chrome_black_green_pink",
+    "security_hold": true
+  }
+}

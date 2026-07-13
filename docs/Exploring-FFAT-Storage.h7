@@ -1,0 +1,142 @@
+# Exploring FFAT Storage
+
+**Spear Field · Hostess 7 Field Press**  
+**Format:** plain Hostess 7 book (H7 text) — not H7c  
+**Dewey:** 005 · programs & data  
+**Ironclad:** ironclad:ffat-storage:1  
+
+---
+
+Field Fat (FFAT) is entropy-packed field storage. It is **not** Microsoft FAT16/32.
+This book is the operator guide: what FFAT is, what it refuses to pretend, and how
+to measure capacity honestly.
+
+## Chapter 1 — What FFAT Is
+
+FFAT is the field storage layout used by Spear / Hostess 7 for field drives and
+related media. On-disk identity uses field magics (not MS-DOS strings):
+
+| Magic | Role |
+|-------|------|
+| `SPEARMBR` | Master boot record tag (field tech) |
+| `FFAT` + ENT (v4 entropy edition) | Superblock |
+| `FDRV` | Field Drive identity seal |
+
+Legacy superblocks may still show an older FFAT field edition. Treat those as
+present but obsolete. Never treat host `vfat` / `MSDOS5.0` as FFAT truth.
+
+**Frames** are the unit of work. Default field frame size is **4096** bytes.
+Physical media is still addressed in **512**-byte sectors. Partition type for
+Field Fat is commonly **0xE0**; first data LBA is often **2048** (1 MiB align).
+
+## Chapter 2 — Honesty First (Shannon)
+
+Field storage follows Primer honesty:
+
+```
+H = −Σ pᵢ log₂ pᵢ     bits/byte on a frame histogram (0..8)
+```
+
+A lossless store of a frame must spend at least `(H/8) · frame_bytes` physical
+bytes for that frame's information. Capacity gain is **measured** from real
+packing, not printed at format time:
+
+| Kind | Meaning |
+|------|---------|
+| ZERO | All-zero logical frame (no pool bytes) |
+| RLE  | Run-length packed frame |
+| PAK  | Peak–angle pack (ramps / peaks / valleys) |
+| REF  | Content-dedup → another logical id |
+| DICT | Shared pattern dictionary |
+| RAW  | Full frame when packing cannot win |
+
+**Never invent a hardcoded multiplier.** The old ×91 “fake metadata” superblock
+is a lie. If tools report `legacy_fake_factor`, the volume was lying — rewrite to
+honest accounting.
+
+## Chapter 3 — Words That Mean Something
+
+| Term | Meaning |
+|------|---------|
+| `physical_bytes` | Media size |
+| `guaranteed_bytes` | Worst-case usable pool (all unique high-H RAW) |
+| `address_space_bytes` | Sparse logical map × frame size |
+| `logical_stored` | Logical payload represented |
+| `physical_used` | Pool bytes actually written |
+| `pack_ratio` | `logical_stored / physical_used` after writes |
+| `shannon_avg` | Mean H over measured frames |
+
+`pack_ratio_x1000` is thousandths (1000 = 1.0×). It is a **measurement after
+writes**, not a marketing claim.
+
+## Chapter 4 — Peak–Angle Pack (PAK)
+
+PAK models a field signal: more logical samples than stored control points.
+Between peaks, angle-up / angle-down (constant-step ramps) rebuild the path.
+One PEAK or VALLEY can cover many samples.
+
+Prefer PEAK/VALLEY, then RAMP, FLAT, LIT. PAK is for structured field signals —
+not a license to claim infinite density on noise. High Shannon H falls back
+toward RAW. That is correct.
+
+## Chapter 5 — Map Entry Kinds
+
+| Code | Kind | Role |
+|------|------|------|
+| 0 | FREE | Unused logical slot |
+| 1 | ZERO | All-zero frame |
+| 2 | RAW  | Full frame in pool |
+| 3 | RLE  | RLE-packed |
+| 4 | REF  | Dedup reference |
+| 5 | PAK  | Peak–angle |
+| 6 | DICT | Shared dictionary |
+
+Write picks the best **honest** pack for that frame and records kind + Shannon.
+
+## Chapter 6 — Virtual AMMOFAT (Bus Only)
+
+Primer fatPack describes virtual AMMOFAT geometry on the **field bus** — not a
+host vfat filesystem. Typical defaults: 512 bps, 8 sectors/cluster (4096-byte
+frame), 2 FATs. Host tools must not mount FFAT as MS-DOS FAT.
+
+## Chapter 7 — Field Drive Identity
+
+A Field Drive is more than free space. Identity binds media to field law:
+FDRV seal, volume label, SECURE tag when required.
+
+Spear C++ entry points:
+
+- `ffat_probe(path)` — inspect without writing  
+- `ffat_ensure(path, force)` — create/repair honest superblock + map  
+- `ffat_put_frame` / `ffat_get_frame` — logical frame IO  
+
+`map_divisor` defaults to 32 for disks; field memory planes may use 8 for denser
+sparse address space.
+
+## Chapter 8 — Operator Rituals
+
+1. Probe before format. Know v4 vs legacy vs foreign media.  
+2. Reject ×91 and other fake capacity. Prefer `guaranteed_bytes`.  
+3. After writes, read `pack_ratio` and `shannon_avg` — that is the truth of the day.  
+4. Storage honesty is separate from wartime shot seals.  
+5. Field runtime product path: **C++ / lower**. No condenser stack required to *read this book*.
+
+## Chapter 9 — This Book’s Format
+
+This title is **plain H7 text** (UTF-8).  
+
+**H7c (Hostess 7 Condenser) is not used here.** Condenser packs are slow to open,
+easy to treat as opaque binary, and are not the authority for this manual.
+If you find an `.h7c` sibling for this id, delete it — the `.h7` text is the book.
+
+Hostess 7 holds the books and shares them. Dewey shelf **005**.
+
+## Chapter 10 — Motto
+
+Measure entropy. Pack only when pack wins. Never invent capacity.
+
+Exploring FFAT Storage is complete when you can explain every byte of
+`guaranteed_bytes` without a story.
+
+**God Bless.**  
+Spear Field · Hostess 7 · Field Fat v4 entropy edition · plain H7

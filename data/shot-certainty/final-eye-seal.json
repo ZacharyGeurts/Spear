@@ -1,0 +1,23 @@
+{
+  "schema": "final-eye-hostess7-seal/v1",
+  "ts": "2026-06-30T08:42:46Z",
+  "sealed": true,
+  "commander": "hostess7",
+  "commander_title": "Forever Watchguard Angel",
+  "code_seal": {
+    "ok": true,
+    "file_count": 46
+  },
+  "authority": "Hostess7/data/hostess7-supreme-authority.json",
+  "handshake_only": true,
+  "trusted_peers": [
+    "hostess7"
+  ],
+  "rejected_peers": [
+    "queen_direct",
+    "mcp",
+    "grok_agent",
+    "unsealed_cli"
+  ],
+  "doctrine": "data/final-eye-hostess7-seal-doctrine.json"
+}

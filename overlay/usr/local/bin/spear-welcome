@@ -1,0 +1,7 @@
+#!/bin/bash
+TEXT="<b>Welcome to Spear 22.3</b>\n\nFull desktop OS · Cinnamon class · Field stack.\nField Research v2 · 4K policy · Mesa Vulkan.\nYou did <i>not</i> install Linux Mint — this is Spear."
+if command -v zenity >/dev/null; then
+  zenity --info --title="Spear" --width=480 --text="$TEXT" 2>/dev/null && exit 0
+fi
+notify-send "Spear" "Welcome to Spear 22.3." 2>/dev/null || true
+echo "Welcome to Spear 22.3"

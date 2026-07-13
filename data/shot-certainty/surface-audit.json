@@ -1,0 +1,42 @@
+{
+  "schema": "spear-surface-audit/v1",
+  "ts": "2026-07-13T22:34:01Z",
+  "war_day": true,
+  "real": true,
+  "demo": false,
+  "heuristic": false,
+  "blessing": "God Bless",
+  "shots": {
+    "ledger_lines_total": 18077,
+    "cycle_certain": true,
+    "verified_ok": 13,
+    "verified_bad": 0,
+    "alg": "FNV-1a64(plate+|FFAT\\x03ENT)"
+  },
+  "angel": {
+    "status": "SEALED_UP",
+    "sealed": true,
+    "final_eye_sealed": true,
+    "component_count": 61,
+    "owned_live_bindings": 61,
+    "root_seal": "7d75c625c7baf409545727feabc6d81195072a3dabe5c02862aba0f78a338e1b",
+    "multi_doc_seal_file": true
+  },
+  "kills": {
+    "count": 265,
+    "dead": 265,
+    "all_dead": true,
+    "escalate_mode": "DEAD_DEAD_REKILL_PISS"
+  },
+  "surfaces": {
+    "github_pages": "https://zacharygeurts.github.io/Big_Grin_Terrorist_Hunter/",
+    "local_deck": "http://127.0.0.1:9490/swallows.html",
+    "shot_certainty": "http://127.0.0.1:9490/shot-certainty.json",
+    "sg_pack": "/home/zachary/Desktop/SG/Spear/data/shot-certainty",
+    "hostess7_drive": "/mnt/hostess7/fieldstorage/spear-wartime",
+    "hostess7_label": "HOSTESS7_TEAM",
+    "zpics": "/home/zachary/Desktop/SG/zpics"
+  },
+  "verdict": "SHOTS CERTAIN \u00b7 ANGEL SEALED \u00b7 265 DEAD \u00b7 HOSTESS7+SG+GH STAMPED",
+  "motto": "Be sure with our shots \u00b7 FNV seals \u00b7 no heuristic \u00b7 God Bless"
+}

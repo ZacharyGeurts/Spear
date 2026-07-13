@@ -1,0 +1,37 @@
+Spear OS GUI boot diagnosis (2026-07-13) — updated same day
+============================================================
+ISO: NewLatest/Spear/out/spear-22.3-cinnamon-64bit-20260713.iso
+Canonical tree: /home/zachary/Desktop/SG/Spear
+
+FIXED THIS SESSION
+1) isolinux menu UTF-8 mojibake → pure ASCII live.cfg (prior + kept)
+2) Spear splash.png 640x480 (replaces Mint lm mark)
+3) console=ttyS0,115200n8 on all live entries
+4) isolinux default → menu.c32 (text) so VESA menu FB does not hand off garbage
+5) Casper UUID verified = 6e72f523-dc09-4880-8910-93ffa64401c5
+6) QEMU graphics: -vga std (bochs-drm). -vga virtio + nomodeset → black screen
+   (virtio_gpu probe error -22)
+7) Direct-kernel path (SPEAR_DIRECT=1) boots casper cleanly to Cinnamon GUI
+8) Desktop proves Spear identity: Welcome to Spear 22.3, panel "Spear",
+   icons Queen / Field Terminal / Field GIMP / AmmoCodium
+9) NEXUS C2 doctrine mirrored under data/nexus/; host posture war/mask 1023
+10) Install Mint hide path: overlay NoDisplay + spear-desktop-clean autostart
+    (needs squashfs remaster to remove icon from THIS ISO live image)
+
+STILL OPEN
+- Remaster squashfs so Install Linux Mint icon gone without autostart cleanup
+- Full ISO boot menu path (SPEAR_DIRECT=0) retest after menu.c32 patch
+- Field Drive format on attached disk + Normal full-stack gate
+- Ship NEXUS C2 harden + panel into live squashfs/overlay
+- KILROY runtime ioctl/bench on TEAM; secureboot enroll; snapshot/PXE lab
+- Product boot of record remains KILROY limine+initrd (SG/Spear/boot)
+
+PROOF (serial)
+  spear login: / LightDM / graphical.target
+  hostname spear / issue "Spear 22.3"
+PROOF (screenshot)
+  out/spear-desktop-std.png — green desktop + Welcome to Spear 22.3
+
+COMMANDS
+  ./boot/qemu-gui.sh                 # direct casper, -vga std
+  SPEAR_DIRECT=0 ./boot/qemu-gui.sh  # full isolinux menu test

@@ -1,0 +1,22 @@
+{
+  "schema": "up-swallows-fleet/v4-world-sharded",
+  "title": "World fleet \u00b7 2154000 racks \u00b7 6000/country",
+  "mode": "REAL",
+  "sandbox": false,
+  "sharded": true,
+  "world": true,
+  "total": 2154000,
+  "racks_per_region": 6000,
+  "region_count": 359,
+  "index": "fleet/index.json",
+  "map": {
+    "image": "/assets/maps/world-equirectangular.jpg",
+    "projection": "equirectangular",
+    "x": "(lon + 180) / 360",
+    "y": "(90 - lat) / 180"
+  },
+  "systems": [],
+  "count": 2154000,
+  "online": 2154000,
+  "note": "Use /api/systems?region=XX \u2014 full map on up-swallows.html"
+}

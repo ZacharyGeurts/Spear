@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en" data-surface="big-grin-swallows-unified">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <title>BIG GRIN SWALLOWS · full deck</title>
+  <link rel="stylesheet" href="assets/spear-world-map.css?v=big2" />
+  <script src="assets/spear-world-map.js?v=big2" defer></script>
+  <style>
+    :root {
+      --bg:#06050a; --panel:#120c18; --panel2:#1a1224; --line:#3a2450;
+      --text:#fff5fb; --muted:#c9a8c0; --green:#5dffb0; --cyan:#7ad7ff;
+      --amber:#ffc857; --red:#ff5d8f; --pink:#ff4fa3; --gold:#ffd56a;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--text);
+      font-family:system-ui,"Segoe UI",sans-serif;min-height:100%}
+    a{color:var(--cyan);text-decoration:none} a:hover{text-decoration:underline}
+    .bridge{
+      display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:start;
+      padding:1rem 1.4rem 1.1rem;
+      background:linear-gradient(180deg,rgba(70,22,80,.95),rgba(8,6,14,.98));
+      border-bottom:2px solid var(--pink);position:sticky;top:0;z-index:50;
+      backdrop-filter:blur(10px);
+    }
+    @media(max-width:960px){.bridge{grid-template-columns:1fr}}
+    .kicker{margin:0 0 .3rem;font-size:.72rem;letter-spacing:.16em;color:var(--amber);text-transform:uppercase}
+    h1{margin:0;font-size:clamp(1.5rem,4vw,2.35rem);letter-spacing:.03em;
+      background:linear-gradient(90deg,var(--gold),var(--pink) 48%,var(--green));
+      -webkit-background-clip:text;background-clip:text;color:transparent}
+    .sub{margin:.4rem 0 0;color:var(--muted);font-size:.92rem;max-width:54rem;line-height:1.5}
+    .actions{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:flex-end}
+    .btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);
+      border-radius:10px;padding:.5rem .85rem;font-size:.82rem;cursor:pointer;
+      transition:border-color .15s,transform .12s}
+    .btn:hover{border-color:var(--green);transform:translateY(-1px)}
+    .btn.primary{border-color:#ff4fa388;background:rgba(255,79,163,.14);color:#ffb3d4}
+    .btn.good{border-color:#2a6a4a;color:var(--green)}
+    .beam{height:3px;background:linear-gradient(90deg,transparent,var(--pink),var(--green),transparent);
+      animation:beam 1.3s linear infinite}
+    @keyframes beam{to{background-position:260px 0}}
+    .stats{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:.55rem;
+      padding:.9rem 1.4rem;border-bottom:1px solid var(--line)}
+    @media(max-width:1300px){.stats{grid-template-columns:repeat(4,1fr)}}
+    @media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
+    .stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:.65rem .75rem;min-height:4.6rem}
+    .stat .n{font-size:1.35rem;font-weight:800;color:var(--green);letter-spacing:.02em}
+    .stat .l{color:var(--muted);font-size:.74rem;margin-top:.2rem;line-height:1.3}
+    .stat.hot .n{color:var(--red)}.stat.warn .n{color:var(--amber)}.stat.cyan .n{color:var(--cyan)}
+    .wrap{padding:1rem 1.4rem 2rem;display:flex;flex-direction:column;gap:1rem}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+    .card>h2{margin:0;padding:.75rem 1rem;font-size:1rem;color:var(--gold);
+      border-bottom:1px solid var(--line);background:#0e0a14;
+      display:flex;justify-content:space-between;align-items:center;gap:.6rem;flex-wrap:wrap}
+    .card .body{padding:.85rem 1rem}
+    .map-card .body{padding:.5rem .6rem .8rem}
+    .map-card .spear-world-map{margin:0;width:100%}
+    .map-card .spear-world-map.big .map-stage{min-height:min(68vh,720px)}
+    .grid2{display:grid;grid-template-columns:1.2fr 1fr;gap:1rem}
+    @media(max-width:1200px){.grid2{grid-template-columns:1fr}}
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+    @media(max-width:1100px){.grid3{grid-template-columns:1fr}}
+    .tabs{display:flex;flex-wrap:wrap;gap:.4rem;padding:.65rem .85rem;border-bottom:1px solid var(--line);background:#0c0812}
+    .tab{border:1px solid var(--line);background:transparent;color:var(--muted);
+      border-radius:999px;padding:.38rem .8rem;font-size:.78rem;cursor:pointer}
+    .tab.on{color:var(--text);border-color:var(--pink);background:rgba(255,79,163,.14)}
+    .pane{display:none;max-height:min(70vh,820px);overflow:auto;padding:.65rem .8rem}
+    .pane.on{display:block}
+    .row{border:1px solid #2a1a38;border-radius:12px;padding:.6rem .75rem;margin:.4rem 0;
+      background:#0e0a14;cursor:pointer;transition:border-color .12s,background .12s}
+    .row:hover,.row.sel{border-color:var(--cyan);background:#15102a}
+    .row .t{font-weight:700;font-size:.92rem;line-height:1.35}
+    .row .m{color:var(--muted);font-size:.78rem;margin-top:.22rem;line-height:1.4;white-space:pre-wrap}
+    .tag{display:inline-block;font-size:.68rem;padding:.12rem .42rem;border-radius:6px;
+      margin:0 .28rem 0 0;border:1px solid var(--line);color:var(--muted);vertical-align:middle}
+    .tag.dead{color:var(--red);border-color:#6a2040}
+    .tag.ok{color:var(--green);border-color:#2a6a4a}
+    .tag.crit{color:var(--amber);border-color:#6a5020}
+    .search{width:100%;background:#0a0810;border:1px solid var(--line);color:var(--text);
+      border-radius:10px;padding:.55rem .7rem;margin:.45rem 0 .55rem;font-size:.9rem}
+    .drawer{position:fixed;right:0;top:0;bottom:0;width:min(520px,100vw);
+      background:#100a18;border-left:1px solid var(--line);z-index:60;
+      transform:translateX(105%);transition:transform .22s ease;
+      box-shadow:-14px 0 40px rgba(0,0,0,.5);display:flex;flex-direction:column}
+    .drawer.open{transform:translateX(0)}
+    .drawer header{padding:1rem 1.1rem;border-bottom:1px solid var(--line);
+      display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem}
+    .drawer header h3{margin:0;color:var(--pink);font-size:1.15rem;line-height:1.3}
+    .drawer .content{padding:1rem 1.1rem;overflow:auto;flex:1;font-size:.9rem;line-height:1.5}
+    .drawer pre{white-space:pre-wrap;word-break:break-word;background:#070a09;
+      border:1px solid var(--line);border-radius:12px;padding:.75rem;color:var(--green);font-size:.78rem}
+    .kv{display:grid;grid-template-columns:120px 1fr;gap:.3rem .55rem;margin:.45rem 0}
+    .kv span:first-child{color:var(--muted)}
+    .pager{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin:.4rem 0;font-size:.8rem;color:var(--muted)}
+    .pager button{font-size:.75rem}
+    .mono{font-family:ui-monospace,monospace;font-size:.8rem;color:var(--green)}
+    .strip{display:grid;grid-template-columns:repeat(5,1fr);gap:.65rem}
+    @media(max-width:1000px){.strip{grid-template-columns:1fr 1fr}}
+    .mini{background:#0e0a14;border:1px solid #2a1a38;border-radius:12px;padding:.65rem .75rem;font-size:.82rem}
+    .mini b{display:block;color:var(--gold);margin-bottom:.25rem;font-size:.78rem}
+    .foot{padding:1rem 1.4rem 2rem;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);line-height:1.45}
+    .err{color:var(--red);padding:.5rem;font-size:.85rem}
+    .okline{color:var(--green);font-size:.8rem}
+    .section-label{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin:0 0 .4rem}
+  </style>
+</head>
+<body>
+  <header class="bridge">
+    <div>
+      <p class="kicker">BIG GRIN SWALLOWS · unified full deck · C++ stack · live</p>
+      <h1>LETHAL kills · cook FAT · queue reburn · burn · scrub · wall outlet · map · dossiers</h1>
+      <p class="sub">
+        Kills and rekills are LETHAL. Cook Field FAT · queue reburn · burn · scrub · destroy to the wall outlet. Terror does not exist. Hover pins for full enemy tooltips. Click anything for the detail drawer.
+        Lists paginate so the deck stays smooth. Auto-refresh keeps up with C++ wartime data.
+      </p>
+      <p class="okline" id="bootLine">booting…</p>
+    </div>
+    <div class="actions">
+      <button class="btn good" id="btnCsv" type="button">⬇ Export CSV</button>
+      <button class="btn good" id="btnJson" type="button">⬇ Export JSON</button>
+      <a class="btn primary" href="/export/big-grin-swallows.xlsx">⬇ Excel .xlsx</a>
+      <a class="btn primary" href="/export/big-grin-swallows.ods">⬇ LibreOffice .ods</a>
+      <a class="btn" href="/export/big-grin-swallows-global.csv">CSV file</a>
+      <a class="btn" href="/export/big-grin-swallows-global.json">JSON file</a>
+      <button class="btn" id="btnRefresh" type="button">↻ Refresh now</button>
+    </div>
+  </header>
+  <div class="beam"></div>
+  <section class="stats" id="stats"></section>
+  <div id="lethalPipe" style="padding:.55rem 1.4rem;border-bottom:1px solid var(--line);font-size:.82rem;color:var(--muted);line-height:1.45">
+    <b style="color:var(--red)">LETHAL KILL/REKILL</b> ·
+    SPOT → VECTOR → <b style="color:var(--amber)">COOK_FAT</b> →
+    <b style="color:var(--amber)">QUEUE_REBURN</b> →
+    <b style="color:var(--red)">BURN</b> →
+    <b style="color:var(--cyan)">SCRUB</b> →
+    <b style="color:var(--pink)">OUTLET_DESTROY</b> → SEAL ·
+    <span style="color:var(--green)">terror does not exist</span> · God Bless
+  </div>
+
+  <div class="wrap">
+    <!-- MAP FULL WIDTH -->
+    <section class="card map-card">
+      <h2>
+        <span>World map · fleet areas + enemy GPS · full tooltips</span>
+        <span style="font-size:.78rem;color:var(--muted)" id="mapMeta">—</span>
+      </h2>
+      <div class="body">
+        <div id="worldMap" class="spear-world-map big" aria-label="World map"></div>
+      </div>
+    </section>
+
+    <!-- QUICK STRIPS -->
+    <section class="strip" id="strips"></section>
+
+    <div class="grid2">
+      <!-- LISTS -->
+      <section class="card">
+        <h2>
+          <span>Browse · search · click for full detail</span>
+          <span style="font-size:.78rem;color:var(--muted)" id="clock">—</span>
+        </h2>
+        <div class="tabs" id="tabs">
+          <button class="tab on" data-pane="enemies" type="button">☠ Enemies</button>
+          <button class="tab" data-pane="kills" type="button">Kill dossiers</button>
+          <button class="tab" data-pane="fleet" type="button">Fleet areas</button>
+          <button class="tab" data-pane="live" type="button">Live feed</button>
+          <button class="tab" data-pane="history" type="button">History</button>
+          <button class="tab" data-pane="wartime" type="button">Wartime</button>
+          <button class="tab" data-pane="copilot" type="button">Copilot global</button>
+          <button class="tab" data-pane="infra" type="button">Angel · DNS · mesh</button>
+          <button class="tab" data-pane="raw" type="button">Raw status</button>
+        </div>
+        <div style="padding:0 .8rem">
+          <input class="search" id="q" placeholder="Filter IPs, vectors, areas, tags, dossier text…" />
+          <div class="pager" id="pager"></div>
+        </div>
+        <div class="pane on" id="pane-enemies"></div>
+        <div class="pane" id="pane-kills"></div>
+        <div class="pane" id="pane-fleet"></div>
+        <div class="pane" id="pane-live"></div>
+        <div class="pane" id="pane-history"></div>
+        <div class="pane" id="pane-wartime"></div>
+        <div class="pane" id="pane-copilot"></div>
+        <div class="pane" id="pane-infra"></div>
+        <div class="pane" id="pane-raw"></div>
+      </section>
+
+      <!-- SIDE DETAIL ALWAYS VISIBLE -->
+      <section class="card" id="sideDetail">
+        <h2><span>Selected detail</span><span style="font-size:.75rem;color:var(--muted)" id="sideHint">click map or list</span></h2>
+        <div class="body" id="sideBody">
+          <p class="section-label">Ready</p>
+          <p style="color:var(--muted);line-height:1.5">
+            Select an enemy pin, kill row, or fleet area. Full dossier text, GPS, ISP, ironclad cites,
+            rekill counts, and export links appear here and in the slide-out drawer.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <!-- LONG INFO BANDS -->
+    <section class="grid3">
+      <div class="card">
+        <h2>Pipeline · doctrine</h2>
+        <div class="body mono" id="doctrineBox">loading…</div>
+      </div>
+      <div class="card">
+        <h2>Planet · fleet mesh</h2>
+        <div class="body mono" id="planetBox">loading…</div>
+      </div>
+      <div class="card">
+        <h2>Wartime rekill ledger</h2>
+        <div class="body mono" id="rekillBox">loading…</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>
+        <span>Global tables · enemies with GPS first</span>
+        <span style="font-size:.75rem;color:var(--muted)">scroll · dense</span>
+      </h2>
+      <div class="body" style="overflow:auto;max-height:480px">
+        <table id="denseTable" style="width:100%;border-collapse:collapse;font-size:.78rem">
+          <thead>
+            <tr style="color:var(--muted);text-align:left">
+              <th style="padding:.35rem">Kind</th>
+              <th>Target</th>
+              <th>Status</th>
+              <th>Vector</th>
+              <th>GPS</th>
+              <th>Place / note</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <footer class="foot" id="foot">BIG GRIN SWALLOWS · C++ spear-www · spear-planet · spear-wartime · no scripts · God Bless</footer>
+
+  <aside class="drawer" id="drawer">
+    <header>
+      <div>
+        <h3 id="dTitle">Detail</h3>
+        <div id="dSub" style="color:var(--muted);font-size:.82rem;margin-top:.25rem"></div>
+      </div>
+      <button class="btn" type="button" id="dClose">Close</button>
+    </header>
+    <div class="content" id="dBody"></div>
+  </aside>
+
+  <script>
+  (function () {
+    "use strict";
+    const $ = (s, r=document) => r.querySelector(s);
+    const $$ = (s, r=document) => Array.prototype.slice.call(r.querySelectorAll(s));
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c =>
+      ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+    const fmt = (n) => (n==null||n==="") ? "—" : (Number(n).toLocaleString ? Number(n).toLocaleString() : String(n));
+    const PAGE = 80;
+
+    const STATE = {
+      status:{}, regions:[], threats:[], kills:[], live:[], history:[],
+      wartime:{}, copilot:{}, copilotGlobal:{}, angel:{}, dns:{}, planet:{},
+      mesh:{}, rekill:{}, doctrine:{}, eaten:{},
+      map:null, filter:"", pane:"enemies", page:0, mapReady:false, errors:[]
+    };
+
+    async function j(url) {
+      try {
+        const r = await fetch(url + (url.indexOf("?")>=0?"&":"?") + "t=" + Date.now(), {cache:"no-store"});
+        if (!r.ok) throw new Error(url + " " + r.status);
+        return await r.json();
+      } catch (e) {
+        STATE.errors.push(String(e && e.message || e));
+        return null;
+      }
+    }
+
+    function openDrawer(title, sub, html) {
+      $("#dTitle").textContent = title;
+      $("#dSub").textContent = sub || "";
+      $("#dBody").innerHTML = html;
+      $("#drawer").classList.add("open");
+      $("#sideBody").innerHTML = html;
+      $("#sideHint").textContent = title;
+    }
+    function closeDrawer(){ $("#drawer").classList.remove("open"); }
+
+    function killTip(k){
+      const g=k.gps||{};
+      const loc=[g.city,g.region,g.country].filter(Boolean).join(", ");
+      return [
+        (k.dead||k.status==="DEAD"?"☠ DEAD":"•")+" "+(k.target||k.id),
+        "status: "+(k.status||"—")+" · sev: "+(k.severity||"—"),
+        "vector: "+(k.vector||"—"),
+        k.reason||"",
+        loc?("place: "+loc):"",
+        g.lat!=null?("GPS: "+g.lat+", "+g.lon+" · "+(g.precision||"")):"",
+        g.isp?("ISP: "+g.isp):"",
+        g.org?("org: "+g.org):"",
+        g.as?("AS: "+g.as):"",
+        g.timezone?("tz: "+g.timezone):"",
+        k.tooltip||"",
+        k.dossier_text||"",
+        (k.tags||[]).length?("tags: "+k.tags.join(", ")):""
+      ].filter(Boolean).join("\n");
+    }
+    function threatTip(t){
+      return [
+        "☠ "+(t.label||t.id),
+        "status: "+(t.status||(t.eaten?"EATEN":"—"))+" · sev: "+(t.severity||"—"),
+        "vector: "+(t.vector||"—"),
+        t.detail||t.dossier_text||"",
+        t.ironclad?("ironclad: "+t.ironclad):"",
+        t.pwnership_kill?("kill page: "+t.pwnership_kill):"",
+        (t.tags||[]).length?("tags: "+t.tags.join(", ")):""
+      ].filter(Boolean).join("\n");
+    }
+    function fleetTip(r){
+      return [
+        r.code+" · "+r.name,
+        "zone: "+(r.zone||"—")+" · kind: "+(r.kind||"—"),
+        "racks: "+fmt(r.racks)+" · online: "+fmt(r.online||r.racks)+" · status: "+(r.status||"ok"),
+        "GPS centroid: "+r.lat+", "+r.lon,
+        "API: /api/area-dossier?code="+r.code,
+        "CSV: /api/fleet-gps.csv?region="+r.code
+      ].join("\n");
+    }
+
+    function showThreat(t){
+      openDrawer(t.label||t.id, (t.status||"")+" · "+(t.severity||"")+" · "+(t.vector||""), `
+        <div class="kv"><span>ID</span><span>${esc(t.id)}</span></div>
+        <div class="kv"><span>Kind</span><span>${esc(t.kind)}</span></div>
+        <div class="kv"><span>Status</span><span>${esc(t.status||(t.eaten?"EATEN":"—"))}</span></div>
+        <div class="kv"><span>Severity</span><span>${esc(t.severity)}</span></div>
+        <div class="kv"><span>Vector</span><span>${esc(t.vector)}</span></div>
+        <div class="kv"><span>Ironclad</span><span>${esc(t.ironclad||"—")}</span></div>
+        <div class="kv"><span>Kill page</span><span>${esc(t.pwnership_kill||"—")}</span></div>
+        <div class="kv"><span>Tags</span><span>${esc((t.tags||[]).join(", "))}</span></div>
+        <p style="margin:.8rem 0 .35rem;color:var(--gold)">Full detail</p>
+        <pre>${esc(t.detail||t.dossier_text||threatTip(t))}</pre>
+        <p style="margin-top:.8rem">
+          <a href="/api/dossier?id=${encodeURIComponent(t.id)}" target="_blank">API dossier</a>
+          ${t.pwnership_kill?` · <a href="pwnership/kills/${esc(t.pwnership_kill)}.html">Pwnership kill</a>`:""}
+        </p>`);
+    }
+    function showKill(k){
+      const g=k.gps||{};
+      openDrawer(String(k.target||k.id), (k.status||"")+" · "+(k.vector||""), `
+        <div class="kv"><span>Status</span><span>${esc(k.status)}</span></div>
+        <div class="kv"><span>Severity</span><span>${esc(k.severity)}</span></div>
+        <div class="kv"><span>Vector</span><span>${esc(k.vector)}</span></div>
+        <div class="kv"><span>Reason</span><span>${esc(k.reason)}</span></div>
+        <div class="kv"><span>GPS</span><span>${g.lat!=null?esc(g.lat+", "+g.lon):"—"}</span></div>
+        <div class="kv"><span>Place</span><span>${esc([g.city,g.region,g.country].filter(Boolean).join(", ")||"—")}</span></div>
+        <div class="kv"><span>ZIP / TZ</span><span>${esc((g.zip||"")+" "+(g.timezone||""))}</span></div>
+        <div class="kv"><span>ISP</span><span>${esc(g.isp||"—")}</span></div>
+        <div class="kv"><span>Org</span><span>${esc(g.org||"—")}</span></div>
+        <div class="kv"><span>AS</span><span>${esc(g.as||"—")}</span></div>
+        <div class="kv"><span>Source</span><span>${esc(g.source||"—")}</span></div>
+        <p style="margin:.8rem 0 .35rem;color:var(--gold)">Dossier text</p>
+        <pre>${esc(k.dossier_text||killTip(k))}</pre>
+        <p style="margin-top:.8rem">
+          ${g.map?`<a href="${esc(g.map)}" target="_blank">OpenStreetMap</a> · `:""}
+          ${/^\d+\.\d+\.\d+\.\d+$/.test(String(k.target||""))?`<a href="/api/dossier?ip=${encodeURIComponent(k.target)}" target="_blank">API dossier</a>`:""}
+        </p>`);
+    }
+    async function showFleet(r){
+      openDrawer(r.code+" · "+r.name, "loading area dossier…", "<p style='color:var(--muted)'>Fetching full area…</p>");
+      const d = await j("/api/area-dossier?code="+encodeURIComponent(r.code));
+      if(!d||d.error){
+        $("#dBody").innerHTML = "<pre>"+esc(fleetTip(r)+"\n\n"+JSON.stringify(d||{},null,2))+"</pre>";
+        $("#sideBody").innerHTML = $("#dBody").innerHTML;
+        return;
+      }
+      const inv = (d.rack_inventory||[]).slice(0,40);
+      const html = `
+        <div class="kv"><span>Area</span><span>${esc(d.title||d.name)}</span></div>
+        <div class="kv"><span>Zone</span><span>${esc(d.zone)}</span></div>
+        <div class="kv"><span>Racks</span><span>${fmt(d.racks_total)} · online ${fmt(d.racks_online)}</span></div>
+        <div class="kv"><span>Defending</span><span>${fmt(d.defending)}</span></div>
+        <div class="kv"><span>Live planet</span><span>${d.live?"YES":"no"}</span></div>
+        <p style="margin:.8rem 0 .35rem;color:var(--gold)">Summary</p>
+        <pre>${esc(d.summary||"")}</pre>
+        <p style="margin:.8rem 0 .35rem;color:var(--gold)">Racks (first ${inv.length})</p>
+        <pre>${esc(inv.map(x=>x.id+" | "+(x.role||"")+" | "+x.lat+","+x.lon+" | "+(x.ip||"")+" | "+(x.town||"")).join("\n"))}</pre>
+        <p>
+          <a href="/api/area-dossier?code=${encodeURIComponent(r.code)}" target="_blank">Full area JSON</a> ·
+          <a href="/api/fleet-gps.csv?region=${encodeURIComponent(r.code)}">All racks GPS CSV</a>
+        </p>`;
+      $("#dSub").textContent = "racks "+fmt(d.racks_total)+" · defending "+fmt(d.defending);
+      $("#dBody").innerHTML = html;
+      $("#sideBody").innerHTML = html;
+    }
+
+    function matchQ(text){
+      const q=(STATE.filter||"").trim().toLowerCase();
+      if(!q) return true;
+      return String(text||"").toLowerCase().indexOf(q)>=0;
+    }
+
+    function filtered(list, fn){
+      return list.filter(fn);
+    }
+
+    function pageSlice(arr){
+      const start = STATE.page * PAGE;
+      return { total: arr.length, rows: arr.slice(start, start+PAGE), start };
+    }
+
+    function renderPager(total){
+      const pages = Math.max(1, Math.ceil(total / PAGE));
+      if(STATE.page >= pages) STATE.page = pages-1;
+      $("#pager").innerHTML =
+        `<span>${total} matches · page ${STATE.page+1}/${pages} · ${PAGE}/page</span>` +
+        `<button class="btn" type="button" id="pgPrev">Prev</button>` +
+        `<button class="btn" type="button" id="pgNext">Next</button>`;
+      $("#pgPrev").onclick = () => { STATE.page=Math.max(0,STATE.page-1); renderLists(); };
+      $("#pgNext").onclick = () => { STATE.page=Math.min(pages-1,STATE.page+1); renderLists(); };
+    }
+
+    function renderStats(){
+      const s=STATE.status||{}, c=STATE.copilot||{}, g=STATE.copilotGlobal||{};
+      const m=STATE.mesh||{}, rg=STATE.rackGuard||{}, fs=STATE.fleetStatus||{};
+      const kills=STATE.kills||[];
+      const dead=kills.filter(k=>k.dead||k.status==="DEAD").length;
+      const gps=kills.filter(k=>k.gps&&k.gps.lat!=null).length;
+      const zones = (m.zones && Object.keys(m.zones).length) || rg.zones_hunting || 0;
+      const items=[
+        {n:fmt(s.defending||fs.defending||s.online||s.up_systems), l:"Planet defending", cls:""},
+        {n:fmt(s.regions||STATE.regions.length), l:"Fleet areas", cls:"cyan"},
+        {n:fmt(zones), l:"Zones hunting (rack offload)", cls:"hot"},
+        {n:fmt(m.global_shots||rg.global_shots||0), l:"Rack mesh entropy shots", cls:"hot"},
+        {n:fmt(dead)+"/"+fmt(kills.length), l:"Kills DEAD / total", cls:"hot"},
+        {n:fmt(gps), l:"Enemy GPS pins", cls:"warn"},
+        {n:fmt(g.lifetime_rekills||0), l:"Copilot global rekills", cls:"hot"},
+        {n:(m.violent_protection||rg.violent_protection)?"VIOLENT":"off", l:"Protect WORLD+INTERNET", cls:(m.violent_protection||rg.violent_protection)?"":"warn"},
+      ];
+      $("#stats").innerHTML = items.map(i=>
+        `<div class="stat ${i.cls}"><div class="n">${esc(i.n)}</div><div class="l">${esc(i.l)}</div></div>`
+      ).join("");
+    }
+
+    function renderStrips(){
+      const w=STATE.wartime||{}, a=STATE.angel||{}, d=STATE.dns||{}, m=STATE.mesh||{}, rg=STATE.rackGuard||{};
+      const zc = (m.zones && Object.keys(m.zones).length) || rg.zones_hunting || 0;
+      $("#strips").innerHTML = `
+        <div class="mini"><b>Wartime</b>stage ${esc(w.stage||"—")}<br>scripts ${esc(w.scripts||"—")}<br>${esc(w.blessing||"")}</div>
+        <div class="mini"><b>Angel seal</b>${esc(a.status||"—")}<br>${esc(a.commander||"")}<br>components ${fmt(a.component_count)}</div>
+        <div class="mini"><b>World DNS/DHCP</b>${esc(d.status||"—")}<br>foreign hooks blocked<br>${esc((d.policy||"").slice(0,80))}</div>
+        <div class="mini"><b>RACK GUARD</b>QEMU/zone mesh offload<br>zones ${fmt(zc)} · shots ${fmt(m.global_shots||rg.global_shots||0)}<br>VIOLENT · WORLD+INTERNET · SIGKILL</div>
+        <div class="mini"><b>LETHAL</b>cook FAT · queue reburn<br>burn · scrub · wall outlet<br>terror_exists: false</div>
+        <div class="mini"><b>Hunt</b>${esc(STATE.copilot.overall||"—")}<br>engine ${esc(STATE.copilot.engine||"—")}<br>seen ${esc(STATE.copilot.hunt&&STATE.copilot.hunt.seen_this_cycle)}</div>
+      `;
+    }
+
+    function buildMapPoints(){
+      const pts=[];
+      for(const r of STATE.regions||[]){
+        if(r.lat==null||r.lon==null) continue;
+        const tip=fleetTip(r);
+        pts.push({
+          kind:"fleet", id:r.code, name:r.name, lat:r.lat, lon:r.lon,
+          title:r.code+" · "+r.name,
+          subtitle:fmt(r.racks)+" racks · zone "+(r.zone||"?")+" · "+(r.status||"ok"),
+          detail:tip, tooltip:tip, path:"Earth › "+r.name,
+          _type:"fleet", _row:r
+        });
+      }
+      for(const k of STATE.kills||[]){
+        const g=k.gps||{};
+        if(g.lat==null||g.lon==null) continue;
+        const tip=killTip(k);
+        const loc=[g.city,g.country].filter(Boolean).join(", ");
+        pts.push({
+          kind:"threat", threat:true, dead:!!(k.dead||k.status==="DEAD"),
+          id:k.id||k.target, name:k.target, lat:g.lat, lon:g.lon,
+          title:(k.dead||k.status==="DEAD"?"☠ ":"")+(k.target||k.id),
+          subtitle:(k.vector||"")+" · "+(k.status||"")+" · "+loc,
+          detail:tip, tooltip:tip, path:g.isp||g.as||"",
+          _type:"kill", _row:k
+        });
+      }
+      return pts;
+    }
+
+    function ensureMap(){
+      if(!window.SpearWorldMap){
+        STATE.mapReady=false;
+        $("#mapMeta").textContent="map script not ready — lists still work";
+        return;
+      }
+      try{
+        if(!STATE.map){
+          STATE.map = new SpearWorldMap("#worldMap", {
+            mapSrc:"assets/maps/world-equirectangular.jpg",
+            showFleet:true, showThreats:true,
+            onSelect:(pt)=>{
+              if(!pt) return;
+              if(pt._type==="fleet"&&pt._row) showFleet(pt._row);
+              else if(pt._type==="kill"&&pt._row) showKill(pt._row);
+            }
+          });
+        }
+        STATE.map.setPoints(buildMapPoints());
+        STATE.mapReady=true;
+        const gps=(STATE.kills||[]).filter(k=>k.gps&&k.gps.lat!=null).length;
+        $("#mapMeta").textContent = STATE.regions.length+" areas · "+gps+" enemy GPS · hover for full tooltips";
+      }catch(e){
+        STATE.errors.push("map: "+e.message);
+        $("#mapMeta").textContent="map error — "+e.message;
+      }
+    }
+
+    function renderLists(){
+      const pane=STATE.pane;
+      let rows=[], total=0;
+
+      if(pane==="enemies"){
+        const all=filtered(STATE.threats, t=>matchQ([t.id,t.label,t.vector,t.status,t.detail,t.severity,(t.tags||[]).join(" ")].join(" ")));
+        const sl=pageSlice(all); total=sl.total; rows=sl.rows;
+        $("#pane-enemies").innerHTML = rows.map(t=>`
+          <div class="row" data-k="threat"><div class="t">${esc(t.label||t.id)}
+            <span class="tag dead">${esc(t.status||(t.eaten?"EATEN":"threat"))}</span>
+            <span class="tag crit">${esc(t.severity||"")}</span></div>
+            <div class="m">${esc(t.vector||"")} · ${esc((t.detail||"").slice(0,220))}</div></div>`).join("")
+          || "<p class='err'>No threats match filter.</p>";
+        $$("#pane-enemies .row").forEach((el,i)=>el.onclick=()=>showThreat(rows[i]));
+      }
+
+      if(pane==="kills"){
+        const all=filtered(STATE.kills, k=>{
+          const g=k.gps||{};
+          return matchQ([k.id,k.target,k.vector,k.status,k.reason,k.dossier_text,g.city,g.country,g.isp].join(" "));
+        });
+        // GPS first
+        all.sort((a,b)=>((b.gps&&b.gps.lat!=null)?1:0)-((a.gps&&a.gps.lat!=null)?1:0));
+        const sl=pageSlice(all); total=sl.total; rows=sl.rows;
+        $("#pane-kills").innerHTML = rows.map(k=>{
+          const g=k.gps||{}; const loc=[g.city,g.country].filter(Boolean).join(", ");
+          return `<div class="row" data-k="kill"><div class="t">${(k.dead||k.status==="DEAD")?"☠ ":""}${esc(k.target||k.id)}
+            <span class="tag dead">${esc(k.status||"—")}</span>
+            ${g.lat!=null?'<span class="tag ok">GPS</span>':''}</div>
+            <div class="m">${esc(k.vector||"")} · ${esc(loc||(g.lat!=null?g.lat+", "+g.lon:"no GPS"))}
+            · ${esc((k.reason||"").slice(0,140))}
+            ${g.isp?" · "+esc(g.isp):""}</div></div>`;
+        }).join("") || "<p class='err'>No kills match.</p>";
+        $$("#pane-kills .row").forEach((el,i)=>el.onclick=()=>showKill(rows[i]));
+      }
+
+      if(pane==="fleet"){
+        const all=filtered(STATE.regions, r=>matchQ([r.code,r.name,r.zone,r.status,r.kind].join(" ")));
+        const sl=pageSlice(all); total=sl.total; rows=sl.rows;
+        $("#pane-fleet").innerHTML = rows.map(r=>`
+          <div class="row"><div class="t">${esc(r.code)} · ${esc(r.name)}
+            <span class="tag ok">${esc(r.status||"ok")}</span>
+            <span class="tag">${esc(r.zone||"")}</span></div>
+            <div class="m">racks ${fmt(r.racks)} · online ${fmt(r.online)} · GPS ${esc(r.lat)}, ${esc(r.lon)} · kind ${esc(r.kind||"")}</div></div>`
+        ).join("") || "<p class='err'>No areas match.</p>";
+        $$("#pane-fleet .row").forEach((el,i)=>el.onclick=()=>showFleet(rows[i]));
+      }
+
+      if(pane==="live"){
+        const all=filtered(STATE.live, e=>matchQ([e.attack,e.target,e.vector,e.phase,e.fleet,e.stage,e.reason].join(" ")));
+        const sl=pageSlice(all); total=sl.total; rows=sl.rows;
+        $("#pane-live").innerHTML = rows.map(e=>`
+          <div class="row"><div class="t">${esc(e.attack||e.phase||"EVENT")}
+            <span class="tag crit">${esc(e.fleet||e.stage||"")}</span></div>
+            <div class="m">${esc(e.target||"")} · ${esc(e.vector||"")} · rekill ${esc(e.rekill_count??"—")}
+            · ${esc(e.reason||"")} · ${esc(e.ts||"")}</div></div>`
+        ).join("") || "<p class='err'>No live events in buffer.</p>";
+      }
+
+      if(pane==="history"){
+        const all=filtered(STATE.history, h=>matchQ(JSON.stringify(h)));
+        const sl=pageSlice(all); total=sl.total; rows=sl.rows;
+        $("#pane-history").innerHTML = rows.map(h=>`
+          <div class="row"><div class="t">${esc(h.attack||h.action||h.target||h.id||"history")}</div>
+          <div class="m">${esc(JSON.stringify(h).slice(0,280))}</div></div>`
+        ).join("") || "<p class='err'>No history rows.</p>";
+      }
+
+      if(pane==="wartime"){
+        total=1;
+        const w=STATE.wartime||{}, rk=STATE.rekill||{};
+        $("#pane-wartime").innerHTML = `<pre>${esc(JSON.stringify({wartime:w, rekill_state:rk}, null, 2))}</pre>`;
+      }
+      if(pane==="copilot"){
+        total=1;
+        $("#pane-copilot").innerHTML = `<pre>${esc(JSON.stringify({monitor:STATE.copilot, global:STATE.copilotGlobal}, null, 2))}</pre>`;
+      }
+      if(pane==="infra"){
+        total=1;
+        $("#pane-infra").innerHTML = `<pre>${esc(JSON.stringify({angel:STATE.angel, dns:STATE.dns, mesh:STATE.mesh, eaten:STATE.eaten}, null, 2))}</pre>`;
+      }
+      if(pane==="raw"){
+        total=1;
+        $("#pane-raw").innerHTML = `<pre>${esc(JSON.stringify({status:STATE.status, planet:STATE.planet, doctrine:STATE.doctrine, errors:STATE.errors.slice(-20)}, null, 2))}</pre>`;
+      }
+
+      if(["enemies","kills","fleet","live","history"].indexOf(pane)>=0) renderPager(total);
+      else $("#pager").innerHTML = "";
+    }
+
+    function renderDense(){
+      const rows=[];
+      for(const k of STATE.kills||[]){
+        const g=k.gps||{};
+        rows.push({
+          kind:"kill",
+          target:k.target||k.id,
+          status:k.status,
+          vector:k.vector,
+          lat:g.lat, lon:g.lon,
+          note:[g.city,g.country,g.isp,k.reason].filter(Boolean).join(" · "),
+          _k:k
+        });
+      }
+      for(const t of STATE.threats||[]){
+        rows.push({
+          kind:"threat", target:t.label||t.id, status:t.status||(t.eaten?"EATEN":""),
+          vector:t.vector, lat:"", lon:"", note:(t.detail||"").slice(0,120), _t:t
+        });
+      }
+      // GPS kills first
+      rows.sort((a,b)=>(b.lat!==""&&b.lat!=null?1:0)-(a.lat!==""&&a.lat!=null?1:0));
+      const tb=$("#denseTable tbody");
+      tb.innerHTML = rows.slice(0,500).map((r,i)=>`
+        <tr data-i="${i}" style="border-bottom:1px solid #2a1a38;cursor:pointer">
+          <td style="padding:.35rem">${esc(r.kind)}</td>
+          <td>${esc(r.target)}</td>
+          <td>${esc(r.status)}</td>
+          <td>${esc(r.vector)}</td>
+          <td class="mono">${r.lat!=""&&r.lat!=null?esc(r.lat+", "+r.lon):"—"}</td>
+          <td style="color:var(--muted)">${esc(r.note)}</td>
+        </tr>`).join("");
+      $$("#denseTable tbody tr").forEach((tr,i)=>{
+        tr.onclick=()=>{
+          const r=rows[i];
+          if(r._k) showKill(r._k);
+          else if(r._t) showThreat(r._t);
+        };
+      });
+    }
+
+    function renderInfoBands(){
+      const d=STATE.doctrine||{};
+      $("#doctrineBox").textContent = JSON.stringify({
+        motto:d.motto, language_stack:d.language_stack, binaries:d.binaries,
+        ironclad:d.ironclad&&{soft_term:d.ironclad.soft_term_theater, scripts:d.ironclad.scripts, stack:d.ironclad.stack},
+        oust:d.oust
+      }, null, 2);
+      $("#planetBox").textContent = JSON.stringify({
+        planet:STATE.planet, status:STATE.status, mesh:STATE.mesh,
+        rack_guard:STATE.rackGuard, fleet_status:STATE.fleetStatus
+      }, null, 2);
+      $("#rekillBox").textContent = JSON.stringify(STATE.rekill||{}, null, 2);
+    }
+
+    function globalExportObject(){
+      return {
+        schema:"big-grin-swallows-global-export/v1",
+        ts:new Date().toISOString(),
+        stack:"C++",
+        violent_protection:true,
+        protect:["WORLD","INTERNET"],
+        status:STATE.status, planet:STATE.planet, wartime:STATE.wartime,
+        copilot:STATE.copilot, copilot_global:STATE.copilotGlobal,
+        angel:STATE.angel, world_dns_dhcp:STATE.dns, mesh:STATE.mesh,
+        rack_guard:STATE.rackGuard, fleet_status:STATE.fleetStatus,
+        doctrine:STATE.doctrine, rekill:STATE.rekill,
+        regions:STATE.regions, threats:STATE.threats, kills:STATE.kills,
+        live_events:STATE.live, history:STATE.history
+      };
+    }
+    function download(name,mime,text){
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(new Blob([text],{type:mime}));
+      a.download=name; a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href),2500);
+    }
+    function exportJson(){ download("big-grin-swallows-global.json","application/json", JSON.stringify(globalExportObject(),null,2)); }
+    function exportCsv(){
+      const lines=["section,id,label,status,severity,vector,lat,lon,detail"];
+      const ce=v=>{const s=String(v??""); return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;};
+      for(const t of STATE.threats||[])
+        lines.push(["threat",t.id,t.label,t.status||(t.eaten?"EATEN":""),t.severity,t.vector,"","",(t.detail||"").slice(0,400)].map(ce).join(","));
+      for(const k of STATE.kills||[]){
+        const g=k.gps||{};
+        lines.push(["kill",k.id,k.target,k.status,k.severity,k.vector,g.lat,g.lon,(k.dossier_text||k.reason||"").slice(0,400)].map(ce).join(","));
+      }
+      for(const r of STATE.regions||[])
+        lines.push(["fleet",r.code,r.name,r.status,"",r.zone,r.lat,r.lon,"racks="+r.racks].map(ce).join(","));
+      download("big-grin-swallows-global.csv","text/csv", lines.join("\n"));
+    }
+
+    async function refresh(){
+      STATE.errors=[];
+      $("#clock").textContent = new Date().toISOString().slice(0,19)+"Z";
+      $("#bootLine").textContent = "refreshing data…";
+      const [
+        status, regionsWrap, dossiers, catalog, liveFeed,
+        wartime, copilot, copilotGlobal, angel, dns, planet,
+        mesh, rekill, doctrine, history, eaten, lethalQ, lethalDoc, entropyD, shotsBoard,
+        rackGuard, fleetSt
+      ] = await Promise.all([
+        j("/api/status"),
+        j("/api/regions"),
+        j("/api/dossiers"),
+        j("/threat-catalog.json"),
+        j("/live-feed.json"),
+        j("/autopilot.json"),
+        j("/copilot-threat-monitor.json"),
+        j("/copilot-global-rekill.json"),
+        j("/angel-seal-status.json"),
+        j("/world-dns-dhcp-status.json"),
+        j("/api/planet"),
+        j("/fleet-mesh-live.json"),
+        j("/wartime-rekill-state.json"),
+        j("/doctrine.json"),
+        j("/history-recent.json"),
+        j("/eaten-set.json"),
+        j("/lethal-kill-queue.json"),
+        j("/lethal-kill-doctrine.json"),
+        j("/entropy-detailer.json"),
+        j("/shots-ledger.json"),
+        j("/rack-guard-live.json"),
+        j("/fleet/status.json"),
+      ]);
+      STATE.status = status||{};
+      STATE.regions = (regionsWrap&&regionsWrap.regions)||[];
+      STATE.kills = (dossiers&&(dossiers.kills||dossiers.dossiers))||[];
+      STATE.threats = (catalog&&catalog.threats)||[];
+      let ev = (liveFeed&&liveFeed.events)||[];
+      if(!Array.isArray(ev)) ev=[];
+      if(liveFeed&&liveFeed.latest&&!ev.length) ev=[liveFeed.latest];
+      STATE.live = ev.slice().reverse();
+      STATE.wartime = wartime||{};
+      STATE.copilot = copilot||{};
+      STATE.copilotGlobal = copilotGlobal||{};
+      STATE.angel = angel||{};
+      STATE.dns = dns||{};
+      STATE.planet = planet||{};
+      STATE.mesh = mesh||{};
+      STATE.rekill = rekill||{};
+      STATE.doctrine = doctrine||{};
+      STATE.eaten = eaten||{};
+      STATE.lethalQ = lethalQ||{};
+      STATE.lethalDoc = lethalDoc||{}; STATE.entropyD=entropyD||{}; STATE.shotsBoard=shotsBoard||entropyD||{};
+      STATE.rackGuard = rackGuard||{};
+      STATE.fleetStatus = fleetSt||{};
+      const hist = history||{};
+      STATE.history = Array.isArray(hist.recent)?hist.recent:(Array.isArray(hist)?hist:[]);
+
+      renderStats();
+      renderStrips();
+      ensureMap();
+      renderLists();
+      renderDense();
+      renderInfoBands();
+      const zg = (STATE.mesh.zones && Object.keys(STATE.mesh.zones).length) || STATE.rackGuard.zones_hunting || 0;
+      $("#bootLine").textContent =
+        "OK · threats "+STATE.threats.length+" · kills "+STATE.kills.length+
+        " · areas "+STATE.regions.length+" · live "+STATE.live.length+
+        " · zones hunting "+zg+" · rack shots "+fmt(STATE.mesh.global_shots||STATE.rackGuard.global_shots||0)+
+        " · map "+(STATE.mapReady?"ready":"pending")+
+        (STATE.errors.length?" · errs "+STATE.errors.length:"");
+      $("#foot").textContent =
+        "BIG GRIN · C++ · violent WORLD+INTERNET · zones "+zg+
+        " · shots "+fmt(STATE.mesh.global_shots||0)+
+        " · defending "+fmt(STATE.status.defending||STATE.fleetStatus.defending)+
+        " · God Bless · export /export/big-grin-swallows.xlsx";
+    }
+
+    // tabs
+    $$("#tabs .tab").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        $$("#tabs .tab").forEach(b=>b.classList.remove("on"));
+        btn.classList.add("on");
+        STATE.pane = btn.dataset.pane;
+        STATE.page = 0;
+        $$(".pane").forEach(p=>p.classList.remove("on"));
+        const pane = $("#pane-"+STATE.pane);
+        if(pane) pane.classList.add("on");
+        renderLists();
+      });
+    });
+    $("#q").addEventListener("input", e=>{ STATE.filter=e.target.value; STATE.page=0; renderLists(); });
+    $("#dClose").onclick = closeDrawer;
+    $("#btnRefresh").onclick = ()=>refresh();
+    $("#btnCsv").onclick = exportCsv;
+    $("#btnJson").onclick = exportJson;
+
+    function boot(){
+      // Don't hang forever if map script fails
+      let tries=0;
+      function go(){
+        tries++;
+        if(window.SpearWorldMap || tries>40){
+          refresh();
+          setInterval(refresh, 5000);
+          // regenerate office packs hint
+          return;
+        }
+        $("#bootLine").textContent = "waiting for map module… "+tries;
+        setTimeout(go, 50);
+      }
+      go();
+    }
+    if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", boot);
+    else boot();
+  })();
+  </script>
+</body>
+</html>

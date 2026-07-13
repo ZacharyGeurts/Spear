@@ -1,0 +1,62 @@
+{
+  "schema": "operator-gps/v1",
+  "updated": "2026-07-13T20:07Z",
+  "operator": {
+    "lat": 45.82,
+    "lon": -88.041,
+    "label": "8259 W BURNTWOOD P 15 DR, GLADSTONE, MI, 49837",
+    "address": "8259 W Burntwood P.15 Drive, Gladstone, MI 49837",
+    "display_name": "Zachary Geurts",
+    "source": "field_generator_triangulator",
+    "remember": true,
+    "default_for_all": true,
+    "urls": [
+      "https://github.com/ZacharyGeurts",
+      "https://x.com/ZacharyGeurts"
+    ],
+    "github": "https://github.com/ZacharyGeurts",
+    "x": "https://x.com/ZacharyGeurts",
+    "updated": "2026-06-30T03:36:54Z",
+    "gps_fix": {
+      "pos": [
+        45.82,
+        -88.041
+      ],
+      "gps": "45.820000, -88.041000",
+      "timestamp": "2026-06-30T03:36:54Z",
+      "accuracy_pct": 87.5,
+      "cep_m": 0.25,
+      "precision": "0.25m CEP",
+      "fields_used": [
+        "field_gladstone",
+        "field_escanaba",
+        "field_iron_mountain"
+      ],
+      "tri_confidence": 0.177,
+      "pinpoint": {
+        "lat": 45.82,
+        "lon": -88.041,
+        "lat_str": "45.820000000000000",
+        "lon_str": "-88.041000000000000",
+        "lat_i": "45820000000000000",
+        "lon_i": "-88041000000000000",
+        "precision": "sub_micron",
+        "resolution_nm": 0.111,
+        "enu_e_nm": "-17598471396864",
+        "enu_n_nm": "-722209149397",
+        "enu_u_nm": "-24277900948",
+        "anchor_id": "operator",
+        "source": "field_tri_3gps",
+        "label": "pinpoint",
+        "placed": true,
+        "return_type": "point",
+        "placement_mode": "triangulate_3gps",
+        "tri_weights": {
+          "a": 0.0,
+          "b": 0.0,
+          "c": 1.0
+        }
+      }
+    }
+  }
+}

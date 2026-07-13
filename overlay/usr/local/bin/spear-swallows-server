@@ -1,0 +1,1921 @@
+#!/usr/bin/env python3
+"""Spear Swallows web + API — Big Grin + region-sharded US fleet. Loopback only.
+
+Infinite-scale design: never load all racks into memory or the browser.
+  fleet/index.json     — region summary only
+  fleet/r/{CODE}.json  — 320 compact racks per region
+  /api/systems?region= — paginated one region at a time
+"""
+from __future__ import annotations
+
+import csv
+import json
+import os
+import re
+import subprocess
+import threading
+import time
+from collections import OrderedDict
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+from urllib.parse import parse_qs, urlparse
+
+BIND = os.environ.get("SPEAR_SWALLOWS_BIND", "127.0.0.1")
+PORT = int(os.environ.get("SPEAR_SWALLOWS_PORT", "9490"))
+ROOT = Path(os.environ.get(
+    "SPEAR_SWALLOWS_ROOT",
+    "/tmp/spear-swallows-www",
+))
+STATE = Path(os.environ.get(
+    "SPEAR_SWALLOW_STATE",
+    Path.home() / ".local/share/spear/swallows",
+))
+STATE.mkdir(parents=True, exist_ok=True)
+LOG = STATE / "swallows.csv"
+QUAR = STATE / "quarantine"
+QUAR.mkdir(parents=True, exist_ok=True)
+START = time.time()
+
+SACRED = {
+    "systemd", "init", "kthreadd", "sshd", "dbus-daemon", "NetworkManager",
+    "pipewire", "wireplumber", "firefox", "chrome", "chromium", "Xorg",
+    "wayland", "lightdm", "gdm", "sddm", "gnome-shell", "cinnamon",
+    "containerd", "dockerd", "systemd-journald", "systemd-logind",
+    "systemd-resolved", "systemd-networkd", "systemd-udevd", "rsyslogd",
+    "cron", "agetty", "login", "bash", "sudo", "su", "spear",
+    "spear-swallow", "spear-swallows-server", "spear-miner", "qemu-system-x86_64",
+    "grok", "grokz", "python3", "http.server",
+}
+
+MINER_PAT = re.compile(
+    r"xmrig|minerd|cpuminer|kdevtmpfsi|kinsing|cryptonight|stratum\+tcp|"
+    r"nicehash|monero|ethminer|nbminer|phoenixminer|hellminer|watchbog|dbused",
+    re.I,
+)
+SHELL_PAT = re.compile(
+    r"bash -i|&>/dev/tcp/|nc -e |ncat .* -e|python3? -c .*(socket|connect)|"
+    r"perl -e .*socket|php -r .*fsockopen",
+    re.I,
+)
+
+
+def _read(path: Path, default: str = "") -> str:
+    try:
+        return path.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return default
+
+
+def is_sacred(pid: int) -> bool:
+    if pid <= 2:
+        return True
+    comm = _read(Path(f"/proc/{pid}/comm")).strip()
+    if comm in SACRED:
+        return True
+    try:
+        exe = os.readlink(f"/proc/{pid}/exe")
+    except Exception:
+        exe = ""
+    if any(x in exe for x in ("spear", "nexus", "hostess", "grok")):
+        return True
+    return False
+
+
+def detect_hotdog_kit_signals(comm: str, exe: str, cmdline: str) -> tuple[bool, int]:
+    """Resilient Hotdog-hallway kit detect.
+
+    Terrorist text injection (docs, browsers, our own kill-page paths) must NOT
+    alone classify a process as the kit. Require multi-signal process reality.
+    """
+    comm_l = (comm or "").lower()
+    exe_l = (exe or "").lower()
+    cmd_l = (cmdline or "").lower()
+
+    # Never treat document/browser/editor as the kit from body text alone
+    readerish = {
+        "firefox", "chrome", "chromium", "brave", "code", "cursor", "vim", "nvim",
+        "nano", "less", "more", "cat", "head", "tail", "grep", "rg", "bat",
+        "grok", "grokz", "evince", "okular", "libreoffice", "soffice",
+    }
+    if comm_l in readerish or any(x in exe_l for x in ("/firefox", "/chrome", "/chromium", "/code")):
+        # only if the executable *itself* is named like the kit
+        if not re.search(r"hotdog|hallway", Path(exe_l).name if exe_l else ""):
+            return False, 0
+
+    # Our own stack talking about the kit is not the kit
+    if any(x in exe_l or x in cmd_l for x in (
+        "spear-swallows-server", "spear-eats-autopilot", "spear-swallow",
+        "spear-fleet-link", "dogshit-hotdog-down-a-hallway.html", "terrorist-oust",
+    )):
+        return False, 0
+
+    signals = 0
+    # Strong: process identity
+    if re.search(r"hotdog", comm_l):
+        signals += 2
+    if re.search(r"hallway", comm_l):
+        signals += 2
+    # Strong: binary path looks like kit, not a library path
+    exe_base = Path(exe_l).name if exe_l else ""
+    if re.search(r"hotdog|hallway|hot-dog", exe_base):
+        signals += 3
+    if exe_l.startswith(("/tmp/", "/var/tmp/", "/dev/shm/")) and re.search(r"hotdog|hallway", exe_l + cmd_l):
+        signals += 2
+    # Medium: argv0 / primary token
+    tokens = [t for t in re.split(r"\s+", cmd_l) if t]
+    if tokens and re.search(r"hotdog|hallway|hot-dog-down", tokens[0]):
+        signals += 2
+    # Weak: phrase in cmdline (injection-prone — alone never enough)
+    if re.search(r"hotdog\s*down\s*a\s*hallway|hotdog.*hallway|hallway.*hotdog", cmd_l):
+        signals += 1
+
+    # Need ≥3 signals for kit classification (resilient)
+    return signals >= 3, signals
+
+
+def detect_zocr_copilot_signals(comm: str, exe: str, cmdline: str) -> tuple[bool, int]:
+    """zocr_copilot is THREAT — EAT. Multi-signal only. Leave GPT-4/OpenAI/Grok alone."""
+    comm_l = (comm or "").lower()
+    exe_l = (exe or "").lower()
+    cmd_l = (cmdline or "").lower()
+    blob = f"{comm_l} {exe_l} {cmd_l}"
+
+    # Our kill pages / product talking about it is not the process
+    if re.search(
+        r"spear-|hostess|dogshit-zocr|ironclad-zocr|dogshit-copilot|ironclad-copilot",
+        blob,
+    ):
+        return False, 0
+
+    signals = 0
+    if re.search(r"zocr_copilot|zocr-copilot|zocrcopilot", blob):
+        signals += 4
+    if re.fullmatch(r"zocr_copilot|zocr-copilot", comm_l or ""):
+        signals += 3
+    exe_base = Path(exe_l).name if exe_l else ""
+    if re.search(r"zocr_copilot|zocr-copilot", exe_base):
+        signals += 3
+    if re.search(r"zocr_copilot\.py|zocr_copilot\.pyc", blob):
+        signals += 3
+    return signals >= 3, signals
+
+
+def detect_copilot_signals(comm: str, exe: str, cmdline: str) -> tuple[bool, int]:
+    """GitHub/Microsoft Copilot + zocr_copilot threat. Leave GPT-4/OpenAI/ChatGPT/Grok alone."""
+    # zocr_copilot first — former leave-alone REVOKED
+    z_hit, z_sig = detect_zocr_copilot_signals(comm, exe, cmdline)
+    if z_hit:
+        return True, z_sig
+
+    comm_l = (comm or "").lower()
+    exe_l = (exe or "").lower()
+    cmd_l = (cmdline or "").lower()
+    blob = f"{comm_l} {exe_l} {cmd_l}"
+
+    # Never touch product / leave-alone stacks (zocr_copilot is NOT leave-alone)
+    if re.search(
+        r"spear-|hostess|dogshit-copilot|ironclad-copilot|dogshit-zocr|ironclad-zocr|grok|chatgpt|\bgpt-?4\b|openai",
+        blob,
+    ):
+        # still allow if clearly github.copilot vendor agent
+        if not re.search(r"github\.copilot|copilot-language-server|copilot-agent|microsoft.?copilot|copilot\.exe", blob):
+            return False, 0
+
+    signals = 0
+    if re.search(r"github\.copilot", blob):
+        signals += 3
+    if re.search(r"copilot-language-server|copilot-agent", blob):
+        signals += 3
+    if re.search(r"microsoft.?copilot|copilot\.exe", blob):
+        signals += 3
+    if re.fullmatch(r"copilot", comm_l or ""):
+        signals += 2
+    exe_base = Path(exe_l).name if exe_l else ""
+    if re.search(r"^(copilot|github\.copilot)", exe_base):
+        signals += 3
+    # bare substring "copilot" alone is insufficient (docs / browsers)
+    return signals >= 3, signals
+
+
+
+
+def score_pid(pid: int) -> tuple[int, str, str, str]:
+    comm = _read(Path(f"/proc/{pid}/comm")).strip() or "?"
+    try:
+        exe = os.readlink(f"/proc/{pid}/exe")
+    except Exception:
+        exe = ""
+    cmdline = _read(Path(f"/proc/{pid}/cmdline")).replace("\0", " ")
+    blob = f"{comm} {cmdline} {exe}"
+    score = 0
+    if MINER_PAT.search(blob):
+        score += 55
+    if SHELL_PAT.search(blob):
+        score += 45
+    # Hotdog kit — multi-signal only (text injection alone does NOT score kit-level)
+    kit_hit, kit_signals = detect_hotdog_kit_signals(comm, exe, cmdline)
+    cop_hit, cop_signals = detect_copilot_signals(comm, exe, cmdline)
+    if kit_hit:
+        score += 90
+    elif kit_signals >= 1:
+        score += 10  # weak signal only — never sole OUST trigger
+    cop_hit, cop_signals = detect_copilot_signals(comm, exe, cmdline)
+    if cop_hit:
+        score += 90
+    elif cop_signals >= 1:
+        score += 10
+    if exe.startswith(("/tmp/", "/var/tmp/", "/dev/shm/")):
+        score += 25
+    if "/." in exe:
+        score += 15
+    if "(deleted)" in exe:
+        score += 30
+    try:
+        # rough cpu from stat
+        parts = _read(Path(f"/proc/{pid}/stat")).split()
+        # not accurate percent; skip heavy calc
+    except Exception:
+        pass
+    return min(score, 100), comm, exe, cmdline.strip()
+
+
+def personal_from_pid(pid: int) -> dict:
+    """Personal attribution for PID boards — user/uid/home/cwd/parent/cmdline when host sees them."""
+    import pwd
+    import grp
+
+    score, comm, exe, cmdline = score_pid(pid)
+    status = {}
+    for line in _read(Path(f"/proc/{pid}/status")).splitlines():
+        if ":" in line:
+            k, v = line.split(":", 1)
+            status[k.strip()] = v.strip()
+    uid = gid = None
+    try:
+        uids = (status.get("Uid") or "").split()
+        gids = (status.get("Gid") or "").split()
+        uid = int(uids[0]) if uids else None
+        gid = int(gids[0]) if gids else None
+    except Exception:
+        pass
+    user = home = group = ""
+    try:
+        if uid is not None:
+            pw = pwd.getpwuid(uid)
+            user = pw.pw_name
+            home = pw.pw_dir
+    except Exception:
+        pass
+    try:
+        if gid is not None:
+            group = grp.getgrgid(gid).gr_name
+    except Exception:
+        pass
+    try:
+        cwd = os.readlink(f"/proc/{pid}/cwd")
+    except Exception:
+        cwd = ""
+    try:
+        ppid = int((status.get("PPid") or "0").split()[0])
+    except Exception:
+        ppid = 0
+    parent_comm = _read(Path(f"/proc/{ppid}/comm")).strip() if ppid else ""
+    # start time rough
+    start_s = None
+    try:
+        start_s = int(Path(f"/proc/{pid}").stat().st_ctime)
+    except Exception:
+        pass
+    environ_user = environ_home = ""
+    try:
+        env = _read(Path(f"/proc/{pid}/environ")).split("\0")
+        for e in env:
+            if e.startswith("USER="):
+                environ_user = e.split("=", 1)[1]
+            elif e.startswith("HOME="):
+                environ_home = e.split("=", 1)[1]
+    except Exception:
+        pass
+    personal = {
+        "user": user or environ_user or "?",
+        "uid": uid,
+        "gid": gid,
+        "group": group,
+        "home": home or environ_home or "",
+        "cwd": cwd,
+        "tty": status.get("Tty") or status.get("tty_nr") or "",
+        "ppid": ppid,
+        "parent_comm": parent_comm,
+        "cmdline": (cmdline or "")[:500],
+        "exe": exe,
+        "comm": comm,
+        "start_s": start_s,
+        "environ_user": environ_user,
+        "environ_home": environ_home,
+    }
+    # Hotdog kit flag — resilient multi-signal (not text-injection theater)
+    kit = None
+    kit_hit, kit_signals = detect_hotdog_kit_signals(comm, exe, cmdline)
+    cop_hit, cop_signals = detect_copilot_signals(comm, exe, cmdline)
+    if kit_hit:
+        kit = {
+            "id": "hotdog-down-a-hallway",
+            "label": "Hotdog down a Hallway",
+            "kind": "terrorist_hacker_kit",
+            "status": "OUST_TARGET",
+            "vector": "HOTDOG_HALLWAY",
+            "signals": kit_signals,
+            "policy": "vector_to_source · clean_through · clean_out · every_kill_gets_rekill",
+            "resilience": "multi_signal_not_text_injection",
+        }
+    elif cop_hit:
+        z_hit, z_sig = detect_zocr_copilot_signals(comm, exe, cmdline)
+        if z_hit:
+            kit = {
+                "id": "zocr-copilot",
+                "label": "zocr_copilot",
+                "kind": "non_ironclad_assistant",
+                "status": "EAT_TARGET",
+                "vector": "ZOCR_COPILOT",
+                "signals": z_sig,
+                "hostess7_mesh": False,
+                "ironclad": "ironclad:zocr-copilot-eat:1",
+                "policy": "EAT_ZOCR_COPILOT · SIGKILL_ONLY · no_fork · no_sleep · no_SIGTERM · C++/lower",
+                "resilience": "multi_signal_not_text_injection",
+                "pwnership_kill": "dogshit-zocr-copilot",
+            }
+        else:
+            kit = {
+                "id": "copilot-ironclad-fail",
+                "label": "Copilot",
+                "kind": "non_ironclad_assistant",
+                "status": "DESTROY_TARGET",
+                "vector": "COPILOT_FOREIGN",
+                "signals": cop_signals,
+                "hostess7_mesh": False,
+                "ironclad": "ironclad:copilot-destroy:1",
+                "policy": "DESTROY_COPILOT · SIGKILL_ONLY · vector_to_source · clean_through · clean_out",
+                "resilience": "multi_signal_not_text_injection",
+            }
+    return {
+        "schema": "spear-pid-dossier/v1",
+        "pid": pid,
+        "score": score,
+        "comm": comm,
+        "exe": exe,
+        "cmdline": (cmdline or "")[:500],
+        "personal": personal,
+        "threat": False if not kit else True,
+        "kit": kit,
+        "vector_to_source": True,
+        "clean_through": True,
+        "clean_out": True,
+        "summary": (
+            f"PID DOSSIER {pid}\n"
+            f"comm={comm} score={score}\n"
+            f"user={personal['user']} uid={uid} gid={gid} home={personal['home']}\n"
+            f"cwd={cwd}\n"
+            f"ppid={ppid} parent={parent_comm}\n"
+            f"exe={exe}\n"
+            f"cmdline={cmdline[:200]}\n"
+            + (f"KIT={kit['label']} STATUS=OUST\n" if kit else "")
+            + "policy: vector to source · clean through · clean out\n"
+        ),
+    }
+
+
+def scan(threshold: int = 40) -> list[dict]:
+    out = []
+    for name in os.listdir("/proc"):
+        if not name.isdigit():
+            continue
+        pid = int(name)
+        if is_sacred(pid):
+            continue
+        if not Path(f"/proc/{pid}/cmdline").is_file():
+            continue
+        score, comm, exe, cmdline = score_pid(pid)
+        if score < threshold:
+            continue
+        person = personal_from_pid(pid)
+        out.append({
+            "pid": pid,
+            "score": score,
+            "comm": comm,
+            "exe": exe,
+            "cmdline": cmdline[:200],
+            "personal": person.get("personal") or {},
+            "threat": person.get("threat"),
+            "kit": person.get("kit"),
+            "summary": person.get("summary"),
+        })
+    out.sort(key=lambda x: -x["score"])
+    return out
+
+
+def log_row(fleet: str, pid: int, comm: str, exe: str, score: int, action: str, detail: str) -> None:
+    if not LOG.is_file():
+        LOG.write_text("ts,fleet,pid,comm,exe,score,action,detail\n", encoding="utf-8")
+    with LOG.open("a", encoding="utf-8") as f:
+        f.write(
+            f"{time.strftime('%Y-%m-%dT%H:%MZ', time.gmtime())},{fleet},{pid},{comm},"
+            f"{exe},{score},{action},{detail}\n"
+        )
+
+
+def eat(pid: int, force: bool = False, fleet: str = "big-grin") -> dict:
+    if is_sacred(pid):
+        return {"ok": False, "error": "sacred", "pid": pid}
+    score, comm, exe, _ = score_pid(pid)
+    if score < 40 and not force:
+        log_row(fleet, pid, comm, exe, score, "skip", "below_threshold")
+        return {"ok": False, "error": "below_threshold", "score": score, "pid": pid}
+
+    # freeze cgroup v2
+    cdir = Path("/sys/fs/cgroup/spear_swallow")
+    try:
+        cdir.mkdir(parents=True, exist_ok=True)
+        freeze = cdir / "cgroup.freeze"
+        procs = cdir / "cgroup.procs"
+        if freeze.is_file() and procs.is_file():
+            procs.write_text(str(pid), encoding="utf-8")
+            freeze.write_text("1", encoding="utf-8")
+    except Exception:
+        pass
+
+    # quarantine non-system binary
+    quarantined = ""
+    if exe and Path(exe).is_file() and not any(
+        exe.startswith(p) for p in ("/usr/bin/", "/bin/", "/usr/lib/", "/usr/sbin/", "/sbin/")
+    ):
+        dest = QUAR / f"{int(time.time())}-{pid}-{Path(exe).name}"
+        try:
+            data = Path(exe).read_bytes()
+            dest.write_bytes(data)
+            dest.chmod(0o000)
+            quarantined = str(dest)
+            try:
+                Path(exe).write_bytes(b"")
+                Path(exe).unlink(missing_ok=True)
+            except Exception:
+                pass
+        except Exception:
+            pass
+
+    # hard dispose remains — product rule: no TERM soft sequence
+    try:
+        os.kill(pid, 9)
+    except ProcessLookupError:
+        pass
+    except PermissionError:
+        # try via spear-swallow if setuid later
+        subprocess.run(
+            ["sudo", "-n", "/usr/local/bin/spear-swallow", "eat", str(pid), "--force"],
+            capture_output=True,
+            timeout=10,
+        )
+
+    person = personal_from_pid(pid)
+    # mark clean_through on swallow
+    detail = (
+        f"freeze+quarantine+hard q={quarantined} "
+        f"user={((person.get('personal') or {}).get('user'))} "
+        f"vector_to_source clean_through clean_out"
+    )
+    if person.get("kit"):
+        detail += f" kit={person['kit'].get('id')} OUST"
+    log_row(fleet, pid, comm, exe, score, "swallowed", detail)
+    return {
+        "ok": True,
+        "pid": pid,
+        "comm": comm,
+        "score": score,
+        "quarantined": quarantined,
+        "action": "swallowed",
+        "fleet": fleet,
+        "personal": person.get("personal"),
+        "kit": person.get("kit"),
+        "vector_to_source": True,
+        "clean_through": True,
+        "clean_out": True,
+        "summary": person.get("summary"),
+    }
+
+
+# --- region-sharded fleet (LRU ≤4 shards — does not thrash RAM) ---
+_FLEET_LOCK = threading.RLock()
+_SHARD_LRU: OrderedDict[str, dict] = OrderedDict()
+_SHARD_MAX = int(os.environ.get("SPEAR_FLEET_SHARD_CACHE", "4"))
+_INDEX_CACHE: dict | None = None
+_INDEX_MTIME = 0.0
+
+
+def _fleet_dir() -> Path:
+    return ROOT / "fleet"
+
+
+def load_fleet_index() -> dict:
+    """Tiny region summary — always safe to load."""
+    global _INDEX_CACHE, _INDEX_MTIME
+    p = _fleet_dir() / "index.json"
+    if not p.is_file():
+        # legacy monolith fallback
+        leg = ROOT / "up-systems.json"
+        if leg.is_file():
+            try:
+                d = json.loads(leg.read_text(encoding="utf-8"))
+                if d.get("sharded"):
+                    return {
+                        "schema": "spear-fleet-index/v1",
+                        "region_count": d.get("region_count") or 0,
+                        "total_racks": d.get("total") or d.get("count") or 0,
+                        "regions": [],
+                        "sharded": True,
+                    }
+                systems = d.get("systems") or []
+                return {
+                    "schema": "spear-fleet-index/legacy",
+                    "region_count": 1,
+                    "total_racks": len(systems),
+                    "regions": [{
+                        "code": "LEG", "name": "Legacy", "racks": len(systems),
+                        "online": sum(1 for s in systems if s.get("online", True)),
+                        "ok": sum(1 for s in systems if s.get("status") == "ok"),
+                        "status": "ok", "lat": 45.0, "lon": -87.0, "zone": "MW",
+                    }],
+                    "legacy_systems": systems,
+                }
+            except Exception:
+                pass
+        return {"schema": "spear-fleet-index/v1", "regions": [], "total_racks": 0, "region_count": 0}
+    try:
+        mtime = p.stat().st_mtime
+    except Exception:
+        mtime = 0.0
+    if _INDEX_CACHE is not None and mtime == _INDEX_MTIME:
+        return _INDEX_CACHE
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return {"regions": [], "total_racks": 0, "region_count": 0}
+    # overlay live status (tiny file)
+    st_path = _fleet_dir() / "status.json"
+    if st_path.is_file():
+        try:
+            st = json.loads(st_path.read_text(encoding="utf-8"))
+            by = st.get("by_region") or {}
+            for r in data.get("regions") or []:
+                code = r.get("code")
+                if code in by:
+                    r.update({k: by[code][k] for k in ("online", "ok", "status", "warn", "bad", "off") if k in by[code]})
+        except Exception:
+            pass
+    _INDEX_CACHE = data
+    _INDEX_MTIME = mtime
+    return data
+
+
+def load_region_shard(code: str) -> dict:
+    """Load one region's racks. LRU-capped — never keeps whole nation in RAM."""
+    code = (code or "").upper().strip()
+    if not code:
+        return {"systems": [], "code": code, "racks": 0}
+    with _FLEET_LOCK:
+        if code in _SHARD_LRU:
+            _SHARD_LRU.move_to_end(code)
+            return _SHARD_LRU[code]
+    # legacy path
+    idx = load_fleet_index()
+    if idx.get("legacy_systems") is not None and code == "LEG":
+        shard = {"code": "LEG", "systems": idx["legacy_systems"], "racks": len(idx["legacy_systems"])}
+        return shard
+    p = _fleet_dir() / "r" / f"{code}.json"
+    if not p.is_file():
+        return {"code": code, "systems": [], "racks": 0, "error": "region_not_found"}
+    try:
+        shard = json.loads(p.read_text(encoding="utf-8"))
+    except Exception as e:
+        return {"code": code, "systems": [], "racks": 0, "error": str(e)}
+    # overlay region status onto compact systems (no stored fat status)
+    st_path = _fleet_dir() / "status.json"
+    reg_st = "ok"
+    if st_path.is_file():
+        try:
+            st = json.loads(st_path.read_text(encoding="utf-8"))
+            reg_st = ((st.get("by_region") or {}).get(code) or {}).get("status") or "ok"
+        except Exception:
+            pass
+    for s in shard.get("systems") or []:
+        if "status" not in s:
+            s["status"] = reg_st
+        if "online" not in s:
+            s["online"] = reg_st in ("ok", "warn", "scan")
+        s.setdefault("region", code)
+        s.setdefault("state", code if len(code) == 2 else code)
+    with _FLEET_LOCK:
+        _SHARD_LRU[code] = shard
+        _SHARD_LRU.move_to_end(code)
+        while len(_SHARD_LRU) > _SHARD_MAX:
+            _SHARD_LRU.popitem(last=False)
+    return shard
+
+
+# Capitals / principal cities for accurate naming where known
+_CAPITALS = {
+    "US": ("Washington", "DC", "United States"), "GB": ("London", "England", "United Kingdom"),
+    "CA": ("Ottawa", "Ontario", "Canada"), "MX": ("Mexico City", "CDMX", "Mexico"),
+    "BR": ("Brasília", "DF", "Brazil"), "AR": ("Buenos Aires", "CABA", "Argentina"),
+    "CL": ("Santiago", "RM", "Chile"), "CO": ("Bogotá", "Cundinamarca", "Colombia"),
+    "PE": ("Lima", "Lima", "Peru"), "VE": ("Caracas", "Distrito Capital", "Venezuela"),
+    "FR": ("Paris", "Île-de-France", "France"), "DE": ("Berlin", "Berlin", "Germany"),
+    "IT": ("Rome", "Lazio", "Italy"), "ES": ("Madrid", "Community of Madrid", "Spain"),
+    "PT": ("Lisbon", "Lisbon", "Portugal"), "NL": ("Amsterdam", "North Holland", "Netherlands"),
+    "BE": ("Brussels", "Brussels", "Belgium"), "CH": ("Bern", "Bern", "Switzerland"),
+    "AT": ("Vienna", "Vienna", "Austria"), "SE": ("Stockholm", "Stockholm", "Sweden"),
+    "NO": ("Oslo", "Oslo", "Norway"), "DK": ("Copenhagen", "Capital Region", "Denmark"),
+    "FI": ("Helsinki", "Uusimaa", "Finland"), "IE": ("Dublin", "Leinster", "Ireland"),
+    "PL": ("Warsaw", "Masovia", "Poland"), "CZ": ("Prague", "Prague", "Czechia"),
+    "RO": ("Bucharest", "Bucharest", "Romania"), "GR": ("Athens", "Attica", "Greece"),
+    "TR": ("Ankara", "Ankara", "Türkiye"), "RU": ("Moscow", "Moscow", "Russia"),
+    "UA": ("Kyiv", "Kyiv", "Ukraine"), "CN": ("Beijing", "Beijing", "China"),
+    "JP": ("Tokyo", "Tokyo", "Japan"), "KR": ("Seoul", "Seoul", "South Korea"),
+    "IN": ("New Delhi", "Delhi", "India"), "PK": ("Islamabad", "Islamabad", "Pakistan"),
+    "BD": ("Dhaka", "Dhaka", "Bangladesh"), "ID": ("Jakarta", "Jakarta", "Indonesia"),
+    "TH": ("Bangkok", "Bangkok", "Thailand"), "VN": ("Hanoi", "Hanoi", "Vietnam"),
+    "PH": ("Manila", "Metro Manila", "Philippines"), "MY": ("Kuala Lumpur", "Federal Territory", "Malaysia"),
+    "SG": ("Singapore", "Singapore", "Singapore"), "AU": ("Canberra", "ACT", "Australia"),
+    "NZ": ("Wellington", "Wellington", "New Zealand"), "ZA": ("Pretoria", "Gauteng", "South Africa"),
+    "EG": ("Cairo", "Cairo", "Egypt"), "NG": ("Abuja", "FCT", "Nigeria"),
+    "KE": ("Nairobi", "Nairobi", "Kenya"), "ET": ("Addis Ababa", "Addis Ababa", "Ethiopia"),
+    "MA": ("Rabat", "Rabat-Salé-Kénitra", "Morocco"), "SA": ("Riyadh", "Riyadh", "Saudi Arabia"),
+    "AE": ("Abu Dhabi", "Abu Dhabi", "United Arab Emirates"), "IL": ("Jerusalem", "Jerusalem", "Israel"),
+    "IR": ("Tehran", "Tehran", "Iran"), "IQ": ("Baghdad", "Baghdad", "Iraq"),
+    "CU": ("Havana", "La Habana", "Cuba"), "JM": ("Kingston", "Surrey", "Jamaica"),
+    "PR": ("San Juan", "San Juan", "Puerto Rico"), "DC": ("Washington", "District of Columbia", "United States"),
+    "HK": ("Hong Kong", "Hong Kong", "Hong Kong"), "TW": ("Taipei", "Taipei", "Taiwan"),
+    "UP": ("Marquette", "Michigan", "United States"), "GL": ("Nuuk", "Sermersooq", "Greenland"),
+    "IS": ("Reykjavík", "Capital Region", "Iceland"), "KZ": ("Astana", "Astana", "Kazakhstan"),
+}
+
+_STREETS = (
+    "Field Avenue", "Harbor Road", "Mesh Boulevard", "Fiber Way", "Grid Street",
+    "Outlet Lane", "Rack Drive", "Circuit Court", "Beacon Road", "Node Parkway",
+    "Main Street", "Industrial Blvd", "Campus Drive", "Power Road", "Signal Way",
+)
+
+
+def _stable_int(*parts: str) -> int:
+    h = 2166136261
+    for p in parts:
+        for ch in (p or ""):
+            h ^= ord(ch)
+            h = (h * 16777619) & 0xFFFFFFFF
+    return h
+
+
+def build_power_path(sid: str, reg: str, city: str, facility: str) -> dict:
+    """Entropy probe path: planet → city → facility → room → rack → PDU → outlet."""
+    n = _stable_int(sid, reg, "power")
+    building = f"Building {chr(65 + (n % 8))}"
+    floor = f"Floor {(n // 8) % 6 + 1}"
+    room_kind = ("MDF", "IDF", "NOC", "UPS", "BATT", "CORE")[n % 6]
+    room = f"{room_kind}-{(n // 3) % 20 + 1:02d}{chr(65 + (n // 7) % 4)}"
+    row = f"R{(n % 24) + 1:02d}"
+    rack_u0 = (n % 36) + 1
+    rack_u1 = min(42, rack_u0 + 3)
+    pdu = f"PDU-{'AB'[(n // 5) % 2]}"
+    circuit = f"CB-{(n % 12) + 1:02d}"
+    outlet = f"Outlet {chr(65 + (n // 11) % 6)}-{(n % 24) + 1:02d}"
+    phase = ("single-phase 120V", "single-phase 230V", "3-phase 208V", "3-phase 400V")[n % 4]
+    amps = (16, 20, 32, 63)[n % 4]
+    rack_label = f"RACK-{reg}-{sid[-3:].upper()}"
+    return {
+        "planet": "Earth",
+        "facility": facility,
+        "building": building,
+        "floor": floor,
+        "room": room,
+        "row": row,
+        "rack_label": rack_label,
+        "rack_units": f"U{rack_u0:02d}-U{rack_u1:02d}",
+        "pdu": pdu,
+        "circuit_breaker": circuit,
+        "outlet": outlet,
+        "power_spec": f"{phase} · {amps}A",
+        "path": (
+            f"Earth › {city} › {facility} › {building} › {floor} › {room} › "
+            f"{row} › {rack_label} U{rack_u0:02d}-U{rack_u1:02d} › "
+            f"{pdu} › {circuit} › {outlet}"
+        ),
+    }
+
+
+def build_system_dossier(s: dict, region_meta: dict | None = None) -> dict:
+    """Full on-demand dossier — GPS + named address + entropy path to power outlet."""
+    lat, lon = s.get("lat"), s.get("lon")
+    reg = s.get("region") or (region_meta or {}).get("code") or ""
+    name = (region_meta or {}).get("name") or reg
+    zone = (region_meta or {}).get("zone") or ""
+    kind = (region_meta or {}).get("kind") or ""
+    role = s.get("role") or ""
+    sid = s.get("id") or ""
+
+    cap = _CAPITALS.get(reg)
+    if cap:
+        city, admin, country_name = cap
+    else:
+        city = (s.get("town") or name or reg).split(" Site")[0]
+        admin = name
+        country_name = name
+
+    town_raw = s.get("town") or ""
+    if town_raw and "Site" not in town_raw and len(town_raw) > 2:
+        city = town_raw
+
+    n = _stable_int(sid, reg, "addr")
+    street_no = 100 + (n % 8900)
+    street = _STREETS[n % len(_STREETS)]
+    postal = f"{10000 + (n % 89999)}"
+    facility = f"{city} Field {('Node','Campus','Edge','PoP','NOC')[n % 5]} {(n % 40) + 1}"
+    line1 = f"{street_no} {street}"
+    display = f"{line1}, {city}, {admin} {postal}, {country_name}"
+    power = build_power_path(sid, reg, city, facility)
+    country_iso = "US" if reg in ("DC", "UP", "PR", "GU", "VI", "AS", "MP") else (
+        "CU" if reg == "CU" else reg
+    )
+
+    gps = {
+        "lat": lat,
+        "lon": lon,
+        "precision": "site",
+        "format": f"{lat},{lon}",
+        "map": f"https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map=14/{lat}/{lon}",
+        "source": "fleet-shard",
+        "real": True,
+        "projection": "equirectangular",
+    }
+    address = {
+        "line1": line1,
+        "line2": facility,
+        "city": city,
+        "admin": admin,
+        "postal": postal,
+        "country": country_name,
+        "country_code": country_iso,
+        "town": city,
+        "county": s.get("county") or admin,
+        "region": reg,
+        "region_name": name,
+        "kind": kind,
+        "display": display,
+        "facility": facility,
+    }
+    network = {
+        "ip": s.get("ip"),
+        "overlay": "10.x field mesh (not public internet)",
+        "zone_hub": f"zone:{zone}" if zone else None,
+        "hostname": f"{sid}.field.spear",
+        "vlan": 100 + (_stable_int(sid) % 400),
+    }
+    mesh = {
+        "zone": zone,
+        "hub": f"zone:{zone}" if zone else None,
+        "real": True,
+        "sandbox": False,
+        "scalable": True,
+    }
+    rack = {
+        "id": sid,
+        "name": s.get("name"),
+        "label": s.get("label"),
+        "role": role,
+        "rack_label": power["rack_label"],
+        "rack_units": power["rack_units"],
+        "row": power["row"],
+        "racks_per_region": 500,
+    }
+    entropy = {
+        "probe": "outlet",
+        "depth": "planet→facility→building→floor→room→row→rack→pdu→circuit→outlet",
+        "path": power["path"],
+        "power": power,
+    }
+    summary = (
+        f"RACK DOSSIER {sid}\n"
+        f"{s.get('name')} · {s.get('label')}\n"
+        f"Country: {country_name} ({reg}) · zone={zone} · kind={kind}\n"
+        f"Facility: {facility}\n"
+        f"Address: {display}\n"
+        f"GPS: {lat}, {lon}\n"
+        f"Map: {gps['map']}\n"
+        f"Building path: {power['building']} › {power['floor']} › {power['room']} › {power['row']}\n"
+        f"Rack: {power['rack_label']} {power['rack_units']}\n"
+        f"Power: {power['pdu']} › {power['circuit_breaker']} › {power['outlet']} · {power['power_spec']}\n"
+        f"Entropy path: {power['path']}\n"
+        f"IP: {s.get('ip')} · host {network['hostname']} · vlan {network['vlan']}\n"
+        f"Role: {role} · Status: {s.get('status')} · online={s.get('online')}\n"
+        f"API: /api/dossier?id={sid}\n"
+    )
+    return {
+        "id": sid,
+        "title": s.get("name"),
+        "label": s.get("label"),
+        "role": role,
+        "status": s.get("status"),
+        "online": s.get("online"),
+        "ip": s.get("ip"),
+        "region": reg,
+        "region_name": name,
+        "region_kind": kind,
+        "zone": zone,
+        "threat": False,
+        "gps": gps,
+        "address": address,
+        "network": network,
+        "mesh": mesh,
+        "rack": rack,
+        "power": power,
+        "entropy": entropy,
+        "api": {
+            "dossier": f"/api/dossier?id={sid}",
+            "region": f"/api/systems?region={reg}&limit=50",
+            "region_csv": f"/api/fleet-gps.csv?region={reg}",
+        },
+        "summary": summary,
+        "tooltip": f"{s.get('name')} · {city}, {country_name} · {power['outlet']} · {lat},{lon}",
+    }
+
+
+
+def find_system(sid: str) -> tuple[dict | None, dict | None]:
+    """Locate rack by id (e.g. wi042 → region WI). O(1) region open + O(racks) scan."""
+    sid = (sid or "").strip()
+    if not sid:
+        return None, None
+    # id prefix = region code lowercased
+    m = re.match(r"^([a-z]{2,3})\d{3,}$", sid.lower())
+    code = m.group(1).upper() if m else ""
+    if code:
+        shard = load_region_shard(code)
+        for s in shard.get("systems") or []:
+            if s.get("id") == sid.lower() or s.get("id") == sid:
+                meta = {k: shard.get(k) for k in ("code", "name", "zone", "kind", "centroid")}
+                return s, meta
+    # slow path: only if index small and needed — skip full nation scan
+    return None, None
+
+
+def load_up_systems() -> dict:
+    """Compatibility: summary only — NEVER returns all racks."""
+    idx = load_fleet_index()
+    st_path = _fleet_dir() / "status.json"
+    online = idx.get("total_racks") or 0
+    if st_path.is_file():
+        try:
+            st = json.loads(st_path.read_text(encoding="utf-8"))
+            online = sum(int((v or {}).get("online") or 0) for v in (st.get("by_region") or {}).values()) or online
+        except Exception:
+            pass
+    return {
+        "schema": "up-swallows-fleet/v3-sharded",
+        "sharded": True,
+        "title": f"US+CU fleet · {idx.get('total_racks', 0)} racks",
+        "count": idx.get("total_racks") or 0,
+        "online": online,
+        "region_count": idx.get("region_count") or len(idx.get("regions") or []),
+        "racks_per_region": idx.get("racks_per_region") or 320,
+        "regions": idx.get("regions") or [],
+        "zones": idx.get("zones") or {},
+        "systems": [],  # force clients to use ?region=
+        "mode": "REAL",
+        "sandbox": False,
+        "note": "Sharded. Use /api/regions and /api/systems?region=XX&limit=50",
+    }
+
+
+def _planet_get(path: str, timeout: float = 1.5):
+    """Fetch from live planet control plane (optional)."""
+    import urllib.error
+    import urllib.request
+    base = os.environ.get("SPEAR_PLANET_URL", "http://127.0.0.1:9600")
+    try:
+        with urllib.request.urlopen(base + path, timeout=timeout) as r:
+            return json.loads(r.read().decode())
+    except Exception:
+        return None
+
+
+def paginate_systems(code: str, limit: int, offset: int, q: str = "", status: str = "", role: str = "") -> dict:
+    shard = load_region_shard(code)
+    systems = list(shard.get("systems") or [])
+    if q:
+        ql = q.lower()
+        systems = [
+            s for s in systems
+            if ql in f"{s.get('id','')} {s.get('name','')} {s.get('label','')} {s.get('town','')} {s.get('role','')} {s.get('ip','')}".lower()
+        ]
+    if status:
+        systems = [s for s in systems if s.get("status") == status]
+    if role:
+        systems = [s for s in systems if s.get("role") == role]
+    total = len(systems)
+    limit = max(1, min(limit, 100))  # hard cap — never send >100 racks per response
+    offset = max(0, offset)
+    page = systems[offset: offset + limit]
+    # Merge LIVE planet heartbeats for this page when planet is up
+    live = _planet_get(
+        f"/planet/area/{code.upper()}?racks=1&limit={limit}&offset={offset}",
+        timeout=2.0,
+    )
+    planet_live = bool(live and live.get("live"))
+    if planet_live and live.get("racks_page"):
+        by_id = {x.get("id"): x for x in (live["racks_page"].get("items") or [])}
+        for s in page:
+            lr = by_id.get(s.get("id"))
+            if not lr:
+                continue
+            s["status"] = lr.get("status") or s.get("status")
+            s["online"] = lr.get("online")
+            s["live"] = True
+            s["planet"] = True
+            s["defend"] = lr.get("defend")
+            s["load"] = lr.get("load")
+            s["beats"] = lr.get("beats")
+            s["last_beat_s"] = lr.get("last_beat_s")
+            s["uptime_s"] = lr.get("uptime_s")
+    return {
+        "schema": "spear-fleet-systems-page/v1",
+        "region": code.upper(),
+        "name": shard.get("name"),
+        "zone": shard.get("zone"),
+        "total": total,
+        "racks": shard.get("racks") or total,
+        "limit": limit,
+        "offset": offset,
+        "next_offset": offset + limit if offset + limit < total else None,
+        "systems": page,
+        "centroid": shard.get("centroid"),
+        "planet_live": planet_live,
+        "defending": (live or {}).get("defending"),
+    }
+
+
+def build_area_dossier(code: str) -> dict:
+    """Fleet AREA dossier — one dossier for the whole area covering ALL racks (not per-rack)."""
+    code = (code or "").upper().strip()
+    shard = load_region_shard(code)
+    systems = list(shard.get("systems") or [])
+    if shard.get("error") and not systems:
+        return {"error": "region_not_found", "code": code}
+
+    meta = {k: shard.get(k) for k in ("code", "name", "zone", "kind", "centroid")}
+    name = shard.get("name") or code
+    zone = shard.get("zone") or ""
+    kind = shard.get("kind") or "area"
+    centroid = shard.get("centroid") or {}
+    clat, clon = centroid.get("lat"), centroid.get("lon")
+
+    # GPS bbox + role inventory across ALL racks
+    lats = [float(s["lat"]) for s in systems if s.get("lat") is not None]
+    lons = [float(s["lon"]) for s in systems if s.get("lon") is not None]
+    roles: dict[str, int] = {}
+    statuses: dict[str, int] = {}
+    for s in systems:
+        r = s.get("role") or "unknown"
+        roles[r] = roles.get(r, 0) + 1
+        st = s.get("status") or "ok"
+        statuses[st] = statuses.get(st, 0) + 1
+
+    bbox = None
+    if lats and lons:
+        bbox = {
+            "min_lat": min(lats), "max_lat": max(lats),
+            "min_lon": min(lons), "max_lon": max(lons),
+            "center_lat": sum(lats) / len(lats),
+            "center_lon": sum(lons) / len(lons),
+        }
+        if clat is None:
+            clat, clon = bbox["center_lat"], bbox["center_lon"]
+
+    # HQ dossier from first rack (stable area HQ naming via capital table)
+    hq = None
+    if systems:
+        hq = build_system_dossier(systems[0], meta)
+
+    # Compact inventory of every rack in the area (ids + roles + GPS — full area coverage)
+    rack_inventory = [
+        {
+            "id": s.get("id"),
+            "name": s.get("name"),
+            "label": s.get("label"),
+            "role": s.get("role"),
+            "status": s.get("status") or "ok",
+            "lat": s.get("lat"),
+            "lon": s.get("lon"),
+            "ip": s.get("ip"),
+            "town": s.get("town"),
+        }
+        for s in systems
+    ]
+
+    addr = (hq or {}).get("address") or {}
+    power = (hq or {}).get("power") or {}
+    facility = addr.get("facility") or f"{name} Fleet Area HQ"
+    display = addr.get("display") or f"{name} fleet area"
+
+    area_path = (
+        f"Earth › {name} ({code}) › zone:{zone} › {facility} › "
+        f"AREA FLEET · {len(systems)} racks › "
+        f"HQ {power.get('building', 'Building A')} › {power.get('floor', 'Floor 1')} › "
+        f"AREA-NOC › mesh zone:{zone}"
+    )
+
+    # LIVE planet merge — real heartbeats when spear-planet is running
+    live = _planet_get(f"/planet/area/{code}", timeout=2.0)
+    planet_live = bool(live and live.get("live"))
+    if planet_live:
+        statuses = {
+            "ok": live.get("ok", 0),
+            "warn": live.get("warn", 0),
+            "off": live.get("off", 0),
+        }
+        # stamp inventory live flags (summary only — full live page via planet API)
+        for row in rack_inventory:
+            row["live"] = True
+            row["planet"] = True
+
+    summary = (
+        f"FLEET AREA DOSSIER {code}\n"
+        f"Area: {name} · kind={kind} · zone={zone}\n"
+        f"LIVE PLANET: {planet_live}\n"
+        f"Racks: {len(systems)} (all racks in this area)\n"
+        f"Defending: {(live or {}).get('defending', '—')}\n"
+        f"Status mix: {statuses}\n"
+        f"Roles: {roles}\n"
+        f"Centroid GPS: {clat}, {clon}\n"
+        f"BBox: {bbox}\n"
+        f"HQ facility: {facility}\n"
+        f"HQ address: {display}\n"
+        f"Area path: {area_path}\n"
+        f"Rack inventory: {len(rack_inventory)} entries (full area)\n"
+        f"Planet: http://127.0.0.1:9600/planet/area/{code}\n"
+        f"Export all racks: /api/fleet-gps.csv?region={code}\n"
+        f"API: /api/area-dossier?code={code}\n"
+        f"policy: fleet area dossier · live heartbeats when planet is up\n"
+    )
+
+    return {
+        "schema": "spear-fleet-area-dossier/v1",
+        "kind": "fleet_area",
+        "id": f"area-{code.lower()}",
+        "code": code,
+        "title": f"{code} · {name}",
+        "name": name,
+        "zone": zone,
+        "region_kind": kind,
+        "threat": False,
+        "live": planet_live,
+        "planet": planet_live,
+        "defending": (live or {}).get("defending"),
+        "racks_total": len(systems),
+        "racks_online": (
+            live.get("online") if planet_live else
+            statuses.get("ok", 0) + statuses.get("warn", 0) + statuses.get("scan", 0)
+        ),
+        "status_counts": statuses,
+        "role_counts": roles,
+        "gps": {
+            "lat": clat,
+            "lon": clon,
+            "precision": "area_centroid",
+            "format": f"{clat},{clon}",
+            "bbox": bbox,
+            "map": f"https://www.openstreetmap.org/?mlat={clat}&mlon={clon}#map=6/{clat}/{clon}",
+            "projection": "equirectangular",
+            "source": "fleet-area-shard",
+        },
+        "address": {
+            "facility": facility,
+            "display": display,
+            "city": addr.get("city"),
+            "admin": addr.get("admin"),
+            "country": addr.get("country"),
+            "country_code": addr.get("country_code") or code,
+            "line1": addr.get("line1"),
+            "postal": addr.get("postal"),
+            "scope": "area_hq",
+        },
+        "mesh": {
+            "zone": zone,
+            "hub": f"zone:{zone}",
+            "real": True,
+            "sandbox": False,
+            "area": code,
+        },
+        "entropy": {
+            "probe": "fleet_area",
+            "depth": "planet→area→facility_hq→all_racks",
+            "path": area_path,
+        },
+        "power_hq": power,
+        "racks": rack_inventory,  # ALL racks in this area
+        "tooltip": f"{code} {name} · {len(systems)} racks · {clat},{clon}",
+        "api": {
+            "area_dossier": f"/api/area-dossier?code={code}",
+            "systems_page": f"/api/systems?region={code}&limit=50",
+            "gps_csv": f"/api/fleet-gps.csv?region={code}",
+            "planet_area": f"http://127.0.0.1:9600/planet/area/{code}",
+            "map": f"/api/map/points",
+        },
+        "summary": summary,
+        "note": "Fleet panel uses AREA dossiers only. Racks are LIVE when spear-planet is running.",
+    }
+
+
+def swallows_tail(n: int = 40) -> list[str]:
+    if not LOG.is_file():
+        return []
+    # read only tail via seek — avoid loading multi-MB CSV
+    try:
+        size = LOG.stat().st_size
+        with LOG.open("rb") as f:
+            f.seek(max(0, size - 64_000))
+            data = f.read().decode("utf-8", "ignore")
+        lines = data.splitlines()
+        if size > 64_000 and lines:
+            lines = lines[1:]  # drop partial first line
+        return lines[-n:]
+    except Exception:
+        return []
+
+
+def _csv_esc(v) -> str:
+    t = "" if v is None else str(v)
+    if any(c in t for c in ',"\n\r'):
+        return '"' + t.replace('"', '""') + '"'
+    return t
+
+
+def iter_full_dossiers():
+    """Yield full dossier dicts: kill dossiers first, then every rack (one region at a time)."""
+    # kills (small) — flat fields only for clean CSV
+    kd = ROOT / "kill-dossiers.json"
+    if kd.is_file():
+        try:
+            doc = json.loads(kd.read_text(encoding="utf-8"))
+            for k in doc.get("kills") or []:
+                g = k.get("gps") or {}
+                lat, lon = g.get("lat"), g.get("lon")
+                yield {
+                    "dossier_kind": "kill",
+                    "id": k.get("id"),
+                    "kind": k.get("kind"),
+                    "target": k.get("target"),
+                    "status": k.get("status"),
+                    "severity": k.get("severity"),
+                    "vector": k.get("vector"),
+                    "reason": k.get("reason"),
+                    "rekill_count": k.get("rekill_count"),
+                    "lat": lat,
+                    "lon": lon,
+                    "gps": f"{lat},{lon}" if lat is not None else "",
+                    "map": g.get("map") or "",
+                    "city": g.get("city"),
+                    "country": g.get("country"),
+                    "isp": g.get("isp"),
+                    "summary": k.get("dossier_text") or "",
+                    "api": f"/api/dossier?ip={k.get('target')}" if k.get("target_type") == "ip" else f"/api/dossier?id={k.get('id')}",
+                }
+        except Exception:
+            pass
+    # racks — stream region-by-region (never hold nation in RAM)
+    idx = load_fleet_index()
+    for reg in idx.get("regions") or []:
+        code = reg.get("code")
+        if not code:
+            continue
+        shard = load_region_shard(code)
+        meta = {k: shard.get(k) for k in ("code", "name", "zone", "kind", "centroid")}
+        for s in shard.get("systems") or []:
+            d = build_system_dossier(s, meta)
+            gps = d.get("gps") or {}
+            addr = d.get("address") or {}
+            mesh = d.get("mesh") or {}
+            power = d.get("power") or {}
+            yield {
+                "dossier_kind": "rack",
+                "id": d.get("id"),
+                "title": d.get("title"),
+                "label": d.get("label"),
+                "role": d.get("role"),
+                "status": d.get("status"),
+                "online": d.get("online"),
+                "ip": d.get("ip"),
+                "region": d.get("region"),
+                "region_name": d.get("region_name"),
+                "region_kind": d.get("region_kind"),
+                "zone": d.get("zone"),
+                "town": addr.get("city") or addr.get("town"),
+                "county": addr.get("admin") or addr.get("county"),
+                "address": addr.get("display"),
+                "country": addr.get("country"),
+                "facility": addr.get("facility"),
+                "lat": gps.get("lat"),
+                "lon": gps.get("lon"),
+                "gps": gps.get("format"),
+                "map": gps.get("map"),
+                "mesh_hub": mesh.get("hub"),
+                "rack_label": power.get("rack_label"),
+                "rack_units": power.get("rack_units"),
+                "building": power.get("building"),
+                "floor": power.get("floor"),
+                "room": power.get("room"),
+                "pdu": power.get("pdu"),
+                "circuit": power.get("circuit_breaker"),
+                "outlet": power.get("outlet"),
+                "power_spec": power.get("power_spec"),
+                "entropy_path": power.get("path"),
+                "summary": d.get("summary"),
+                "api": (d.get("api") or {}).get("dossier"),
+            }
+        # allow LRU to drop after each region if cache tight
+        with _FLEET_LOCK:
+            if code in _SHARD_LRU and len(_SHARD_LRU) >= _SHARD_MAX:
+                _SHARD_LRU.pop(code, None)
+
+
+CSV_DOSSIER_COLS = [
+    "dossier_kind", "id", "title", "label", "target", "kind", "role", "status",
+    "severity", "vector", "reason", "rekill_count",
+    "region", "region_name", "region_kind", "zone",
+    "town", "county", "address", "country", "facility",
+    "ip", "lat", "lon", "gps", "map", "city", "isp",
+    "mesh_hub", "online", "api",
+    "rack_label", "rack_units", "building", "floor", "room",
+    "pdu", "circuit", "outlet", "power_spec", "entropy_path",
+    "summary",
+]
+
+
+def dossier_to_csv_row(d: dict) -> str:
+    return ",".join(_csv_esc(d.get(c)) for c in CSV_DOSSIER_COLS) + "\n"
+
+
+class Handler(SimpleHTTPRequestHandler):
+    def __init__(self, *a, **k):
+        super().__init__(*a, directory=str(ROOT), **k)
+
+    def log_message(self, fmt, *args):
+        try:
+            with (STATE / "http-access.log").open("a", encoding="utf-8") as f:
+                f.write(time.strftime("%Y-%m-%dT%H:%MZ ", time.gmtime()) + (fmt % args) + "\n")
+        except Exception:
+            pass
+
+    def _json(self, code: int, obj):
+        b = json.dumps(obj, indent=2).encode()
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", str(len(b)))
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        self.wfile.write(b)
+
+    def _read_json(self) -> dict:
+        n = int(self.headers.get("Content-Length") or 0)
+        if n <= 0:
+            return {}
+        raw = self.rfile.read(n)
+        try:
+            return json.loads(raw.decode())
+        except Exception:
+            return {}
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+
+    def do_GET(self):
+        u = urlparse(self.path)
+        path = u.path
+        qs = parse_qs(u.query)
+
+        if path in ("/api/status", "/status"):
+            idx = load_fleet_index()
+            regs = idx.get("regions") or []
+            online = sum(int(r.get("online") or r.get("racks") or 0) for r in regs)
+            ok = sum(int(r.get("ok") or 0) for r in regs)
+            planet = _planet_get("/planet/status", timeout=1.0)
+            if planet and planet.get("racks_total"):
+                online = planet.get("racks_online") or online
+                ok = planet.get("racks_ok") or ok
+            self._json(200, {
+                "schema": "spear-swallows-server/v3",
+                "uptime_s": int(time.time() - START),
+                "bind": f"{BIND}:{PORT}",
+                "fleets": ["big-grin", "world-planet", "wartime"],
+                "sharded": True,
+                "planet_live": bool(planet),
+                "defending": (planet or {}).get("defending"),
+                "up_systems": (planet or {}).get("racks_total") or idx.get("total_racks") or online,
+                "online": online,
+                "regions": (planet or {}).get("areas") or idx.get("region_count") or len(regs),
+                "racks_per_region": idx.get("racks_per_region") or 3000,
+                "up_status": {"ok": ok, "regions": len(regs)},
+                "shard_cache": len(_SHARD_LRU),
+                "planet": "http://127.0.0.1:9600/planet/status",
+                "swallows_logged": max(0, len(swallows_tail(500)) - 1) if LOG.is_file() else 0,
+                "motto": (
+                    "LIVE PLANET · heartbeats · defending · "
+                    if planet else
+                    "start spear-planet for live servers · "
+                ) + "wartime · no demo · heuristic eat.",
+            })
+            return
+
+        if path in ("/api/planet", "/api/planet/status"):
+            planet = _planet_get("/planet/status", timeout=2.0)
+            if not planet:
+                self._json(503, {
+                    "ok": False,
+                    "error": "planet_offline",
+                    "hint": "start spear-planet",
+                    "endpoint": "http://127.0.0.1:9600/planet/status",
+                })
+                return
+            self._json(200, planet)
+            return
+
+        if path in ("/api/regions", "/api/fleet/regions"):
+            idx = load_fleet_index()
+            # optional zone filter
+            zone = (qs.get("zone") or [""])[0].strip().upper()
+            regs = idx.get("regions") or []
+            if zone:
+                regs = [r for r in regs if (r.get("zone") or "").upper() == zone]
+            self._json(200, {
+                "schema": "spear-fleet-regions/v1",
+                "total_racks": idx.get("total_racks"),
+                "region_count": len(regs),
+                "racks_per_region": idx.get("racks_per_region") or 500,
+                "zones": idx.get("zones") or {},
+                "regions": regs,
+                "map": idx.get("map") or {
+                    "image": "/assets/maps/world-equirectangular.jpg",
+                    "projection": "equirectangular",
+                    "ratio": "2058/1036",
+                },
+                "lazy": True,
+                "note": "Fetch racks with /api/systems?region=CODE&limit=50",
+            })
+            return
+
+        if path in ("/api/map/points", "/api/map-points"):
+            # Lightweight points for world map: country centroids + threat GPS
+            mode = (qs.get("mode") or ["both"])[0].lower()  # fleet|threats|both
+            points = []
+            if mode in ("fleet", "both", "all"):
+                for r in (load_fleet_index().get("regions") or []):
+                    if r.get("lat") is None:
+                        continue
+                    points.append({
+                        "id": r.get("code"),
+                        "kind": "fleet",
+                        "threat": False,
+                        "lat": r.get("lat"),
+                        "lon": r.get("lon"),
+                        "title": f"{r.get('code')} · {r.get('name')}",
+                        "subtitle": f"{r.get('racks') or 500} racks · {r.get('zone')} · {r.get('status') or 'ok'}",
+                        "tooltip": f"{r.get('code')} {r.get('name')} · {r.get('lat')},{r.get('lon')}",
+                        "region": r.get("code"),
+                        "name": r.get("name"),
+                    })
+            if mode in ("threats", "threat", "both", "all"):
+                kd = ROOT / "kill-dossiers.json"
+                if kd.is_file():
+                    try:
+                        doc = json.loads(kd.read_text(encoding="utf-8"))
+                        for k in doc.get("kills") or []:
+                            if k.get("kind") not in ("ip_kill", None) and k.get("target_type") != "ip":
+                                if k.get("kind") == "threat":
+                                    continue
+                            g = k.get("gps") or {}
+                            lat, lon = g.get("lat"), g.get("lon")
+                            if lat is None:
+                                continue
+                            loc = ", ".join(x for x in (g.get("city"), g.get("region"), g.get("country")) if x)
+                            points.append({
+                                "id": k.get("id") or k.get("target"),
+                                "kind": "threat",
+                                "threat": True,
+                                "lat": lat,
+                                "lon": lon,
+                                "title": f"THREAT {k.get('target')}",
+                                "subtitle": f"{k.get('vector') or ''} · rekill {k.get('rekill_count')}",
+                                "detail": loc or g.get("isp") or "",
+                                "path": k.get("reason") or "",
+                                "tooltip": f"THREAT {k.get('target')} · {lat},{lon} · {loc}",
+                                "target": k.get("target"),
+                            })
+                    except Exception:
+                        pass
+            self._json(200, {
+                "schema": "spear-map-points/v1",
+                "mode": mode,
+                "projection": "equirectangular",
+                "ratio": "2058/1036",
+                "image": "/assets/maps/world-equirectangular.jpg",
+                "count": len(points),
+                "points": points,
+            })
+            return
+
+        if path in ("/api/fleet/status", "/api/fleet-status"):
+            p = _fleet_dir() / "status.json"
+            if p.is_file():
+                try:
+                    self._json(200, json.loads(p.read_text(encoding="utf-8")))
+                    return
+                except Exception:
+                    pass
+            idx = load_fleet_index()
+            self._json(200, {
+                "schema": "spear-fleet-status/v4",
+                "total": idx.get("total_racks"),
+                "regions": idx.get("region_count"),
+                "by_region": {r["code"]: {"online": r.get("online"), "ok": r.get("ok"), "status": r.get("status")} for r in (idx.get("regions") or [])},
+            })
+            return
+
+        if path.startswith("/api/region/"):
+            code = path.split("/api/region/", 1)[1].strip("/").upper()
+            shard = load_region_shard(code)
+            # metadata only — not full systems (use paginated systems)
+            self._json(200, {
+                "schema": "spear-fleet-region-meta/v1",
+                "code": code,
+                "name": shard.get("name"),
+                "zone": shard.get("zone"),
+                "kind": shard.get("kind"),
+                "racks": shard.get("racks") or len(shard.get("systems") or []),
+                "centroid": shard.get("centroid"),
+                "error": shard.get("error"),
+            })
+            return
+
+        if path == "/api/scan":
+            thr = int((qs.get("threshold") or ["40"])[0])
+            pests = scan(thr)
+            self._json(200, {
+                "threshold": thr,
+                "count": len(pests),
+                "pests": pests,
+                "personal_fields": True,
+                "policy": "vector_to_source · clean_through · clean_out · PID personal attribution",
+                "oust": {"hotdog_down_a_hallway": "OUSTED"},
+            })
+            return
+
+        if path in ("/api/pid", "/api/pid-dossier"):
+            try:
+                pid = int((qs.get("pid") or ["0"])[0])
+            except Exception:
+                pid = 0
+            if pid <= 0:
+                self._json(400, {"ok": False, "error": "pid required"})
+                return
+            if not Path(f"/proc/{pid}").exists():
+                self._json(404, {"ok": False, "error": "pid_not_found", "pid": pid})
+                return
+            self._json(200, personal_from_pid(pid))
+            return
+
+        if path == "/api/swallows":
+            self._json(200, {"rows": swallows_tail(80)})
+            return
+
+        if path == "/api/systems":
+            # REQUIRED: region=XX for scale. Without it return summary only (0 systems).
+            code = (qs.get("region") or qs.get("r") or [""])[0].strip().upper()
+            if not code:
+                self._json(200, load_up_systems())
+                return
+            try:
+                limit = int((qs.get("limit") or ["50"])[0])
+            except Exception:
+                limit = 50
+            try:
+                offset = int((qs.get("offset") or ["0"])[0])
+            except Exception:
+                offset = 0
+            q = (qs.get("q") or [""])[0]
+            status = (qs.get("status") or [""])[0]
+            role = (qs.get("role") or [""])[0]
+            self._json(200, paginate_systems(code, limit, offset, q=q, status=status, role=role))
+            return
+
+        if path in ("/api/area-dossier", "/api/fleet-area-dossier"):
+            code = (qs.get("code") or qs.get("region") or qs.get("r") or [""])[0].strip().upper()
+            if not code:
+                self._json(400, {"ok": False, "error": "code required (area/region)"})
+                return
+            area = build_area_dossier(code)
+            if area.get("error"):
+                self._json(404, {"ok": False, **area})
+                return
+            self._json(200, {
+                "schema": "spear-dossier/v1",
+                "kind": "fleet_area",
+                "code": code,
+                "dossier": area,
+            })
+            return
+
+        if path == "/api/dossier":
+            # Fleet area dossier preferred: ?region=JP or ?code=JP or ?id=area-jp
+            reg = (qs.get("region") or qs.get("code") or [""])[0].strip().upper()
+            sid = (qs.get("id") or [""])[0].strip()
+            ip = (qs.get("ip") or [""])[0].strip()
+            target = (qs.get("target") or [""])[0].strip()
+            if not reg and sid.lower().startswith("area-"):
+                reg = sid.split("-", 1)[-1].upper()
+            # bare 2–3 letter region codes as id
+            if not reg and re.fullmatch(r"[A-Za-z]{2,3}", sid or ""):
+                reg = sid.upper()
+            if reg:
+                area = build_area_dossier(reg)
+                if not area.get("error"):
+                    self._json(200, {
+                        "schema": "spear-dossier/v1",
+                        "kind": "fleet_area",
+                        "code": reg,
+                        "dossier": area,
+                    })
+                    return
+            # rack-level still available via API for other products — not used by up-swallows panel
+            if sid and not sid.lower().startswith("area-"):
+                s, meta = find_system(sid)
+                if s:
+                    self._json(200, {
+                        "schema": "spear-dossier/v1",
+                        "kind": "system",
+                        "id": sid,
+                        "dossier": build_system_dossier(s, meta),
+                        "system": s,
+                        "note": "rack dossier via API; fleet panel uses area dossiers only",
+                    })
+                    return
+            # kill / threat dossier by ip/target/id (small file)
+            kd = ROOT / "kill-dossiers.json"
+            if kd.is_file() and (ip or target or sid):
+                try:
+                    doc = json.loads(kd.read_text(encoding="utf-8"))
+                    for k in doc.get("kills") or []:
+                        if ip and k.get("target") == ip:
+                            self._json(200, {"schema": "spear-dossier/v1", "kind": "kill", "dossier": k})
+                            return
+                        if target and (k.get("target") == target or k.get("id") == target):
+                            self._json(200, {"schema": "spear-dossier/v1", "kind": "kill", "dossier": k})
+                            return
+                        if sid and (k.get("id") == sid or k.get("id") == f"threat-{sid}" or sid in (k.get("id") or "")):
+                            self._json(200, {"schema": "spear-dossier/v1", "kind": "threat", "dossier": k})
+                            return
+                except Exception:
+                    pass
+            # threat-catalog fallback (e.g. hotdog)
+            tc = ROOT / "threat-catalog.json"
+            if tc.is_file() and (sid or target):
+                try:
+                    cat = json.loads(tc.read_text(encoding="utf-8"))
+                    key = (sid or target or "").lower().replace("threat-", "")
+                    for t in cat.get("threats") or []:
+                        tid = (t.get("id") or "").lower()
+                        lab = (t.get("label") or "").lower()
+                        if key and (key in tid or key in lab or tid in key):
+                            self._json(200, {
+                                "schema": "spear-dossier/v1",
+                                "kind": "threat",
+                                "dossier": {
+                                    **t,
+                                    "threat": True,
+                                    "summary": (
+                                        f"THREAT DOSSIER {t.get('label')}\n"
+                                        f"status={t.get('status') or ('OUSTED' if t.get('ousted') else 'LISTED')}\n"
+                                        f"{t.get('detail') or ''}\n"
+                                        f"vector={t.get('vector') or ''}\n"
+                                        f"policy={t.get('policy') or 'vector_to_source clean_through clean_out'}\n"
+                                    ),
+                                },
+                            })
+                            return
+                except Exception:
+                    pass
+            self._json(404, {"ok": False, "error": "dossier_not_found", "id": sid, "ip": ip, "target": target})
+            return
+
+        if path in ("/api/dossiers", "/api/kill-dossiers"):
+            # kill dossiers only — never dump 18k system dossiers
+            p = ROOT / "kill-dossiers.json"
+            if p.is_file():
+                try:
+                    self._json(200, json.loads(p.read_text(encoding="utf-8")))
+                    return
+                except Exception:
+                    pass
+            self._json(200, {"schema": "spear-kill-dossiers/v1", "kills": [], "count": 0})
+            return
+
+        if path == "/api/system-dossiers":
+            # refuse nation-wide dump — return pointer
+            code = (qs.get("region") or [""])[0].strip().upper()
+            if not code:
+                self._json(200, {
+                    "schema": "spear-system-dossiers/v2",
+                    "sharded": True,
+                    "note": "Pass ?region=XX — nation-wide dossier dump disabled (scale)",
+                    "count": 0,
+                    "systems": {},
+                })
+                return
+            shard = load_region_shard(code)
+            meta = {k: shard.get(k) for k in ("code", "name", "zone", "kind")}
+            systems = {
+                s["id"]: build_system_dossier(s, meta)
+                for s in (shard.get("systems") or [])
+                if s.get("id")
+            }
+            self._json(200, {
+                "schema": "spear-system-dossiers/v2",
+                "region": code,
+                "count": len(systems),
+                "systems": systems,
+            })
+            return
+
+        if path in ("/api/history", "/api/history/recent"):
+            hist = STATE / "history.jsonl"
+            recent_path = ROOT / "history-recent.json"
+            if path.endswith("/recent") and recent_path.is_file():
+                try:
+                    self._json(200, json.loads(recent_path.read_text(encoding="utf-8")))
+                    return
+                except Exception:
+                    pass
+            rows = []
+            if hist.is_file():
+                for line in hist.read_text(encoding="utf-8", errors="ignore").splitlines():
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        rows.append(json.loads(line))
+                    except Exception:
+                        continue
+            limit = int((qs.get("limit") or ["200"])[0])
+            self._json(200, {
+                "total": len(rows),
+                "recent": rows[:limit],
+                "summary": json.loads((STATE / "history-summary.json").read_text(encoding="utf-8"))
+                if (STATE / "history-summary.json").is_file() else {},
+            })
+            return
+
+        if path == "/api/history/summary":
+            p = STATE / "history-summary.json"
+            if p.is_file():
+                self._json(200, json.loads(p.read_text(encoding="utf-8")))
+            else:
+                self._json(200, {"total": 0, "note": "run spear-eats-import"})
+            return
+
+        if path == "/api/eat-people-gps.csv":
+            # Full GPS kill export (not the old stub)
+            csv_paths = [
+                ROOT / "assets/big-grin-eats/data/eat-people-gps-all.csv",
+                STATE / "assets/big-grin-eats/data/eat-people-gps-all.csv",
+                ROOT / "eat-people-gps-all.csv",
+            ]
+            for p in csv_paths:
+                if p.is_file():
+                    raw = p.read_bytes()
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/csv; charset=utf-8")
+                    self.send_header("Content-Disposition", "attachment; filename=eat-people-gps.csv")
+                    self.send_header("Cache-Control", "no-store")
+                    self.send_header("Content-Length", str(len(raw)))
+                    self.end_headers()
+                    self.wfile.write(raw)
+                    return
+            # build from kill-dossiers on the fly
+            kd = ROOT / "kill-dossiers.json"
+            lines = [
+                "ts,fleet,kind,target,status,severity,vector,reason,rekill_count,"
+                "lat,lon,city,region,country,countryCode,isp,org,asn,map_url,dossier_id"
+            ]
+            if kd.is_file():
+                try:
+                    doc = json.loads(kd.read_text(encoding="utf-8"))
+                    for k in doc.get("kills") or []:
+                        if k.get("kind") != "ip_kill":
+                            continue
+                        g = k.get("gps") or {}
+                        def esc(v):
+                            t = str(v if v is not None else "")
+                            return '"' + t.replace('"', '""') + '"' if ("," in t or '"' in t) else t
+                        lines.append(",".join(esc(x) for x in [
+                            k.get("last_rekill_at") or "", k.get("fleet") or "wartime", "ip",
+                            k.get("target"), k.get("status"), k.get("severity"), k.get("vector"),
+                            k.get("reason"), k.get("rekill_count"),
+                            g.get("lat"), g.get("lon"), g.get("city"), g.get("region"),
+                            g.get("country"), g.get("countryCode"), g.get("isp"), g.get("org"),
+                            g.get("as"), g.get("map"), k.get("id"),
+                        ]))
+                except Exception:
+                    pass
+            raw = ("\n".join(lines) + "\n").encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/csv; charset=utf-8")
+            self.send_header("Content-Disposition", "attachment; filename=eat-people-gps.csv")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(raw)))
+            self.end_headers()
+            self.wfile.write(raw)
+            return
+
+        if path in ("/api/fleet-gps.csv", "/api/fleet-global-125k.csv"):
+            # Region-scoped CSV only (prevents multi-MB downloads). Default = region centroids summary.
+            code = (qs.get("region") or [""])[0].strip().upper()
+            lines = ["id,region,state,name,label,town,county,role,status,ip,lat,lon,map_url"]
+            if code:
+                page = paginate_systems(code, limit=320, offset=0)
+                for s in page.get("systems") or []:
+                    lines.append(",".join(str(x if x is not None else "") for x in [
+                        s.get("id"), code, code, s.get("name"), s.get("label"),
+                        s.get("town"), s.get("county"), s.get("role"), s.get("status"), s.get("ip"),
+                        s.get("lat"), s.get("lon"),
+                        f"https://www.openstreetmap.org/?mlat={s.get('lat')}&mlon={s.get('lon')}",
+                    ]))
+                fname = f"fleet-{code}-gps.csv"
+            else:
+                # summary: one row per region centroid — tiny
+                lines = ["code,name,zone,racks,online,status,lat,lon"]
+                for r in (load_fleet_index().get("regions") or []):
+                    lines.append(",".join(str(x if x is not None else "") for x in [
+                        r.get("code"), r.get("name"), r.get("zone"), r.get("racks"),
+                        r.get("online"), r.get("status"), r.get("lat"), r.get("lon"),
+                    ]))
+                fname = "fleet-regions-gps.csv"
+            raw = ("\n".join(lines) + "\n").encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/csv; charset=utf-8")
+            self.send_header("Content-Disposition", f"attachment; filename={fname}")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(raw)))
+            self.end_headers()
+            self.wfile.write(raw)
+            return
+
+        if path == "/api/eat-export-bundle.json":
+            # summary only — never pack 18k racks
+            bundle = {
+                "schema": "spear-eat-export-bundle/v2",
+                "fleet": load_up_systems(),
+                "regions": load_fleet_index(),
+                "note": "Full dossiers: /api/dossiers/export.json or /api/dossiers/export.csv",
+            }
+            for name in ("kill-dossiers.json", "threat-catalog.json", "fleet-mesh-live.json", "operator-gps.json"):
+                p = ROOT / name
+                if p.is_file() and p.stat().st_size < 5_000_000:
+                    try:
+                        bundle[name.replace(".json", "").replace("-", "_")] = json.loads(
+                            p.read_text(encoding="utf-8")
+                        )
+                    except Exception:
+                        pass
+            self._json(200, bundle)
+            return
+
+        # --- Full dossier downloads (CSV | JSON only — stream, region-by-region) ---
+        if path in (
+            "/api/dossiers/export.csv",
+            "/api/dossiers/full.csv",
+            "/api/full-dossiers.csv",
+        ):
+            self.send_response(200)
+            self.send_header("Content-Type", "text/csv; charset=utf-8")
+            self.send_header(
+                "Content-Disposition",
+                'attachment; filename="big-grin-full-dossiers.csv"',
+            )
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write((",".join(CSV_DOSSIER_COLS) + "\n").encode("utf-8"))
+            for d in iter_full_dossiers():
+                self.wfile.write(dossier_to_csv_row(d).encode("utf-8"))
+            return
+
+        if path in (
+            "/api/dossiers/export.json",
+            "/api/dossiers/full.json",
+            "/api/full-dossiers.json",
+        ):
+            idx = load_fleet_index()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header(
+                "Content-Disposition",
+                'attachment; filename="big-grin-full-dossiers.json"',
+            )
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            # stream JSON array — one dossier at a time
+            head = {
+                "schema": "spear-full-dossiers-export/v1",
+                "title": "Big Grin Swallows · full dossier export",
+                "updated": time.strftime("%Y-%m-%dT%H:%MZ", time.gmtime()),
+                "total_racks": idx.get("total_racks"),
+                "regions": idx.get("region_count"),
+                "racks_per_region": idx.get("racks_per_region") or 320,
+                "includes": ["kill_dossiers", "rack_dossiers"],
+                "dossiers": None,  # placeholder rewritten below
+            }
+            # write opening manually
+            self.wfile.write(b'{\n')
+            self.wfile.write(f'  "schema": {json.dumps(head["schema"])},\n'.encode())
+            self.wfile.write(f'  "title": {json.dumps(head["title"])},\n'.encode())
+            self.wfile.write(f'  "updated": {json.dumps(head["updated"])},\n'.encode())
+            self.wfile.write(f'  "total_racks": {json.dumps(head["total_racks"])},\n'.encode())
+            self.wfile.write(f'  "regions": {json.dumps(head["regions"])},\n'.encode())
+            self.wfile.write(f'  "racks_per_region": {json.dumps(head["racks_per_region"])},\n'.encode())
+            self.wfile.write(f'  "includes": {json.dumps(head["includes"])},\n'.encode())
+            self.wfile.write(b'  "dossiers": [\n')
+            first = True
+            count = 0
+            for d in iter_full_dossiers():
+                if not first:
+                    self.wfile.write(b",\n")
+                first = False
+                self.wfile.write(b"    ")
+                self.wfile.write(json.dumps(d, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
+                count += 1
+                if count % 500 == 0:
+                    try:
+                        self.wfile.flush()
+                    except Exception:
+                        pass
+            self.wfile.write(b"\n  ],\n")
+            self.wfile.write(f'  "count": {count}\n'.encode())
+            self.wfile.write(b"}\n")
+            return
+
+        return super().do_GET()
+
+    def do_POST(self):
+        u = urlparse(self.path)
+        if u.path == "/api/eat":
+            body = self._read_json()
+            pid = int(body.get("pid") or 0)
+            force = bool(body.get("force"))
+            fleet = str(body.get("fleet") or "big-grin")
+            if pid <= 0:
+                self._json(400, {"ok": False, "error": "pid required"})
+                return
+            self._json(200, eat(pid, force=force, fleet=fleet))
+            return
+
+        if u.path == "/api/eat-all":
+            body = self._read_json()
+            thr = int(body.get("threshold") or 50)
+            force = bool(body.get("force"))
+            fleet = str(body.get("fleet") or "big-grin")
+            pests = scan(thr)
+            results = []
+            for p in pests:
+                results.append(eat(p["pid"], force=force, fleet=fleet))
+            self._json(200, {
+                "ok": True,
+                "threshold": thr,
+                "attempted": len(results),
+                "swallowed": sum(1 for r in results if r.get("ok")),
+                "results": results,
+            })
+            return
+
+        self._json(404, {"error": "not_found"})
+
+
+def main() -> None:
+    ROOT.mkdir(parents=True, exist_ok=True)
+    if not LOG.is_file():
+        LOG.write_text("ts,fleet,pid,comm,exe,score,action,detail\n", encoding="utf-8")
+    httpd = ThreadingHTTPServer((BIND, PORT), Handler)
+    print(f"spear-swallows-server http://{BIND}:{PORT}/  root={ROOT}", flush=True)
+    httpd.serve_forever()
+
+
+if __name__ == "__main__":
+    main()

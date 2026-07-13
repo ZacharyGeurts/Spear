@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Spear desktop clean
+Exec=/usr/local/bin/spear-desktop-clean
+OnlyShowIn=X-Cinnamon;Cinnamon;
+X-GNOME-Autostart-enabled=true
+NoDisplay=true

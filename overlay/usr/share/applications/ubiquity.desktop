@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Install Linux Mint
+NoDisplay=true
+Hidden=true
+Exec=/bin/true

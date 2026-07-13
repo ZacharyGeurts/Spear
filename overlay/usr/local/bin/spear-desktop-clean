@@ -1,0 +1,6 @@
+#!/bin/bash
+# Remove Mint installer leftovers from live desktop each login.
+for d in "$HOME/Desktop" /home/*/Desktop; do
+  [[ -d "$d" ]] || continue
+  rm -f "$d/"*Install*Linux*Mint* "$d/"*ubiquity* "$d/ubiquity.desktop" 2>/dev/null || true
+done

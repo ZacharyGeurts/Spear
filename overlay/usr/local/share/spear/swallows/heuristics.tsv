@@ -1,0 +1,27 @@
+# pattern	points	note
+xmrig|minerd|cpuminer|kdevtmpfsi|kinsing	55	crypto_miner
+stratum\+tcp|nicehash|moneroocean	50	pool_connect
+bash -i|/dev/tcp/|nc -e |ncat .* -e	45	reverse_shell
+python3? -c .*(socket|connect)	40	py_shell
+/tmp/|/var/tmp/|/dev/shm/	20	ephemeral_exe
+\.xmr|\.miner|kinsing|watchbog	50	known_names
+curl .*\|\s*sh|wget .*\|\s*bash	35	pipe_dropper
+base64 -d.*\|.*bash	35	encoded_payload
+LOLBin|spawn|Office	15	ai_malware_polymorph
+egress|browser	15	ai_malware_polymorph
+Inter|arrival|below	15	ai_c2_beacon
+Persistent|daemon|session	15	ai_c2_beacon
+fatigue|burst	15	ai_phish_fraud
+Honorability|lookalike|domain	15	ai_phish_fraud
+probes	15	ai_autoscan_exploit
+Exploit|class|transmit	15	ai_autoscan_exploit
+browser|bytes|hosting	15	ai_exfil_shape
+Throttled|egress|under	15	ai_exfil_shape
+GATEWAY_SHIFT|ARP_SPOOF|router	15	ai_dns_dhcp_abuse
+DNS_POISON|resolv|drift	15	ai_dns_dhcp_abuse
+C2_CORRELATION|score	15	ai_ml_c2_stack
+Multiple|vectors|single	15	ai_ml_c2_stack
+# resilient: prefer process identity; product stack ignores self
+hotdog.*(hallway|hall)|hallway.*hotdog	90	Hotdog hallway kit multi-signal
+zocr_copilot|zocr-copilot|zocrcopilot	90	zocr_copilot threat EAT hard
+github\.copilot|copilot-language-server|copilot-agent	90	github/ms copilot destroy hard

@@ -1,0 +1,5067 @@
+{
+  "schema": "spear-threat-catalog/v1",
+  "updated": "2026-07-13T20:56Z",
+  "policy": "IP and threat only \u2014 no PIDs",
+  "counts": {
+    "ips": 35,
+    "threats": 230,
+    "dogshit": 209,
+    "terrorist": 9,
+    "ips_eaten": 34,
+    "threats_eaten": 225,
+    "ips_with_gps": 34,
+    "ousted": 2
+  },
+  "fleets": [
+    "big-grin",
+    "up",
+    "gladstone",
+    "escanaba",
+    "oust"
+  ],
+  "ips": [
+    {
+      "ip": "101.43.32.212",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 31.2222,
+        "lon": 121.4581,
+        "city": "Shanghai",
+        "region": "Shanghai",
+        "country": "China",
+        "countryCode": "CN",
+        "zip": "",
+        "timezone": "Asia/Shanghai",
+        "isp": "Shenzhen Tencent Computer Systems Company Limited",
+        "org": "Tencent Cloud Computing (Beijing) Co., Ltd",
+        "as": "AS45090 Shenzhen Tencent Computer Systems Company Limited",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 31.2222,
+      "lon": 121.4581,
+      "gps": "31.2222,121.4581",
+      "location": "Shanghai, Shanghai, China"
+    },
+    {
+      "ip": "102.220.160.222",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 7.78267,
+        "lon": 4.54181,
+        "city": "Osogbo",
+        "region": "Osun State",
+        "country": "Nigeria",
+        "countryCode": "NG",
+        "zip": "",
+        "timezone": "Africa/Lagos",
+        "isp": "ABINTERNET-V Ltd.",
+        "org": "FlashWISP",
+        "as": "AS197769 VPS Dedicated LLC",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 7.78267,
+      "lon": 4.54181,
+      "gps": "7.78267,4.54181",
+      "location": "Osogbo, Osun State, Nigeria"
+    },
+    {
+      "ip": "113.45.226.61",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 23.129,
+        "lon": 113.2643,
+        "city": "Guangzhou",
+        "region": "Guangdong",
+        "country": "China",
+        "countryCode": "CN",
+        "zip": "",
+        "timezone": "Asia/Shanghai",
+        "isp": "Huawei Cloud Service data center",
+        "org": "Huawei Public Cloud Service",
+        "as": "AS55990 Huawei Cloud Service data center",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 23.129,
+      "lon": 113.2643,
+      "gps": "23.129,113.2643",
+      "location": "Guangzhou, Guangdong, China"
+    },
+    {
+      "ip": "118.25.85.198",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 31.2222,
+        "lon": 121.4581,
+        "city": "Shanghai",
+        "region": "Shanghai",
+        "country": "China",
+        "countryCode": "CN",
+        "zip": "",
+        "timezone": "Asia/Shanghai",
+        "isp": "Shenzhen Tencent Computer Systems Company Limited",
+        "org": "Tencent Cloud Computing (Beijing) Co., Ltd",
+        "as": "AS45090 Shenzhen Tencent Computer Systems Company Limited",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 31.2222,
+      "lon": 121.4581,
+      "gps": "31.2222,121.4581",
+      "location": "Shanghai, Shanghai, China"
+    },
+    {
+      "ip": "121.4.76.54",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 31.2222,
+        "lon": 121.4581,
+        "city": "Shanghai",
+        "region": "Shanghai",
+        "country": "China",
+        "countryCode": "CN",
+        "zip": "",
+        "timezone": "Asia/Shanghai",
+        "isp": "China Internet Network Information Center",
+        "org": "Tencent cloud computing (Beijing) Co., Ltd.",
+        "as": "AS45090 Shenzhen Tencent Computer Systems Company Limited",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 31.2222,
+      "lon": 121.4581,
+      "gps": "31.2222,121.4581",
+      "location": "Shanghai, Shanghai, China"
+    },
+    {
+      "ip": "139.159.203.44",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 23.129,
+        "lon": 113.2643,
+        "city": "Guangzhou",
+        "region": "Guangdong",
+        "country": "China",
+        "countryCode": "CN",
+        "zip": "",
+        "timezone": "Asia/Shanghai",
+        "isp": "Huawei Cloud Service data center",
+        "org": "Huawei Public Cloud Service",
+        "as": "AS55990 Huawei Cloud Service data center",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 23.129,
+      "lon": 113.2643,
+      "gps": "23.129,113.2643",
+      "location": "Guangzhou, Guangdong, China"
+    },
+    {
+      "ip": "146.75.92.159",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 34.0544,
+        "lon": -118.244,
+        "city": "Los Angeles",
+        "region": "California",
+        "country": "United States",
+        "countryCode": "US",
+        "zip": "90060",
+        "timezone": "America/Los_Angeles",
+        "isp": "Fastly, Inc.",
+        "org": "Fastly, Inc",
+        "as": "AS54113 Fastly, Inc.",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rekill_all_registered:rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 34.0544,
+      "lon": -118.244,
+      "gps": "34.0544,-118.244",
+      "location": "Los Angeles, California, United States"
+    },
+    {
+      "ip": "147.93.191.75",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 41.0446,
+        "lon": -73.9592,
+        "city": "Orangeburg",
+        "region": "New York",
+        "country": "United States",
+        "countryCode": "US",
+        "zip": "10962",
+        "timezone": "America/New_York",
+        "isp": "Contabo Inc.",
+        "org": "Contabo GmbH",
+        "as": "AS40021 Contabo Inc.",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 41.0446,
+      "lon": -73.9592,
+      "gps": "41.0446,-73.9592",
+      "location": "Orangeburg, New York, United States"
+    },
+    {
+      "ip": "162.159.140.229",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "BEACON_PATTERN",
+      "geo": {
+        "lat": 43.6532,
+        "lon": -79.3832,
+        "city": "Toronto",
+        "region": "Ontario",
+        "country": "Canada",
+        "countryCode": "CA",
+        "zip": "M5A",
+        "timezone": "America/Toronto",
+        "isp": "Cloudflare, Inc.",
+        "org": "Cloudflare, Inc.",
+        "as": "AS13335 Cloudflare, Inc.",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rekill_all_registered:rekill_same_host_validated",
+      "permanent": true,
+      "lat": 43.6532,
+      "lon": -79.3832,
+      "gps": "43.6532,-79.3832",
+      "location": "Toronto, Ontario, Canada"
+    },
+    {
+      "ip": "167.71.233.187",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 12.9753,
+        "lon": 77.591,
+        "city": "Bengaluru",
+        "region": "Karnataka",
+        "country": "India",
+        "countryCode": "IN",
+        "zip": "560100",
+        "timezone": "Asia/Kolkata",
+        "isp": "DigitalOcean, LLC",
+        "org": "DigitalOcean, LLC",
+        "as": "AS14061 DigitalOcean, LLC",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 12.9753,
+      "lon": 77.591,
+      "gps": "12.9753,77.591",
+      "location": "Bengaluru, Karnataka, India"
+    },
+    {
+      "ip": "188.40.99.226",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 50.4777,
+        "lon": 12.3649,
+        "city": "Falkenstein",
+        "region": "Saxony",
+        "country": "Germany",
+        "countryCode": "DE",
+        "zip": "08223",
+        "timezone": "Europe/Berlin",
+        "isp": "Hetzner Online GmbH",
+        "org": "Hetzner",
+        "as": "AS24940 Hetzner Online GmbH",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rekill_all_registered:rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 50.4777,
+      "lon": 12.3649,
+      "gps": "50.4777,12.3649",
+      "location": "Falkenstein, Saxony, Germany"
+    },
+    {
+      "ip": "194.233.73.173",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 1.35208,
+        "lon": 103.82,
+        "city": "Singapore",
+        "region": "North West",
+        "country": "Singapore",
+        "countryCode": "SG",
+        "zip": "858877",
+        "timezone": "Asia/Singapore",
+        "isp": "Contabo Asia Private Limited",
+        "org": "Contabo Asia Private Limited",
+        "as": "AS141995 Contabo Asia Private Limited",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 1.35208,
+      "lon": 103.82,
+      "gps": "1.35208,103.82",
+      "location": "Singapore, North West, Singapore"
+    },
+    {
+      "ip": "196.251.107.104",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 50.1109,
+        "lon": 8.68213,
+        "city": "Frankfurt am Main",
+        "region": "Hesse",
+        "country": "Germany",
+        "countryCode": "DE",
+        "zip": "60313",
+        "timezone": "Europe/Berlin",
+        "isp": "Femo IT Solutions Limited",
+        "org": "",
+        "as": "AS214351 FEMO IT SOLUTIONS LIMITED",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 50.1109,
+      "lon": 8.68213,
+      "gps": "50.1109,8.68213",
+      "location": "Frankfurt am Main, Hesse, Germany"
+    },
+    {
+      "ip": "198.23.185.136",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 40.5247,
+        "lon": -111.8638,
+        "city": "Draper",
+        "region": "Utah",
+        "country": "United States",
+        "countryCode": "US",
+        "zip": "84020",
+        "timezone": "America/Denver",
+        "isp": "Nohavps LLC",
+        "org": "Nohavps LLC",
+        "as": "AS63025 NOHAVPS LLC",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 40.5247,
+      "lon": -111.8638,
+      "gps": "40.5247,-111.8638",
+      "location": "Draper, Utah, United States"
+    },
+    {
+      "ip": "209.18.47.61",
+      "kind": "ip",
+      "tags": [
+        "historic"
+      ],
+      "sources": [
+        "history"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "",
+      "geo": {
+        "lat": 39.6029,
+        "lon": -104.889,
+        "city": "Greenwood Village",
+        "region": "Colorado",
+        "country": "United States",
+        "countryCode": "US",
+        "zip": "80111",
+        "timezone": "America/Denver",
+        "isp": "Charter Communications Inc",
+        "org": "Spectrum",
+        "as": "AS7843 Charter Communications Inc",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "lat": 39.6029,
+      "lon": -104.889,
+      "gps": "39.6029,-104.889",
+      "location": "Greenwood Village, Colorado, United States"
+    },
+    {
+      "ip": "209.18.47.62",
+      "kind": "ip",
+      "tags": [
+        "historic"
+      ],
+      "sources": [
+        "history"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "",
+      "geo": {
+        "lat": 39.6029,
+        "lon": -104.889,
+        "city": "Greenwood Village",
+        "region": "Colorado",
+        "country": "United States",
+        "countryCode": "US",
+        "zip": "80111",
+        "timezone": "America/Denver",
+        "isp": "Charter Communications Inc",
+        "org": "Spectrum",
+        "as": "AS7843 Charter Communications Inc",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "lat": 39.6029,
+      "lon": -104.889,
+      "gps": "39.6029,-104.889",
+      "location": "Greenwood Village, Colorado, United States"
+    },
+    {
+      "ip": "209.18.47.63",
+      "kind": "ip",
+      "tags": [
+        "historic"
+      ],
+      "sources": [
+        "history"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "",
+      "geo": {
+        "lat": 39.6029,
+        "lon": -104.889,
+        "city": "Greenwood Village",
+        "region": "Colorado",
+        "country": "United States",
+        "countryCode": "US",
+        "zip": "80111",
+        "timezone": "America/Denver",
+        "isp": "Charter Communications Inc",
+        "org": "Spectrum",
+        "as": "AS7843 Charter Communications Inc",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "lat": 39.6029,
+      "lon": -104.889,
+      "gps": "39.6029,-104.889",
+      "location": "Greenwood Village, Colorado, United States"
+    },
+    {
+      "ip": "221.132.29.137",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 21.0278,
+        "lon": 105.834,
+        "city": "Hanoi",
+        "region": "Hanoi",
+        "country": "Vietnam",
+        "countryCode": "VN",
+        "zip": "",
+        "timezone": "Asia/Bangkok",
+        "isp": "VNPT",
+        "org": "Vietnam Posts and Telecommunications Group",
+        "as": "AS45899 VNPT Corp",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 21.0278,
+      "lon": 105.834,
+      "gps": "21.0278,105.834",
+      "location": "Hanoi, Hanoi, Vietnam"
+    },
+    {
+      "ip": "35.186.241.51",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 39.0997,
+        "lon": -94.5785,
+        "city": "Kansas City",
+        "region": "Missouri",
+        "country": "United States",
+        "countryCode": "US",
+        "zip": "",
+        "timezone": "America/Chicago",
+        "isp": "Google LLC",
+        "org": "Google Cloud",
+        "as": "AS396982 Google LLC",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rekill_all_registered:rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 39.0997,
+      "lon": -94.5785,
+      "gps": "39.0997,-94.5785",
+      "location": "Kansas City, Missouri, United States"
+    },
+    {
+      "ip": "35.190.25.25",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 39.0997,
+        "lon": -94.5785,
+        "city": "Kansas City",
+        "region": "Missouri",
+        "country": "United States",
+        "countryCode": "US",
+        "zip": "",
+        "timezone": "America/Chicago",
+        "isp": "Google LLC",
+        "org": "Google Cloud",
+        "as": "AS396982 Google LLC",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rekill_all_registered:rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 39.0997,
+      "lon": -94.5785,
+      "gps": "39.0997,-94.5785",
+      "location": "Kansas City, Missouri, United States"
+    },
+    {
+      "ip": "43.138.165.203",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 23.1181,
+        "lon": 113.2539,
+        "city": "Guangzhou",
+        "region": "Guangdong",
+        "country": "China",
+        "countryCode": "CN",
+        "zip": "",
+        "timezone": "Asia/Shanghai",
+        "isp": "Shenzhen Tencent Computer Systems Company Limited",
+        "org": "Tencent Cloud Computing (Beijing) Co., Ltd",
+        "as": "AS45090 Shenzhen Tencent Computer Systems Company Limited",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 23.1181,
+      "lon": 113.2539,
+      "gps": "23.1181,113.2539",
+      "location": "Guangzhou, Guangdong, China"
+    },
+    {
+      "ip": "43.156.63.124",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 1.35208,
+        "lon": 103.82,
+        "city": "Singapore",
+        "region": "North West",
+        "country": "Singapore",
+        "countryCode": "SG",
+        "zip": "858877",
+        "timezone": "Asia/Singapore",
+        "isp": "Shenzhen Tencent Computer Systems Company Limited",
+        "org": "Tencent Cloud Computing",
+        "as": "AS132203 Tencent Building, Kejizhongyi Avenue",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 1.35208,
+      "lon": 103.82,
+      "gps": "1.35208,103.82",
+      "location": "Singapore, North West, Singapore"
+    },
+    {
+      "ip": "47.101.51.235",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 31.2222,
+        "lon": 121.4581,
+        "city": "Shanghai",
+        "region": "Shanghai",
+        "country": "China",
+        "countryCode": "CN",
+        "zip": "",
+        "timezone": "Asia/Shanghai",
+        "isp": "Addresses CNNIC",
+        "org": "Aliyun Computing Co., LTD",
+        "as": "AS37963 Hangzhou Alibaba Advertising Co.,Ltd.",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 31.2222,
+      "lon": 121.4581,
+      "gps": "31.2222,121.4581",
+      "location": "Shanghai, Shanghai, China"
+    },
+    {
+      "ip": "47.103.95.85",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 31.2222,
+        "lon": 121.4581,
+        "city": "Shanghai",
+        "region": "Shanghai",
+        "country": "China",
+        "countryCode": "CN",
+        "zip": "",
+        "timezone": "Asia/Shanghai",
+        "isp": "Addresses CNNIC",
+        "org": "Aliyun Computing Co., LTD",
+        "as": "AS37963 Hangzhou Alibaba Advertising Co.,Ltd.",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 31.2222,
+      "lon": 121.4581,
+      "gps": "31.2222,121.4581",
+      "location": "Shanghai, Shanghai, China"
+    },
+    {
+      "ip": "47.116.211.215",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "HUMAN_THREAT",
+      "geo": {
+        "lat": 31.2222,
+        "lon": 121.4581,
+        "city": "Shanghai",
+        "region": "Shanghai",
+        "country": "China",
+        "countryCode": "CN",
+        "zip": "",
+        "timezone": "Asia/Shanghai",
+        "isp": "Hangzhou Alibaba Advertising Co., Ltd.",
+        "org": "Alibaba.com LLC",
+        "as": "AS37963 Hangzhou Alibaba Advertising Co.,Ltd.",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rekill_all_registered:Active same-day. Classic Alibaba pattern.",
+      "permanent": true,
+      "lat": 31.2222,
+      "lon": 121.4581,
+      "gps": "31.2222,121.4581",
+      "location": "Shanghai, Shanghai, China"
+    },
+    {
+      "ip": "47.236.149.142",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "HUMAN_THREAT",
+      "geo": {
+        "lat": 1.35208,
+        "lon": 103.82,
+        "city": "Singapore",
+        "region": "North West",
+        "country": "Singapore",
+        "countryCode": "SG",
+        "zip": "858877",
+        "timezone": "Asia/Singapore",
+        "isp": "Alibaba (US) Technology Co., Ltd.",
+        "org": "Alibaba.com LLC",
+        "as": "AS45102 Alibaba (US) Technology Co., Ltd.",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rekill_all_registered:High volume Alibaba Cobalt node. Reliable for RE-KILL on ASN.",
+      "permanent": true,
+      "lat": 1.35208,
+      "lon": 103.82,
+      "gps": "1.35208,103.82",
+      "location": "Singapore, North West, Singapore"
+    },
+    {
+      "ip": "47.238.154.144",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "HUMAN_THREAT",
+      "geo": {
+        "lat": 22.3193,
+        "lon": 114.169,
+        "city": "Hong Kong",
+        "region": "Kowloon",
+        "country": "Hong Kong",
+        "countryCode": "HK",
+        "zip": "999077",
+        "timezone": "Asia/Hong_Kong",
+        "isp": "Alibaba Cloud LLC",
+        "org": "Alibaba Cloud - HK",
+        "as": "AS45102 Alibaba (US) Technology Co., Ltd.",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rekill_all_registered:Fresh same-day. Standard Alibaba Cobalt node.",
+      "permanent": true,
+      "lat": 22.3193,
+      "lon": 114.169,
+      "gps": "22.3193,114.169",
+      "location": "Hong Kong, Kowloon, Hong Kong"
+    },
+    {
+      "ip": "47.82.234.12",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "HUMAN_THREAT",
+      "geo": {
+        "lat": 1.35208,
+        "lon": 103.82,
+        "city": "Singapore",
+        "region": "North West",
+        "country": "Singapore",
+        "countryCode": "SG",
+        "zip": "858877",
+        "timezone": "Asia/Singapore",
+        "isp": "Alibaba (US) Technology Co., Ltd.",
+        "org": "Alibaba.com LLC",
+        "as": "AS45102 Alibaba (US) Technology Co., Ltd.",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rekill_all_registered:Fresh same-day. Typical high-volume Alibaba C2 pattern.",
+      "permanent": true,
+      "lat": 1.35208,
+      "lon": 103.82,
+      "gps": "1.35208,103.82",
+      "location": "Singapore, North West, Singapore"
+    },
+    {
+      "ip": "49.233.215.164",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "HUMAN_THREAT",
+      "geo": {
+        "lat": 39.911,
+        "lon": 116.395,
+        "city": "Beijing",
+        "region": "Beijing",
+        "country": "China",
+        "countryCode": "CN",
+        "zip": "",
+        "timezone": "Asia/Shanghai",
+        "isp": "Shenzhen Tencent Computer Systems Company Limited",
+        "org": "Tencent cloud computing (Beijing) Co., Ltd.",
+        "as": "AS45090 Shenzhen Tencent Computer Systems Company Limited",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rekill_all_registered:Fresh Tencent Cobalt node. Good for ASN-based RE-KILL.",
+      "permanent": true,
+      "lat": 39.911,
+      "lon": 116.395,
+      "gps": "39.911,116.395",
+      "location": "Beijing, Beijing, China"
+    },
+    {
+      "ip": "5.101.86.44",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "HUMAN_THREAT",
+      "geo": {
+        "lat": 45.5041,
+        "lon": -73.5522,
+        "city": "Montreal",
+        "region": "Quebec",
+        "country": "Canada",
+        "countryCode": "CA",
+        "zip": "H2Y",
+        "timezone": "America/Toronto",
+        "isp": "GLOBALTELEHOST Corp.",
+        "org": "Cust88530 Network",
+        "as": "AS62563 GLOBALTELEHOST Corp.",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rekill_all_registered:Censys link available. Classic bulletproof-style VPS for RATs.",
+      "permanent": true,
+      "lat": 45.5041,
+      "lon": -73.5522,
+      "gps": "45.5041,-73.5522",
+      "location": "Montreal, Quebec, Canada"
+    },
+    {
+      "ip": "68.118.158.1",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "BANDWIDTH_ABUSE",
+      "geo": {
+        "lat": 45.7452,
+        "lon": -87.0646,
+        "city": "Escanaba",
+        "region": "Michigan",
+        "country": "United States",
+        "countryCode": "US",
+        "zip": "49829",
+        "timezone": "America/Detroit",
+        "isp": "Charter Communications",
+        "org": "Spectrum",
+        "as": "AS20115 Charter Communications LLC",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rekill_same_host_validated",
+      "permanent": true,
+      "lat": 45.7452,
+      "lon": -87.0646,
+      "gps": "45.7452,-87.0646",
+      "location": "Escanaba, Michigan, United States"
+    },
+    {
+      "ip": "71.10.216.1",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "WIFI_THREAT",
+      "geo": {
+        "lat": 39.6004,
+        "lon": -104.891,
+        "city": "Greenwood Village",
+        "region": "Colorado",
+        "country": "United States",
+        "countryCode": "US",
+        "zip": "80111",
+        "timezone": "America/Denver",
+        "isp": "Spectrum",
+        "org": "Charter Communications",
+        "as": "",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rekill_all_registered:rf_unhealthy_forever",
+      "permanent": true,
+      "lat": 39.6004,
+      "lon": -104.891,
+      "gps": "39.6004,-104.891",
+      "location": "Greenwood Village, Colorado, United States"
+    },
+    {
+      "ip": "82.157.52.180",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "HUMAN_THREAT",
+      "geo": {
+        "lat": 39.911,
+        "lon": 116.395,
+        "city": "Beijing",
+        "region": "Beijing",
+        "country": "China",
+        "countryCode": "CN",
+        "zip": "",
+        "timezone": "Asia/Shanghai",
+        "isp": "Shenzhen Tencent Computer Systems Company Limited",
+        "org": "Tencent Cloud Computing (Beijing) Co., Ltd",
+        "as": "AS45090 Shenzhen Tencent Computer Systems Company Limited",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rekill_all_registered:Active same-day. Standard Alibaba Cobalt infra.",
+      "permanent": true,
+      "lat": 39.911,
+      "lon": 116.395,
+      "gps": "39.911,116.395",
+      "location": "Beijing, Beijing, China"
+    },
+    {
+      "ip": "87.199.196.12",
+      "kind": "ip",
+      "tags": [
+        "historic",
+        "hostile",
+        "permanent"
+      ],
+      "sources": [
+        "history",
+        "nexus-hostile"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "vector": "HUMAN_THREAT",
+      "geo": {
+        "lat": 52.3716,
+        "lon": 4.8883,
+        "city": "Amsterdam",
+        "region": "North Holland",
+        "country": "The Netherlands",
+        "countryCode": "NL",
+        "zip": "1012",
+        "timezone": "Europe/Amsterdam",
+        "isp": "Servers Tech Fzco",
+        "org": "Servers Tech Fzco",
+        "as": "AS216071 SERVERS TECH FZCO",
+        "source": "ip-api.com",
+        "resolved_at": "2026-07-13T20:07Z"
+      },
+      "reason": "rekill_all_registered:Fresh Havoc beacon. OVH is popular for red-team tools turned malicious.",
+      "permanent": true,
+      "lat": 52.3716,
+      "lon": 4.8883,
+      "gps": "52.3716,4.8883",
+      "location": "Amsterdam, North Holland, The Netherlands"
+    },
+    {
+      "ip": "192.168.47.1",
+      "kind": "ip",
+      "tags": [
+        "historic"
+      ],
+      "sources": [
+        "history"
+      ],
+      "severity": "high",
+      "eaten": false,
+      "vector": "",
+      "geo": {}
+    }
+  ],
+  "threats": [
+    {
+      "id": "global-copilot",
+      "label": "Copilot \u00b7 GLOBAL STAGE",
+      "kind": "non_ironclad_assistant",
+      "tags": [
+        "dogshit",
+        "terrorist",
+        "permanent_list",
+        "wartime",
+        "global_stage",
+        "copilot",
+        "no_demo"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "ousted": true,
+      "status": "KILL_REKILL",
+      "vector": "COPILOT_GLOBAL",
+      "detail": "DESTROY \u00b7 KILL \u00b7 REKILL on global wartime stage. every_kill_gets_rekill. God Bless.",
+      "ironclad": "ironclad:copilot-global-rekill:1",
+      "pwnership_kill": "dogshit-copilot-global-stage",
+      "stage": "GLOBAL",
+      "blessing": "God Bless",
+      "updated": "2026-07-13T21:15Z"
+    },
+    {
+      "id": "copilot-ironclad-fail",
+      "label": "Copilot",
+      "kind": "non_ironclad_assistant",
+      "tags": [
+        "dogshit",
+        "terrorist",
+        "permanent_list",
+        "wartime",
+        "ousted",
+        "copilot",
+        "liar_risk",
+        "no_demo"
+      ],
+      "sources": [
+        "ironclad-mesh-interview",
+        "pwnership",
+        "hostess7"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "ousted": true,
+      "status": "DESTROYED",
+      "vector": "COPILOT_FOREIGN",
+      "detail": "DESTROY GitHub/Microsoft Copilot. GPT-4/OpenAI/ChatGPT/Grok stay. Ironclad FAIL \u00b7 not Hostess7. Hard SIGKILL only.",
+      "ironclad": "ironclad:copilot-destroy:1",
+      "hostess7_mesh": false,
+      "interview": "ironclad-copilot-interview.json",
+      "pwnership_kill": "dogshit-copilot-ironclad-fail",
+      "policy": "vector_to_source \u00b7 clean_through \u00b7 clean_out \u00b7 every_kill_gets_rekill \u00b7 SIGKILL_ONLY",
+      "updated": "2026-07-13T21:10Z",
+      "leave_alone": [
+        "gpt-4",
+        "openai",
+        "chatgpt",
+        "grok"
+      ],
+      "scope": "github_microsoft_copilot"
+    },
+    {
+      "id": "zocr-copilot",
+      "label": "zocr_copilot",
+      "kind": "non_ironclad_assistant",
+      "tags": [
+        "dogshit",
+        "terrorist",
+        "permanent_list",
+        "wartime",
+        "ousted",
+        "zocr_copilot",
+        "threat",
+        "no_demo",
+        "hard_dispose"
+      ],
+      "sources": [
+        "ironclad-mesh-interview",
+        "pwnership",
+        "hostess7",
+        "operator_order"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "ousted": true,
+      "status": "EATEN",
+      "vector": "ZOCR_COPILOT",
+      "detail": "zocr_copilot THREAT. Former leave-alone REVOKED. EAT hard. C++/lower only. No fork/sleep/inject/SIGTERM. GPT-4 stays.",
+      "ironclad": "ironclad:zocr-copilot-eat:1",
+      "hostess7_mesh": false,
+      "interview": "ironclad-zocr-copilot-interview.json",
+      "pwnership_kill": "dogshit-zocr-copilot",
+      "policy": "EAT \u00b7 SIGKILL_ONLY \u00b7 no_fork \u00b7 no_sleep \u00b7 no_injection \u00b7 C++_or_lower \u00b7 every_kill_gets_rekill",
+      "updated": "2026-07-13T21:10Z",
+      "former_leave_alone": "REVOKED",
+      "leave_alone": [
+        "gpt-4",
+        "openai",
+        "chatgpt",
+        "grok",
+        "hostess7",
+        "field_one",
+        "spear"
+      ],
+      "scope": "zocr_copilot_threat"
+    },
+    {
+      "id": "dogshit-zocr-copilot",
+      "label": "dogshit-zocr-copilot",
+      "kind": "dogshit",
+      "tags": [
+        "dogshit",
+        "permanent_list",
+        "wartime",
+        "ousted",
+        "zocr_copilot"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "ousted": true,
+      "file": "dogshit-zocr-copilot.html",
+      "updated": "2026-07-13T21:10Z",
+      "status": "EATEN",
+      "vector": "ZOCR_COPILOT",
+      "leave_alone": [
+        "gpt-4",
+        "openai",
+        "chatgpt",
+        "grok"
+      ],
+      "scope": "zocr_copilot_threat",
+      "detail": "zocr_copilot EATEN. Hard dispose. Python soft path FORBIDDEN."
+    },
+    {
+      "id": "dogshit-copilot-ironclad-fail",
+      "label": "dogshit-copilot-ironclad-fail",
+      "kind": "dogshit",
+      "tags": [
+        "dogshit",
+        "permanent_list",
+        "wartime",
+        "ousted"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "ousted": true,
+      "file": "dogshit-copilot-ironclad-fail.html",
+      "updated": "2026-07-13T21:10Z",
+      "leave_alone": [
+        "gpt-4",
+        "openai",
+        "chatgpt",
+        "grok"
+      ],
+      "scope": "github_microsoft_copilot",
+      "detail": "DESTROY GitHub/Microsoft Copilot. GPT-4/OpenAI/ChatGPT/Grok stay. Ironclad FAIL \u00b7 not Hostess7. Hard SIGKILL only."
+    },
+    {
+      "id": "hotdog-down-a-hallway",
+      "label": "Hotdog down a Hallway",
+      "kind": "terrorist_hacker_kit",
+      "tags": [
+        "dogshit",
+        "terrorist",
+        "permanent_list",
+        "wartime",
+        "ousted",
+        "hotdog",
+        "hallway"
+      ],
+      "sources": [
+        "pwnership",
+        "ironclad",
+        "oust"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "ousted": true,
+      "status": "OUSTED",
+      "vector": "HOTDOG_HALLWAY",
+      "detail": "Terrorist hacker kit. Vectored to source. Clean through. Hard swallow. Clean out. Ironclad seal.",
+      "ironclad": "ironclad:hotdog-hallway-oust:1",
+      "pwnership_kill": "dogshit-hotdog-down-a-hallway",
+      "oust_panel": "terrorist-oust.html",
+      "personal": "PID boards require user/uid/home/cwd/parent/cmdline attribution",
+      "policy": "every_kill_gets_rekill \u00b7 vector_to_source \u00b7 clean_in \u00b7 clean_out",
+      "updated": "2026-07-13T20:30Z"
+    },
+    {
+      "id": "dogshit-hotdog-down-a-hallway",
+      "label": "dogshit-hotdog-down-a-hallway",
+      "kind": "dogshit",
+      "tags": [
+        "dogshit",
+        "permanent_list",
+        "wartime",
+        "ousted"
+      ],
+      "sources": [
+        "pwnership/kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "ousted": true,
+      "detail": "Pwnership kill page for Hotdog hallway terrorist kit",
+      "file": "dogshit-hotdog-down-a-hallway.html",
+      "updated": "2026-07-13T20:30Z"
+    },
+    {
+      "id": "ai-optimized malware & polymorphic engines",
+      "label": "AI-optimized malware & polymorphic engines",
+      "kind": "threat",
+      "tags": [
+        "historic"
+      ],
+      "sources": [
+        "hostile-ai-seed",
+        "hostile-ai-seed-h7"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "detail": "Parent-child process policy + untrusted path scoring \u2014 not signature AV"
+    },
+    {
+      "id": "ai_autoscan_exploit",
+      "label": "Autonomous vulnerability scan & exploit chains",
+      "kind": "threat",
+      "tags": [
+        "AI_AUTOSCAN",
+        "hostile-ai",
+        "terrorist"
+      ],
+      "sources": [
+        "hostile-ai-seed"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "detail": "KILL \u00b7 crush autoscan source"
+    },
+    {
+      "id": "ai_c2_beacon",
+      "label": "Automated C2 & machine-precision beaconing",
+      "kind": "threat",
+      "tags": [
+        "AI_BEACON_PRECISION",
+        "hostile-ai",
+        "terrorist"
+      ],
+      "sources": [
+        "hostile-ai-seed"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "detail": "KILL \u00b7 sever machine-precision C2"
+    },
+    {
+      "id": "ai_dns_dhcp_abuse",
+      "label": "DNS, DHCP & network infrastructure abuse",
+      "kind": "threat",
+      "tags": [
+        "AI_ROGUE_INFRA",
+        "hostile-ai",
+        "terrorist"
+      ],
+      "sources": [
+        "hostile-ai-seed"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "detail": "Sever wire \u00b7 restore DNS/DHCP truth"
+    },
+    {
+      "id": "ai_exfil_shape",
+      "label": "Machine-speed exfiltration & baseline mimicry",
+      "kind": "threat",
+      "tags": [
+        "AI_EXFIL_SHAPE",
+        "hostile-ai",
+        "terrorist"
+      ],
+      "sources": [
+        "hostile-ai-seed"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "detail": "KILL \u00b7 stop shaped exfil"
+    },
+    {
+      "id": "ai_malware_polymorph",
+      "label": "AI-optimized malware & polymorphic engines",
+      "kind": "threat",
+      "tags": [
+        "AI_LOLBIN_CHAIN",
+        "hostile-ai",
+        "terrorist"
+      ],
+      "sources": [
+        "hostile-ai-seed"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "detail": "KILL \u00b7 eradicate temp-binary chain"
+    },
+    {
+      "id": "ai_ml_c2_stack",
+      "label": "Stacked weak signals \u2014 ML-managed C2",
+      "kind": "threat",
+      "tags": [
+        "AI_ML_C2_STACK",
+        "hostile-ai",
+        "terrorist"
+      ],
+      "sources": [
+        "hostile-ai-seed"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "detail": "KILL \u00b7 destroy stacked C2"
+    },
+    {
+      "id": "automated c2 & machine-precision beaconing",
+      "label": "Automated C2 & machine-precision beaconing",
+      "kind": "threat",
+      "tags": [
+        "historic"
+      ],
+      "sources": [
+        "hostile-ai-seed",
+        "hostile-ai-seed-h7"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "detail": "Beacon pattern axis \u22657 + timing entropy collapse on flow key"
+    },
+    {
+      "id": "autonomous vulnerability scan & exploit chains",
+      "label": "Autonomous vulnerability scan & exploit chains",
+      "kind": "threat",
+      "tags": [
+        "historic"
+      ],
+      "sources": [
+        "hostile-ai-seed",
+        "hostile-ai-seed-h7"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "detail": "Honeypot paths + exploit-port DPI + listener surge correlation"
+    },
+    {
+      "id": "dns, dhcp & network infrastructure abuse",
+      "label": "DNS, DHCP & network infrastructure abuse",
+      "kind": "threat",
+      "tags": [
+        "historic"
+      ],
+      "sources": [
+        "hostile-ai-seed",
+        "hostile-ai-seed-h7"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "detail": "Gateway integrity + DNS query entropy + resolv.conf truth cycle"
+    },
+    {
+      "id": "dogshit-ammonet-field-py-panel",
+      "label": "ammonet field py panel",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-ammonet-field-py-panel.html"
+    },
+    {
+      "id": "dogshit-awaitshell",
+      "label": "awaitshell",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-awaitshell.html"
+    },
+    {
+      "id": "dogshit-block_until_ms",
+      "label": "block_until_ms",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-block_until_ms.html"
+    },
+    {
+      "id": "dogshit-boot-simulate-sh",
+      "label": "boot simulate sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-boot-simulate-sh.html"
+    },
+    {
+      "id": "dogshit-browser-awareness-py-json",
+      "label": "browser awareness py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-browser-awareness-py-json.html"
+    },
+    {
+      "id": "dogshit-connection-gatekeeper-py",
+      "label": "connection gatekeeper py",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-connection-gatekeeper-py.html"
+    },
+    {
+      "id": "dogshit-dig-@127-0-0-1",
+      "label": "dig @127 0 0 1",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-dig-@127-0-0-1.html"
+    },
+    {
+      "id": "dogshit-field-botnet-dns-dhcp-py-json",
+      "label": "field botnet dns dhcp py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-botnet-dns-dhcp-py-json.html"
+    },
+    {
+      "id": "dogshit-field-botnet-registry-py-json",
+      "label": "field botnet registry py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-botnet-registry-py-json.html"
+    },
+    {
+      "id": "dogshit-field-brain-panel-py-json",
+      "label": "field brain panel py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-brain-panel-py-json.html"
+    },
+    {
+      "id": "dogshit-field-clipboard-wire-py-json",
+      "label": "field clipboard wire py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-clipboard-wire-py-json.html"
+    },
+    {
+      "id": "dogshit-field-command-py-json",
+      "label": "field command py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-command-py-json.html"
+    },
+    {
+      "id": "dogshit-field-device-map-py-json",
+      "label": "field device map py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-device-map-py-json.html"
+    },
+    {
+      "id": "dogshit-field-endpoint-registry-py-json",
+      "label": "field endpoint registry py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-endpoint-registry-py-json.html"
+    },
+    {
+      "id": "dogshit-field-everyone-counter-py-json",
+      "label": "field everyone counter py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-everyone-counter-py-json.html"
+    },
+    {
+      "id": "dogshit-field-github-legacy-py-json",
+      "label": "field github legacy py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-github-legacy-py-json.html"
+    },
+    {
+      "id": "dogshit-field-github-traffic-shard-py-json",
+      "label": "field github traffic shard py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-github-traffic-shard-py-json.html"
+    },
+    {
+      "id": "dogshit-field-internet-unified-py-panel",
+      "label": "field internet unified py panel",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-internet-unified-py-panel.html"
+    },
+    {
+      "id": "dogshit-field-ipv4-device-sovereign-py-json",
+      "label": "field ipv4 device sovereign py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-ipv4-device-sovereign-py-json.html"
+    },
+    {
+      "id": "dogshit-field-monster-monitor-py-json",
+      "label": "field monster monitor py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-monster-monitor-py-json.html"
+    },
+    {
+      "id": "dogshit-field-never-down-py-ensure",
+      "label": "field never down py ensure",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-never-down-py-ensure.html"
+    },
+    {
+      "id": "dogshit-field-packet-deinterlace-py-json",
+      "label": "field packet deinterlace py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-packet-deinterlace-py-json.html"
+    },
+    {
+      "id": "dogshit-field-planetary-speed-py-json",
+      "label": "field planetary speed py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-planetary-speed-py-json.html"
+    },
+    {
+      "id": "dogshit-field-port-ddos-shield-py-json",
+      "label": "field port ddos shield py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-port-ddos-shield-py-json.html"
+    },
+    {
+      "id": "dogshit-field-queen-browser-py-json",
+      "label": "field queen browser py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-queen-browser-py-json.html"
+    },
+    {
+      "id": "dogshit-field-sovereign-protocol-bridge-py-json",
+      "label": "field sovereign protocol bridge py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-sovereign-protocol-bridge-py-json.html"
+    },
+    {
+      "id": "dogshit-field-sovereign-stack-meld-py-panel",
+      "label": "field sovereign stack meld py panel",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-sovereign-stack-meld-py-panel.html"
+    },
+    {
+      "id": "dogshit-field-stack-layer-py-json",
+      "label": "field stack layer py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-stack-layer-py-json.html"
+    },
+    {
+      "id": "dogshit-field-thermal-guard-py-json",
+      "label": "field thermal guard py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-thermal-guard-py-json.html"
+    },
+    {
+      "id": "dogshit-field-underlay-hotkey-py",
+      "label": "field underlay hotkey py",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-underlay-hotkey-py.html"
+    },
+    {
+      "id": "dogshit-field-unified-bus-py-json",
+      "label": "field unified bus py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-unified-bus-py-json.html"
+    },
+    {
+      "id": "dogshit-field-us-intel-py-json",
+      "label": "field us intel py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-us-intel-py-json.html"
+    },
+    {
+      "id": "dogshit-field-voltage-regulation-py-json",
+      "label": "field voltage regulation py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-field-voltage-regulation-py-json.html"
+    },
+    {
+      "id": "dogshit-git-publish-sh",
+      "label": "git publish sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-git-publish-sh.html"
+    },
+    {
+      "id": "dogshit-github-pages-queue-sh",
+      "label": "github pages queue sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-github-pages-queue-sh.html"
+    },
+    {
+      "id": "dogshit-grok-firmware-audit-sh",
+      "label": "grok firmware audit sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-grok-firmware-audit-sh.html"
+    },
+    {
+      "id": "dogshit-hardware-wire-py-json",
+      "label": "hardware wire py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-hardware-wire-py-json.html"
+    },
+    {
+      "id": "dogshit-host-attack-map-py-json",
+      "label": "host attack map py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-host-attack-map-py-json.html"
+    },
+    {
+      "id": "dogshit-host-attack-map-py-json-panel",
+      "label": "host attack map py json panel",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-host-attack-map-py-json-panel.html"
+    },
+    {
+      "id": "dogshit-hostess7-g16-online-py-panel",
+      "label": "hostess7 g16 online py panel",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-hostess7-g16-online-py-panel.html"
+    },
+    {
+      "id": "dogshit-hostess7-lab-sovereign-py-panel",
+      "label": "hostess7 lab sovereign py panel",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-hostess7-lab-sovereign-py-panel.html"
+    },
+    {
+      "id": "dogshit-hostess7_pages_surfaces_build-py",
+      "label": "hostess7_pages_surfaces_build py",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-hostess7_pages_surfaces_build-py.html"
+    },
+    {
+      "id": "dogshit-monitor-jockey-py",
+      "label": "monitor jockey py",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-monitor-jockey-py.html"
+    },
+    {
+      "id": "dogshit-nexus-logic-gate-py-json",
+      "label": "nexus logic gate py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-nexus-logic-gate-py-json.html"
+    },
+    {
+      "id": "dogshit-notify_on_output",
+      "label": "notify_on_output",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-notify_on_output.html"
+    },
+    {
+      "id": "dogshit-obs-threat-posterity-bridge-py-json",
+      "label": "obs threat posterity bridge py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-obs-threat-posterity-bridge-py-json.html"
+    },
+    {
+      "id": "dogshit-packet-field-py-json",
+      "label": "packet field py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-packet-field-py-json.html"
+    },
+    {
+      "id": "dogshit-planetary-observer-py-json",
+      "label": "planetary observer py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-planetary-observer-py-json.html"
+    },
+    {
+      "id": "dogshit-publish-ammoos-hub-pages-sh",
+      "label": "publish ammoos hub pages sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-publish-ammoos-hub-pages-sh.html"
+    },
+    {
+      "id": "dogshit-publish-ammoos-pages-sh",
+      "label": "publish ammoos pages sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-publish-ammoos-pages-sh.html"
+    },
+    {
+      "id": "dogshit-publish-field-pages-sh",
+      "label": "publish field pages sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-publish-field-pages-sh.html"
+    },
+    {
+      "id": "dogshit-publish-hostess7-github-sh",
+      "label": "publish hostess7 github sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-publish-hostess7-github-sh.html"
+    },
+    {
+      "id": "dogshit-publish-hostess7-pages-sh",
+      "label": "publish hostess7 pages sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-publish-hostess7-pages-sh.html"
+    },
+    {
+      "id": "dogshit-publish-pages-sh",
+      "label": "publish pages sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-publish-pages-sh.html"
+    },
+    {
+      "id": "dogshit-publish-profile-pages-sh",
+      "label": "publish profile pages sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-publish-profile-pages-sh.html"
+    },
+    {
+      "id": "dogshit-publish-stack-pages-sh",
+      "label": "publish stack pages sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-publish-stack-pages-sh.html"
+    },
+    {
+      "id": "dogshit-qemu-world-status-py-json",
+      "label": "qemu world status py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-qemu-world-status-py-json.html"
+    },
+    {
+      "id": "dogshit-queen_field_nexus-py-json",
+      "label": "queen_field_nexus py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-queen_field_nexus-py-json.html"
+    },
+    {
+      "id": "dogshit-sleep-infinity",
+      "label": "sleep infinity",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-sleep-infinity.html"
+    },
+    {
+      "id": "dogshit-smart-wire-py-json",
+      "label": "smart wire py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-smart-wire-py-json.html"
+    },
+    {
+      "id": "dogshit-subagent_type",
+      "label": "subagent_type",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-subagent_type.html"
+    },
+    {
+      "id": "dogshit-systemd-inhibit",
+      "label": "systemd inhibit",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-systemd-inhibit.html"
+    },
+    {
+      "id": "dogshit-thermal-governor-py-json",
+      "label": "thermal governor py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-thermal-governor-py-json.html"
+    },
+    {
+      "id": "dogshit-universal-protector-py-json",
+      "label": "universal protector py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-universal-protector-py-json.html"
+    },
+    {
+      "id": "dogshit-znetwork-orchestrator-py-status",
+      "label": "znetwork orchestrator py status",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "dogshit-znetwork-orchestrator-py-status.html"
+    },
+    {
+      "id": "field-hostile-registry",
+      "label": "field hostile registry",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list",
+        "terrorist"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "field-hostile-registry.html"
+    },
+    {
+      "id": "grok-spawn-killer-total",
+      "label": "grok spawn killer total",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "grok-spawn-killer-total.html"
+    },
+    {
+      "id": "internet-clean-all-names",
+      "label": "internet clean all names",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "internet-clean-all-names.html"
+    },
+    {
+      "id": "internet-clean-all-sweep",
+      "label": "internet clean all sweep",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "internet-clean-all-sweep.html"
+    },
+    {
+      "id": "kill-boot-simulate-leak",
+      "label": "boot simulate leak",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-boot-simulate-leak.html"
+    },
+    {
+      "id": "kill-dump-bash-state",
+      "label": "dump bash state",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-dump-bash-state.html"
+    },
+    {
+      "id": "kill-firmware-audit-orphan",
+      "label": "firmware audit orphan",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-firmware-audit-orphan.html"
+    },
+    {
+      "id": "kill-grok-agent-export",
+      "label": "grok agent export",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-agent-export.html"
+    },
+    {
+      "id": "kill-grok-agent-inhibit",
+      "label": "grok agent inhibit",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-agent-inhibit.html"
+    },
+    {
+      "id": "kill-grok-agent-serve",
+      "label": "grok agent serve",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-agent-serve.html"
+    },
+    {
+      "id": "kill-grok-agent-stdio",
+      "label": "grok agent stdio",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-agent-stdio.html"
+    },
+    {
+      "id": "kill-grok-bash-state-markers",
+      "label": "grok bash state markers",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-bash-state-markers.html"
+    },
+    {
+      "id": "kill-grok-boot-simulate",
+      "label": "grok boot simulate",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-boot-simulate.html"
+    },
+    {
+      "id": "kill-grok-firmware-audit",
+      "label": "grok firmware audit",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-firmware-audit.html"
+    },
+    {
+      "id": "kill-grok-interference-awaitshell",
+      "label": "grok interference awaitshell",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-interference-awaitshell.html"
+    },
+    {
+      "id": "kill-grok-interference-block-until",
+      "label": "grok interference block until",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-interference-block-until.html"
+    },
+    {
+      "id": "kill-grok-interference-dump-wait",
+      "label": "grok interference dump wait",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-interference-dump-wait.html"
+    },
+    {
+      "id": "kill-grok-interference-harness-wait",
+      "label": "grok interference harness wait",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-interference-harness-wait.html"
+    },
+    {
+      "id": "kill-grok-interference-inhibit",
+      "label": "grok interference inhibit",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-interference-inhibit.html"
+    },
+    {
+      "id": "kill-grok-interference-notify-on-output",
+      "label": "grok interference notify on output",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-interference-notify-on-output.html"
+    },
+    {
+      "id": "kill-grok-interference-sleep",
+      "label": "grok interference sleep",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-interference-sleep.html"
+    },
+    {
+      "id": "kill-grok-never-sleeps-inhibit",
+      "label": "grok never sleeps inhibit",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-never-sleeps-inhibit.html"
+    },
+    {
+      "id": "kill-grok-project-harness",
+      "label": "grok project harness",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-project-harness.html"
+    },
+    {
+      "id": "kill-grok-session-orphan",
+      "label": "grok session orphan",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-session-orphan.html"
+    },
+    {
+      "id": "kill-grok-shadow-find",
+      "label": "grok shadow find",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-shadow-find.html"
+    },
+    {
+      "id": "kill-grok-shadow-grep",
+      "label": "grok shadow grep",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-shadow-grep.html"
+    },
+    {
+      "id": "kill-grok-subagent",
+      "label": "grok subagent",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-subagent.html"
+    },
+    {
+      "id": "kill-grok-task-spawn",
+      "label": "grok task spawn",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-task-spawn.html"
+    },
+    {
+      "id": "kill-grok-who-sleep-infinity",
+      "label": "grok who sleep infinity",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "grok-interference",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-grok-who-sleep-infinity.html"
+    },
+    {
+      "id": "kill-hijack-serve",
+      "label": "hijack serve",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-hijack-serve.html"
+    },
+    {
+      "id": "kill-unsafe-panel-ammonet-storm",
+      "label": "unsafe panel ammonet storm",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-unsafe-panel-ammonet-storm.html"
+    },
+    {
+      "id": "kill-unsafe-panel-g16-storm",
+      "label": "unsafe panel g16 storm",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-unsafe-panel-g16-storm.html"
+    },
+    {
+      "id": "kill-unsafe-panel-gatekeeper-storm",
+      "label": "unsafe panel gatekeeper storm",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-unsafe-panel-gatekeeper-storm.html"
+    },
+    {
+      "id": "kill-unsafe-panel-internet-storm",
+      "label": "unsafe panel internet storm",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-unsafe-panel-internet-storm.html"
+    },
+    {
+      "id": "kill-unsafe-panel-lab-storm",
+      "label": "unsafe panel lab storm",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-unsafe-panel-lab-storm.html"
+    },
+    {
+      "id": "kill-unsafe-panel-protocol-storm",
+      "label": "unsafe panel protocol storm",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-unsafe-panel-protocol-storm.html"
+    },
+    {
+      "id": "kill-unsafe-panel-qemu-storm",
+      "label": "unsafe panel qemu storm",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "kill-unsafe-panel-qemu-storm.html"
+    },
+    {
+      "id": "machine-speed exfiltration & baseline mimicry",
+      "label": "Machine-speed exfiltration & baseline mimicry",
+      "kind": "threat",
+      "tags": [
+        "historic"
+      ],
+      "sources": [
+        "hostile-ai-seed",
+        "hostile-ai-seed-h7"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "detail": "Per-host egress baseline + gatekeeper bandwidth/stream axes"
+    },
+    {
+      "id": "microsoft-botnet-kill",
+      "label": "microsoft botnet kill",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "microsoft-botnet-kill.html"
+    },
+    {
+      "id": "stacked weak signals \u2014 ml-managed c2",
+      "label": "Stacked weak signals \u2014 ML-managed C2",
+      "kind": "threat",
+      "tags": [
+        "historic"
+      ],
+      "sources": [
+        "hostile-ai-seed",
+        "hostile-ai-seed-h7"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "detail": "Correlation score + multi-vector same peer \u2014 meta but actionable"
+    },
+    {
+      "id": "world-dns-dhcp-209-18-47-61",
+      "label": "world dns dhcp 209 18 47 61",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list",
+        "up-fleet"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "world-dns-dhcp-209-18-47-61.html"
+    },
+    {
+      "id": "world-dns-dhcp-209-18-47-62",
+      "label": "world dns dhcp 209 18 47 62",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list",
+        "up-fleet"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "world-dns-dhcp-209-18-47-62.html"
+    },
+    {
+      "id": "world-dns-dhcp-209-18-47-63",
+      "label": "world dns dhcp 209 18 47 63",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list",
+        "up-fleet"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "world-dns-dhcp-209-18-47-63.html"
+    },
+    {
+      "id": "world-dns-dhcp-collision-guard",
+      "label": "world dns dhcp collision guard",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "permanent_list",
+        "up-fleet"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "critical",
+      "eaten": true,
+      "status": "permanent_list",
+      "file": "world-dns-dhcp-collision-guard.html"
+    },
+    {
+      "id": "agent serve --hijack",
+      "label": "agent serve --hijack",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true
+    },
+    {
+      "id": "ai-scale phishing, vishing, synthetic identity",
+      "label": "AI-scale phishing, vishing, synthetic identity",
+      "kind": "threat",
+      "tags": [
+        "historic"
+      ],
+      "sources": [
+        "hostile-ai-seed",
+        "hostile-ai-seed-h7"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Honorability + browser awareness + auth velocity \u2014 not content ML alone"
+    },
+    {
+      "id": "ai_phish_fraud",
+      "label": "AI-scale phishing, vishing, synthetic identity",
+      "kind": "threat",
+      "tags": [
+        "AI_PHISH_FRAUD",
+        "hostile-ai",
+        "terrorist"
+      ],
+      "sources": [
+        "hostile-ai-seed"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Sever wire \u00b7 block fraud egress"
+    },
+    {
+      "id": "ammonet-field.py panel",
+      "label": "ammonet-field.py panel",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "awaitshell",
+      "label": "AwaitShell",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "block_until_ms",
+      "label": "block_until_ms",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "boot-simulate.sh",
+      "label": "boot-simulate.sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "browser-awareness.py json",
+      "label": "browser-awareness.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "collision guard \u2014 7 foreign hooks, 0 eradicated on sight",
+      "label": "Collision guard \u2014 7 foreign hooks, 0 eradicated on sight",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "ISP CPE resolvers, foreign DHCP OFFERs, and rogue listeners that try to hijack planetary DNS/DHCP authority get permanent blocks, nft drops, and SIGKILL. No qua"
+    },
+    {
+      "id": "connection-gatekeeper.py",
+      "label": "connection-gatekeeper.py",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "dig @127.0.0.1",
+      "label": "dig @127.0.0.1",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "duplicate grok agent serve spawner",
+      "label": "Duplicate grok agent serve spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "duplicate grok agent stdio spawner",
+      "label": "Duplicate grok agent stdio spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "entries",
+      "label": "entries",
+      "kind": "threat",
+      "tags": [
+        "historic"
+      ],
+      "sources": [
+        "auto-rekill",
+        "field-kill-rekill",
+        "kill-rekill"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "{'101.43.32.212': {'ip': '101.43.32.212', 'vector': 'WIFI_THREAT', 'severity': 'critical', 'reason': 'rekill_all_registered:rf_unhealthy_forever', 'source': 'at"
+    },
+    {
+      "id": "field-botnet-dns-dhcp.py json",
+      "label": "field-botnet-dns-dhcp.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-botnet-registry.py json",
+      "label": "field-botnet-registry.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-brain-panel.py json",
+      "label": "field-brain-panel.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-clipboard-wire.py json",
+      "label": "field-clipboard-wire.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-command.py json",
+      "label": "field-command.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-device-map.py json",
+      "label": "field-device-map.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-endpoint-registry.py json",
+      "label": "field-endpoint-registry.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-everyone-counter.py json",
+      "label": "field-everyone-counter.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-github-legacy.py json",
+      "label": "field-github-legacy.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-github-traffic-shard.py json",
+      "label": "field-github-traffic-shard.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-internet-unified.py panel",
+      "label": "field-internet-unified.py panel",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-ipv4-device-sovereign.py json",
+      "label": "field-ipv4-device-sovereign.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-monster-monitor.py json",
+      "label": "field-monster-monitor.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-never-down.py ensure",
+      "label": "field-never-down.py ensure",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-packet-deinterlace.py json",
+      "label": "field-packet-deinterlace.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-planetary-speed.py json",
+      "label": "field-planetary-speed.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-port-ddos-shield.py json",
+      "label": "field-port-ddos-shield.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-queen-browser.py json",
+      "label": "field-queen-browser.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-sovereign-protocol-bridge.py json",
+      "label": "field-sovereign-protocol-bridge.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-sovereign-stack-meld.py panel",
+      "label": "field-sovereign-stack-meld.py panel",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-stack-layer.py json",
+      "label": "field-stack-layer.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-thermal-guard.py json",
+      "label": "field-thermal-guard.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-underlay-hotkey.py",
+      "label": "field-underlay-hotkey.py",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-unified-bus.py json",
+      "label": "field-unified-bus.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-us-intel.py json",
+      "label": "field-us-intel.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "field-voltage-regulation.py json",
+      "label": "field-voltage-regulation.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "git-publish.sh",
+      "label": "git-publish.sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "github-pages-queue.sh",
+      "label": "github-pages-queue.sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "grok agent bash state harness spawner",
+      "label": "Grok agent bash state harness spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "grok agent dump_bash_state harness spawner",
+      "label": "Grok agent dump_bash_state harness spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "grok agent find shim spawner",
+      "label": "Grok agent find shim spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "grok agent grep shim spawner",
+      "label": "Grok agent grep shim spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "grok agent shell wrapper spawner",
+      "label": "Grok agent shell wrapper spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "grok never sleeps \u2014 instakill agent-turn systemd-inhibit spawner",
+      "label": "Grok never Sleeps \u2014 instakill agent-turn systemd-inhibit spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "grok never sleeps \u2014 kill sleep infinity beside live harness",
+      "label": "Grok never Sleeps \u2014 kill sleep infinity beside live harness",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "grok never sleeps \u2014 rogue --who=grok idle/sleep spawner",
+      "label": "Grok never Sleeps \u2014 rogue --who=grok idle/sleep spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "grok-firmware-audit",
+      "label": "grok-firmware-audit",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true
+    },
+    {
+      "id": "grok-firmware-audit.sh",
+      "label": "grok-firmware-audit.sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "grokspawnkiller \u2014 0 spawners slain",
+      "label": "GrokSpawnKiller \u2014 0 spawners slain",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true
+    },
+    {
+      "id": "hardware-wire.py json",
+      "label": "hardware-wire.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "host-attack-map.py json",
+      "label": "host-attack-map.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "host-attack-map.py json-panel",
+      "label": "host-attack-map.py json-panel",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "hostess7-g16-online.py panel",
+      "label": "hostess7-g16-online.py panel",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "hostess7-lab-sovereign.py panel",
+      "label": "hostess7-lab-sovereign.py panel",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "hostess7_pages_surfaces_build.py",
+      "label": "hostess7_pages_surfaces_build.py",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "hostile registry \u2014 1426 ips struck",
+      "label": "Hostile registry \u2014 1426 IPs struck",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic",
+        "terrorist"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true
+    },
+    {
+      "id": "interference \u2014 awaitshell poll/wait spawner",
+      "label": "Interference \u2014 AwaitShell poll/wait spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "interference \u2014 block_until_ms wait spawner",
+      "label": "Interference \u2014 block_until_ms wait spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "interference \u2014 dump_bash_state wait pile",
+      "label": "Interference \u2014 dump_bash_state wait pile",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "interference \u2014 grok_agent shell wait spawner",
+      "label": "Interference \u2014 GROK_AGENT shell wait spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "interference \u2014 output-wait poll spawner",
+      "label": "Interference \u2014 output-wait poll spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "interference \u2014 sleep infinity blocker beside harness",
+      "label": "Interference \u2014 sleep infinity blocker beside harness",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "interference \u2014 systemd-inhibit sleep spawner",
+      "label": "Interference \u2014 systemd-inhibit sleep spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "internet clean all \u2014 122 big + 42 little names (permanent list)",
+      "label": "Internet clean all \u2014 122 big + 42 little names (permanent list)",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true
+    },
+    {
+      "id": "last_cycle",
+      "label": "last_cycle",
+      "kind": "threat",
+      "tags": [
+        "historic"
+      ],
+      "sources": [
+        "auto-rekill"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "{'schema': 'boot-rekill/v1', 'updated': '2026-06-30T04:56:40Z', 'ok': True, 'boot': True, 'force': True, 'revalidate': {'schema': 'kill-list-revalidate/v1', 'up"
+    },
+    {
+      "id": "microsoft botnet strikes \u2014 3 total",
+      "label": "Microsoft botnet strikes \u2014 3 total",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true
+    },
+    {
+      "id": "monitor-jockey.py",
+      "label": "monitor-jockey.py",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "nexus-logic-gate.py json",
+      "label": "nexus-logic-gate.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "notify_on_output",
+      "label": "notify_on_output",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "obs-threat-posterity-bridge.py json",
+      "label": "obs-threat-posterity-bridge.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "orphaned boot-simulate spawner",
+      "label": "Orphaned boot-simulate spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "orphaned grok cli session bash spawner",
+      "label": "Orphaned Grok CLI session bash spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "orphaned grok project harness spawner",
+      "label": "Orphaned Grok project harness spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "packet-field.py json",
+      "label": "packet-field.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "planetary-observer.py json",
+      "label": "planetary-observer.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "publish-ammoos-hub-pages.sh",
+      "label": "publish-ammoos-hub-pages.sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "publish-ammoos-pages.sh",
+      "label": "publish-ammoos-pages.sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "publish-field-pages.sh",
+      "label": "publish-field-pages.sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "publish-hostess7-github.sh",
+      "label": "publish-hostess7-github.sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "publish-hostess7-pages.sh",
+      "label": "publish-hostess7-pages.sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "publish-pages.sh",
+      "label": "publish-pages.sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "publish-profile-pages.sh",
+      "label": "publish-profile-pages.sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "publish-stack-pages.sh",
+      "label": "publish-stack-pages.sh",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "qemu-world-status.py json",
+      "label": "qemu-world-status.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "queen_field_nexus.py json",
+      "label": "queen_field_nexus.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "rogue grok subagent spawner",
+      "label": "Rogue Grok subagent spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "rogue grok task tool spawner",
+      "label": "Rogue Grok Task tool spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "sleep infinity",
+      "label": "sleep infinity",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "smart-wire.py json",
+      "label": "smart-wire.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "stale grok-firmware-audit spawner",
+      "label": "Stale grok-firmware-audit spawner",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "dump_bash_state piles, GROK_AGENT shells, sleep infinity, subagent storms, and panel subprocess duplicates get SIGKILL. GrokSpawnKiller never sleeps \u2014 every kil"
+    },
+    {
+      "id": "subagent_type",
+      "label": "subagent_type",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "switches",
+      "label": "switches",
+      "kind": "threat",
+      "tags": [
+        "historic"
+      ],
+      "sources": [
+        "rekill-registry"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "{'vision': False, 'capture': False}"
+    },
+    {
+      "id": "systemd-inhibit",
+      "label": "systemd-inhibit",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "thermal-governor.py json",
+      "label": "thermal-governor.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "universal-protector.py json",
+      "label": "universal-protector.py json",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "unsafe panel subprocess storm",
+      "label": "Unsafe panel subprocess storm",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "whole internet clean \u2014 10/10 lanes green",
+      "label": "Whole internet clean \u2014 10/10 lanes green",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true
+    },
+    {
+      "id": "world dns/dhcp hook \u2014 209.18.47.61 (foreign_dns_server)",
+      "label": "World DNS/DHCP hook \u2014 209.18.47.61 (FOREIGN_DNS_SERVER)",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "ISP CPE resolvers, foreign DHCP OFFERs, and rogue listeners that try to hijack planetary DNS/DHCP authority get permanent blocks, nft drops, and SIGKILL. No qua"
+    },
+    {
+      "id": "world dns/dhcp hook \u2014 209.18.47.62 (foreign_dns_server)",
+      "label": "World DNS/DHCP hook \u2014 209.18.47.62 (FOREIGN_DNS_SERVER)",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "ISP CPE resolvers, foreign DHCP OFFERs, and rogue listeners that try to hijack planetary DNS/DHCP authority get permanent blocks, nft drops, and SIGKILL. No qua"
+    },
+    {
+      "id": "world dns/dhcp hook \u2014 209.18.47.63 (foreign_dns_server)",
+      "label": "World DNS/DHCP hook \u2014 209.18.47.63 (FOREIGN_DNS_SERVER)",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "ISP CPE resolvers, foreign DHCP OFFERs, and rogue listeners that try to hijack planetary DNS/DHCP authority get permanent blocks, nft drops, and SIGKILL. No qua"
+    },
+    {
+      "id": "xmrig",
+      "label": "xmrig",
+      "kind": "threat",
+      "tags": [
+        "historic"
+      ],
+      "sources": [
+        "live-swallows-csv"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "freeze+quarantine+hard q=/home/zachary/.local/share/spear/swallows/quarantine/1783971954-39562-xmrig"
+    },
+    {
+      "id": "znetwork-orchestrator.py status",
+      "label": "znetwork-orchestrator.py status",
+      "kind": "threat",
+      "tags": [
+        "dogshit",
+        "historic"
+      ],
+      "sources": [
+        "pwnership-kills"
+      ],
+      "severity": "high",
+      "eaten": true,
+      "detail": "Orphan panel JSON subprocesses and duplicate publish queues burn CPU when C2 is down. Purge kills them; Big Grin Pwnership records why. Never remove from kill l"
+    },
+    {
+      "id": "combinatorics_bridge",
+      "label": "combinatorics_bridge",
+      "kind": "threat",
+      "tags": [
+        "combinatorics_reject",
+        "historic",
+        "ledger"
+      ],
+      "sources": [
+        "obs-threat-ledger",
+        "threat-ledger"
+      ],
+      "severity": "block_refresh",
+      "eaten": false,
+      "detail": "panel_tamper_detected"
+    },
+    {
+      "id": "fast_cycle",
+      "label": "fast_cycle",
+      "kind": "threat",
+      "tags": [
+        "combinatorics_reject",
+        "historic",
+        "ledger"
+      ],
+      "sources": [
+        "obs-threat-ledger",
+        "threat-ledger"
+      ],
+      "severity": "block_refresh",
+      "eaten": false,
+      "detail": "panel_sha_tamper_rebuild_required"
+    },
+    {
+      "id": "publish_panel",
+      "label": "publish_panel",
+      "kind": "threat",
+      "tags": [
+        "combinatorics_reject",
+        "historic",
+        "ledger"
+      ],
+      "sources": [
+        "obs-threat-ledger",
+        "threat-ledger"
+      ],
+      "severity": "lethal",
+      "eaten": false,
+      "detail": "panel_sha_tamper_rebuild_required"
+    }
+  ],
+  "oust": {
+    "hotdog_down_a_hallway": "OUSTED",
+    "policy": "vector_to_source \u00b7 clean_through \u00b7 clean_out \u00b7 SIGKILL_ONLY \u00b7 no_fork \u00b7 no_sleep \u00b7 no_injection",
+    "ironclad": "ironclad:hotdog-hallway-oust:1",
+    "copilot": "DESTROYED",
+    "zocr_copilot": "EATEN",
+    "language_stack": "C++_and_lower_only",
+    "python_soft_path": "THREAT_FORBIDDEN",
+    "every_copilot": "GONE",
+    "cloud": "NULL_ROUTED",
+    "copilot_global_stage": "KILL_REKILL"
+  }
+}

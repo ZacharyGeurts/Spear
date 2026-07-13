@@ -1,0 +1,81 @@
+{
+  "schema": "nexus-c2-harden/v1",
+  "title": "NEXUS C2 harden — local, sealed, capability-gated",
+  "motto": "C2 is the only command surface. It is local, sealed, capability-gated, and born with the kernel.",
+  "version": "1.0.0",
+  "updated": "2026-07-13",
+  "bind": {
+    "host": "127.0.0.1",
+    "port": 9477,
+    "public_internet": false,
+    "header": "X-NEXUS-C2-Security: loopback-secured-csp",
+    "module": "lib/threat-panel-http.py"
+  },
+  "capabilities": {
+    "VIEW_PANEL": "read field/desktop surfaces",
+    "DNS_ADMIN": "truth DNS / internet field admin",
+    "GATE_KILL": "connection kill / interdict",
+    "UPDATE_APPLY": "stack update apply",
+    "STACK_LEARN": "Hostess stack-learn / brain teach",
+    "FIELD_SWITCH": "field mode commit / tristate",
+    "WAR_PROFILE": "war harden / lethal surfaces",
+    "DIAG_CLEAR": "clear diagnostic mode after debug_self",
+    "AI_DEFEND": "AI defense under Secure Layer — autonomous interdict / insight",
+    "LETHAL": "lethal enforcement surfaces (war only)"
+  },
+  "default_profile": "war",
+  "always_war": true,
+  "ai_defend": true,
+  "capability_defaults": {
+    "peace": ["VIEW_PANEL", "DNS_ADMIN", "STACK_LEARN"],
+    "operator": ["VIEW_PANEL", "DNS_ADMIN", "STACK_LEARN", "GATE_KILL", "UPDATE_APPLY", "FIELD_SWITCH", "AI_DEFEND"],
+    "war": [
+      "VIEW_PANEL",
+      "DNS_ADMIN",
+      "STACK_LEARN",
+      "GATE_KILL",
+      "UPDATE_APPLY",
+      "FIELD_SWITCH",
+      "WAR_PROFILE",
+      "DIAG_CLEAR",
+      "AI_DEFEND",
+      "LETHAL"
+    ],
+    "diagnostic": ["VIEW_PANEL", "DIAG_CLEAR", "AI_DEFEND"]
+  },
+  "capabilities_extra": {
+    "AI_DEFEND": "AI defense under Secure Layer — autonomous interdict / insight",
+    "LETHAL": "lethal enforcement surfaces (war only)"
+  },
+  "destructive_apis": {
+    "require_capability": true,
+    "require_operator_token": true,
+    "fail_closed": true,
+    "examples": ["KILL", "update apply", "field switch commit", "war engage"]
+  },
+  "sealed_generation": {
+    "panel": "nexus-c2-posture.json",
+    "fields": ["generation", "profile_id", "capability_mask", "bind_host", "i2_attached", "secure_layer"],
+    "module": "lib/nexus-c2-harden.py",
+    "no_plate_meld": true
+  },
+  "supply_chain": {
+    "manifest": "MANIFEST.sha256",
+    "self_defense": "lib/self-defense.sh",
+    "sign_releases": "GPG Zachary Robert Geurts",
+    "panel_assets_immutable_at_boot": true
+  },
+  "remote": {
+    "default": "disabled",
+    "if_enabled": "invite + pin + WireChip only — never open 9477 to WAN"
+  },
+  "telemetry": {
+    "phone_home": false,
+    "local_receipts_only": true
+  },
+  "api": {
+    "status": "/api/c2/harden",
+    "posture": "/api/c2/posture",
+    "capabilities": "/api/c2/capabilities"
+  }
+}

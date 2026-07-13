@@ -1,0 +1,146 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# KILROY — field-native boot. Every branch optimized: no idle work, debug-only benches.
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
+
+# --- stage: mount essentials (fail-soft, ordered for speed) ---
+mount -t proc none /proc 2>/dev/null || true
+mount -t sysfs none /sys 2>/dev/null || true
+mount -t devtmpfs none /dev 2>/dev/null || mount -t tmpfs none /dev 2>/dev/null || true
+mkdir -p /dev/pts /tmp /mnt/field /dev/shm /run
+mount -t devpts none /dev/pts 2>/dev/null || true
+mount -t tmpfs -o size=50%,mode=755 none /run 2>/dev/null || true
+mount -t tmpfs -o size=80% none /dev/shm 2>/dev/null || true
+# mdev once — not in a loop
+mdev -s 2>/dev/null || true
+
+MODE=field
+DEBUG=0
+HARDEN=0
+FAST=0
+for t in $(cat /proc/cmdline 2>/dev/null); do
+  case "$t" in
+    spear_mode=*) MODE=${t#spear_mode=} ;;
+    spear_debug=1) DEBUG=1 ;;
+    spear_harden=1) HARDEN=1 ;;
+    spear_fast=1) FAST=1 ;;
+    debug) DEBUG=1 ;;
+  esac
+done
+[ "$MODE" = "debug" ] && DEBUG=1
+[ "$MODE" = "field" ] && FAST=1
+
+# Compact banner
+printf '\033[1;32mSPEAR·KILROY\033[0m mode=%s fast=%s harden=%s\n' "$MODE" "$FAST" "$HARDEN"
+if [ "$DEBUG" = "1" ]; then
+  echo "  cmdline: $(cat /proc/cmdline 2>/dev/null)"
+fi
+
+shell() {
+  if [ "$DEBUG" = "1" ]; then
+    export PS1='spear-debug:\w # '
+  else
+    export PS1='spear:\w # '
+  fi
+  while :; do setsid cttyhack ash 2>/dev/null || ash || sh; sleep 1; done
+}
+
+spear_bin() { command -v spear >/dev/null && spear "$@"; }
+
+debug_banner() {
+  echo ">>> DEBUG uname=$(uname -r) mem=$(awk '/MemTotal/{print $2}' /proc/meminfo)kB"
+  echo ">>> disks:"
+  for d in /sys/block/*; do
+    n=$(basename "$d")
+    case "$n" in loop*|ram*|sr*) continue ;; esac
+    sz=$(cat "$d/size" 2>/dev/null || echo 0)
+    echo "  /dev/$n ~$((sz/2048))MiB"
+  done
+  spear_bin version 2>/dev/null || echo "  spear: MISSING"
+  spear_bin elevate-status 2>/dev/null || true
+}
+
+# Field-native ensure: always; benches only in debug
+kilroy_field_native() {
+  echo ">>> field-native"
+  if ! command -v spear >/dev/null; then
+    echo "  spear missing — rebuild initrd"
+    return 1
+  fi
+  # Field/fast: ensure only, minimal status (speed path)
+  if [ "$FAST" = "1" ] && [ "$DEBUG" != "1" ]; then
+    spear kilroy-ensure 2>/dev/null || spear fieldmem-ensure host 2>/dev/null || true
+    return 0
+  fi
+  spear kilroy-ensure 2>/dev/null || {
+    spear fieldmem-ensure host 2>/dev/null || true
+    spear fieldmem-ensure gpu 2>/dev/null || true
+  }
+  if [ "$DEBUG" = "1" ]; then
+    spear storage-status 2>/dev/null || true
+    spear dict-status 2>/dev/null || true
+    spear chip-status 2>/dev/null || true
+    spear fieldmem-status all 2>/dev/null || true
+  else
+    spear storage-status 2>/dev/null | head -12 || true
+  fi
+}
+
+has_fd() {
+  if [ -f /run/spear-field-drive.status ]; then
+    grep -q 'field_drive=1' /run/spear-field-drive.status 2>/dev/null && return 0
+    return 1
+  fi
+  command -v spear-field-drive >/dev/null || return 1
+  spear-field-drive has-field-drive 2>/dev/null || return 1
+  echo "field_drive=1" >/run/spear-field-drive.status 2>/dev/null || true
+  return 0
+}
+
+case "$MODE" in
+  debug)
+    debug_banner
+    kilroy_field_native
+    echo ">>> debug shell — spear storage-status | ffat-probe /dev/vda"
+    shell
+    ;;
+  fielddrive|create)
+    echo ">>> Create Field Drive"
+    if command -v spear-field-drive >/dev/null; then
+      spear-field-drive menu || true
+    else
+      echo "spear-field-drive missing"
+    fi
+    kilroy_field_native
+    shell
+    ;;
+  compat)
+    echo ">>> Compat (Field Drive optional)"
+    kilroy_field_native
+    shell
+    ;;
+  field)
+    echo ">>> Field (fast path)"
+    if has_fd; then
+      echo "  Field Drive OK"
+    else
+      echo "  No Field Drive — Create Field Drive or attach Field1"
+    fi
+    kilroy_field_native
+    # ready mark for benches
+    echo "spear_ready mode=field uptime_s=$(cut -d. -f1 /proc/uptime) " >/dev/console 2>/dev/null || true
+    shell
+    ;;
+  normal|*)
+    echo ">>> Normal (full path)"
+    if has_fd; then
+      echo "  Field Drive OK"
+      spear-field-drive mount-all 2>/dev/null || true
+    else
+      echo "  No Field Drive — use Create Field Drive entry or Compat"
+    fi
+    kilroy_field_native
+    echo "spear_ready mode=normal uptime_s=$(cut -d. -f1 /proc/uptime) " >/dev/console 2>/dev/null || true
+    shell
+    ;;
+esac

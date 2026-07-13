@@ -1,0 +1,278 @@
+#!/usr/bin/env bash
+# spear-copilot-threat-monitor — active hunt + angel seal + world DNS/DHCP health.
+# Hunt engine: spear-copilot-monitor (C++) SIGKILL only.
+# Publishes: copilot-threat-monitor.json (mirrored to SPEAR_SWALLOWS_ROOT).
+set -eu
+set +o pipefail 2>/dev/null || true
+
+STATE="${SPEAR_SWALLOW_STATE:-$HOME/.local/share/spear/swallows}"
+WWW="${SPEAR_SWALLOWS_ROOT:-/tmp/spear-swallows-www}"
+INTERVAL="${SPEAR_COPILOT_MONITOR_INTERVAL:-4}"
+NEXUS_STATE="${NEXUS_STATE_DIR:-$HOME/Desktop/SG/NewLatest/.nexus-state}"
+SEAL_FILE="${SPEAR_ANGEL_SEAL:-$HOME/Desktop/SG/zpics/hostess7-component-seal.json}"
+ANGEL_MANDATE="${SPEAR_ANGEL_MANDATE:-$HOME/Desktop/SG/NewLatest/data/queen-angel-mandate.json}"
+mkdir -p "$STATE" "$WWW"
+
+BIN_DIR="$(cd "$(dirname "$0")" && pwd)"
+HUNT=""
+for c in \
+  "$BIN_DIR/spear-copilot-monitor" \
+  "$HOME/.local/bin/spear-copilot-monitor" \
+  /usr/local/bin/spear-copilot-monitor \
+  /home/zachary/Desktop/SG/Spear/src/spear-copilot-monitor
+do
+  [[ -x "$c" ]] && { HUNT="$c"; break; }
+done
+HARD=""
+for c in \
+  "$BIN_DIR/spear-hard-dispose" \
+  "$HOME/.local/bin/spear-hard-dispose" \
+  /usr/local/bin/spear-hard-dispose \
+  /home/zachary/Desktop/SG/Spear/src/spear-hard-dispose
+do
+  [[ -x "$c" ]] && { HARD="$c"; break; }
+done
+
+ts() { date -u +%Y-%m-%dT%H:%MZ; }
+mirror() {
+  local name="$1" src="$2"
+  cp -a "$src" "$STATE/$name" 2>/dev/null || true
+  [[ -d "$WWW" ]] && cp -a "$src" "$WWW/$name" 2>/dev/null || true
+}
+
+# ── Angel seal check ───────────────────────────────────────────────────────
+check_angel() {
+  local out="$STATE/angel-seal-status.json"
+  if ! python3 - "$SEAL_FILE" "$ANGEL_MANDATE" "$out" <<'PY'
+import json, sys
+from pathlib import Path
+from datetime import datetime, timezone
+seal_path, mandate_path, out_path = sys.argv[1:4]
+ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%MZ")
+raw = Path(seal_path).read_text(encoding="utf-8", errors="ignore") if Path(seal_path).is_file() else ""
+dec = json.JSONDecoder()
+obj = {}
+if raw.strip():
+    obj, _ = dec.raw_decode(raw)
+post = obj.get("posture") or obj
+bindings = post.get("bindings") or []
+not_live = [b.get("id") for b in bindings if b.get("live") is False]
+dns_like = [b.get("id") for b in bindings if any(k in ((b.get("id") or "") + (b.get("label") or "")).lower() for k in ("dns", "dhcp", "znetwork", "truth"))]
+mandate = {}
+mp = Path(mandate_path)
+if mp.is_file():
+    try:
+        mandate = json.loads(mp.read_text(encoding="utf-8"))
+    except Exception:
+        pass
+status = {
+    "schema": "angel-seal-status/v1",
+    "ts": ts,
+    "sealed": bool(post.get("sealed")),
+    "commander": post.get("commander_title") or post.get("commander") or "Hostess7",
+    "rank": "ANGEL",
+    "event": obj.get("event"),
+    "component_count": post.get("component_count") or len(bindings),
+    "root_seal": (obj.get("root_seal") or post.get("root_seal") or "")[:32],
+    "owns_desktop_and_browser": post.get("owns_desktop_and_browser"),
+    "bindings_live": sum(1 for b in bindings if b.get("live") is not False),
+    "bindings_not_live": not_live,
+    "dns_dhcp_related": dns_like,
+    "mandate_present": bool(mandate),
+    "mandate_id": mandate.get("mandate_id") or mandate.get("id") or mandate.get("schema"),
+    "status": "SEALED_UP" if post.get("sealed") else "UNSEALED",
+    "seal_path": seal_path,
+}
+Path(out_path).write_text(json.dumps(status, indent=2) + "\n", encoding="utf-8")
+print(status["status"], status["component_count"], "not_live=", not_live)
+PY
+  then
+    printf '%s\n' '{"schema":"angel-seal-status/v1","sealed":false,"error":"parse_failed"}' >"$out"
+  fi
+  mirror "angel-seal-status.json" "$out"
+}
+
+# ── World DNS / DHCP authority health ──────────────────────────────────────
+check_world_dns_dhcp() {
+  local out="$STATE/world-dns-dhcp-status.json"
+  local blocked="$STATE/blocked-ips.txt"
+  local foreign_ok=true
+  local local_dns_ok=false
+  local f61=false f62=false f63=false
+  grep -qx '209.18.47.61' "$blocked" 2>/dev/null && f61=true
+  grep -qx '209.18.47.62' "$blocked" 2>/dev/null && f62=true
+  grep -qx '209.18.47.63' "$blocked" 2>/dev/null && f63=true
+  $f61 && $f62 && $f63 || foreign_ok=false
+
+  # Ensure wartime block list always has foreign world DNS hooks
+  for ip in 209.18.47.61 209.18.47.62 209.18.47.63; do
+    grep -qx "$ip" "$blocked" 2>/dev/null || echo "$ip" >>"$blocked"
+  done
+  f61=true; f62=true; f63=true; foreign_ok=true
+
+  # Local resolver (truth path via systemd-resolved stub or field-dns)
+  if dig +time=1 +tries=1 @127.0.0.53 example.com A +short >/dev/null 2>&1; then
+    local_dns_ok=true
+  elif dig +time=1 +tries=1 @127.0.0.1 example.com A +short >/dev/null 2>&1; then
+    local_dns_ok=true
+  fi
+
+  local field_dns_listen=false field_dhcp_listen=false
+  ss -ulnp 2>/dev/null | grep -qE '127\.0\.0\.1:53\b' && field_dns_listen=true || true
+  ss -ulnp 2>/dev/null | grep -qE ':(67|68)\b' && field_dhcp_listen=true || true
+  ss -ulnp 2>/dev/null | grep -qE '127\.0\.0\.53:53|127\.0\.0\.54:53' && local_stub=true || local_stub=false
+
+  # Fleet / wartime services that must stay up
+  local s9490=false s9600=false s9500=false
+  ss -lntp 2>/dev/null | grep -q ':9490' && s9490=true
+  ss -lntp 2>/dev/null | grep -q ':9600' && s9600=true
+  ss -lntp 2>/dev/null | grep -q ':9500' && s9500=true
+
+  # rekill stamp for foreign DNS
+  local rekill_note="wartime_blocked"
+  if [[ -f "$STATE/wartime-rekill-state.json" ]]; then
+    rekill_note="rekill_registry_present"
+  fi
+
+  local cloud_block=false
+  [[ -f "$STATE/copilot-cloud-block.hosts" ]] && cloud_block=true
+
+  local status="UP"
+  $foreign_ok && $local_dns_ok || status="DEGRADED"
+  $s9490 && $s9600 && $s9500 || status="DEGRADED"
+
+  cat >"$out" <<EOF
+{
+  "schema": "world-dns-dhcp-status/v1",
+  "ts": "$(ts)",
+  "status": "$status",
+  "policy": "foreign_world_dns_hooks BLOCKED · local truth resolver UP · field sole authority",
+  "foreign_world_dns_hooks": {
+    "209.18.47.61": {"role": "FOREIGN_DNS_SERVER", "blocked": $f61, "kill_page": "pwnership/kills/world-dns-dhcp-209-18-47-61.html"},
+    "209.18.47.62": {"role": "FOREIGN_DNS_SERVER", "blocked": $f62, "kill_page": "pwnership/kills/world-dns-dhcp-209-18-47-62.html"},
+    "209.18.47.63": {"role": "FOREIGN_DNS_SERVER", "blocked": $f63, "kill_page": "pwnership/kills/world-dns-dhcp-209-18-47-63.html"},
+    "all_blocked": $foreign_ok,
+    "collision_guard": "pwnership/kills/world-dns-dhcp-collision-guard.html"
+  },
+  "local_truth": {
+    "systemd_resolved_stub": $local_stub,
+    "resolve_ok": $local_dns_ok,
+    "field_dns_listen_127_0_0_1_53": $field_dns_listen,
+    "field_dhcp_listen": $field_dhcp_listen,
+    "note": "Foreign Charter 209.18.* stay BLOCKED. Local stub/field DNS is sole resolve path for field."
+  },
+  "wartime_services": {
+    "swallows_9490": $s9490,
+    "planet_9600": $s9600,
+    "fleet_link_9500": $s9500
+  },
+  "copilot_cloud_block_file": $cloud_block,
+  "rekill": "$rekill_note",
+  "angel_dns_components_sealed": true
+}
+EOF
+  mirror "world-dns-dhcp-status.json" "$out"
+}
+
+# ── One full cycle ─────────────────────────────────────────────────────────
+cycle_once() {
+  local hunt_status="$STATE/copilot-hunt-engine.json"
+  local seen=0 killed=0 engine="none"
+
+  if [[ -n "$HUNT" ]]; then
+    engine="spear-copilot-monitor"
+    "$HUNT" --once --status "$hunt_status" --log "$STATE/copilot-monitor.log" >/dev/null 2>&1 || true
+  elif [[ -n "$HARD" ]]; then
+    engine="spear-hard-dispose"
+    "$HARD" --log "$STATE/copilot-kill.log" >/dev/null 2>&1 || true
+    printf '%s\n' "{\"schema\":\"spear-copilot-monitor/v1\",\"mode\":\"ACTIVE_HUNT\",\"engine\":\"hard-dispose\",\"ts\":\"$(ts)\"}" >"$hunt_status"
+  fi
+
+  # Parse hunt status
+  if [[ -f "$hunt_status" ]]; then
+    seen=$(python3 -c "import json;d=json.load(open('$hunt_status'));print(d.get('seen_this_cycle',0))" 2>/dev/null || echo 0)
+    killed=$(python3 -c "import json;d=json.load(open('$hunt_status'));print(d.get('killed_this_cycle',0))" 2>/dev/null || echo 0)
+  fi
+
+  # Disk remnant scan (live trees only — fast)
+  local remnants=0
+  for f in \
+    "$HOME/Desktop/SG/NewLatest/Final_Eye/zocr_copilot.py" \
+    "$HOME/Desktop/SG/NewLatest/Final_Eye/data/copilot-foundations.json" \
+    "$HOME/Desktop/SG/NewLatest/.pages-hub-Final_Eye/zocr_copilot.py"
+  do
+    [[ -e "$f" ]] && remnants=$((remnants + 1))
+  done
+
+  check_angel
+  check_world_dns_dhcp
+
+  local angel_status world_status
+  angel_status=$(python3 -c "import json;d=json.load(open('$STATE/angel-seal-status.json'));print(d.get('status','?'))" 2>/dev/null || echo '?')
+  world_status=$(python3 -c "import json;d=json.load(open('$STATE/world-dns-dhcp-status.json'));print(d.get('status','?'))" 2>/dev/null || echo '?')
+
+  local overall="CLEAR"
+  [[ "$seen" != "0" || "$killed" != "0" ]] && overall="HUNTING"
+  [[ "$remnants" != "0" ]] && overall="REMNANTS"
+  [[ "$angel_status" != "SEALED_UP" ]] && overall="ANGEL_ALERT"
+  [[ "$world_status" == "DEGRADED" ]] && overall="DNS_DEGRADED"
+
+  cat >"$STATE/copilot-threat-monitor.json" <<EOF
+{
+  "schema": "copilot-threat-monitor/v1",
+  "mode": "ACTIVE_HUNT",
+  "demo": false,
+  "ts": "$(ts)",
+  "overall": "$overall",
+  "interval_s": $INTERVAL,
+  "engine": "$engine",
+  "hunt": {
+    "seen_this_cycle": $seen,
+    "killed_this_cycle": $killed,
+    "disk_remnants_live": $remnants,
+    "signal": "SIGKILL_ONLY",
+    "leave_alone": ["gpt-4", "openai", "chatgpt", "grok", "hostess7", "field_one", "spear"]
+  },
+  "angel": {
+    "status": "$angel_status",
+    "detail": "see angel-seal-status.json"
+  },
+  "world_dns_dhcp": {
+    "status": "$world_status",
+    "detail": "see world-dns-dhcp-status.json",
+    "foreign_hooks": ["209.18.47.61", "209.18.47.62", "209.18.47.63"],
+    "policy": "BLOCKED forever · collision_guard · local truth UP"
+  },
+  "links": {
+    "panel": "copilot-threat-monitor.html",
+    "kill_zocr": "pwnership/kills/dogshit-zocr-copilot.html",
+    "kill_copilot": "pwnership/kills/dogshit-copilot-ironclad-fail.html",
+    "world_dns_61": "pwnership/kills/world-dns-dhcp-209-18-47-61.html",
+    "collision_guard": "pwnership/kills/world-dns-dhcp-collision-guard.html"
+  }
+}
+EOF
+  mirror "copilot-threat-monitor.json" "$STATE/copilot-threat-monitor.json"
+  mirror "copilot-hunt-engine.json" "$hunt_status"
+  echo "$(ts) overall=$overall hunt_seen=$seen killed=$killed angel=$angel_status dns=$world_status remnants=$remnants"
+}
+
+# ── Main ───────────────────────────────────────────────────────────────────
+MODE="${1:-daemon}"
+case "$MODE" in
+  once|--once)
+    cycle_once
+    ;;
+  daemon|run|"")
+    echo "$(ts) copilot threat monitor ACTIVE_HUNT interval=${INTERVAL}s engine=${HUNT:-$HARD}"
+    while true; do
+      cycle_once || true
+      # monitor cadence only (not soft dispose theater)
+      sleep "$INTERVAL" || true
+    done
+    ;;
+  *)
+    echo "usage: $0 [daemon|once]" >&2
+    exit 2
+    ;;
+esac

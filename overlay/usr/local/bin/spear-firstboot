@@ -1,0 +1,23 @@
+#!/bin/bash
+# First desktop login: one welcome dialog. No browser. No nag if Field1 present.
+FLAG="$HOME/.config/spear-firstboot-done"
+[[ -f "$FLAG" ]] && exit 0
+mkdir -p "$(dirname "$FLAG")"
+
+FD_NOTE="Field Drive not detected yet."
+if /usr/local/bin/spear-field-drive has-field-drive 2>/dev/null; then
+  FD_NOTE="Field Drive / Field1 detected — full stack allowed."
+elif command -v spear >/dev/null 2>&1 && spear field1-status 2>/dev/null | grep -q CLAIMED; then
+  FD_NOTE="Field1 CLAIMED — full stack allowed."
+fi
+
+TEXT="<b>Welcome to Spear 22.3</b>\n\nFull desktop · Cinnamon class · Field stack.\n${FD_NOTE}\n\nPrograms: Queen · Field Terminal · Field GIMP · AmmoCodium.\nThis is Spear — not Linux Mint."
+
+if command -v zenity >/dev/null; then
+  zenity --info --title="Spear" --width=480 --text="$TEXT" 2>/dev/null || true
+else
+  notify-send "Spear" "Welcome to Spear 22.3. $FD_NOTE" 2>/dev/null || true
+fi
+
+# Intentionally do NOT open Queen/browser or any docs here.
+touch "$FLAG"

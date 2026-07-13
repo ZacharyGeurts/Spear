@@ -1,0 +1,123 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# KILROY — field-native · modes: debug|normal|fielddrive|compat
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
+mount -t proc none /proc 2>/dev/null || true
+mount -t sysfs none /sys 2>/dev/null || true
+mount -t devtmpfs none /dev 2>/dev/null || mount -t tmpfs none /dev 2>/dev/null || true
+mkdir -p /dev/pts /tmp /mnt/field /dev/shm
+mount -t devpts none /dev/pts 2>/dev/null || true
+mount -t tmpfs -o size=80% none /dev/shm 2>/dev/null || true
+mdev -s 2>/dev/null || true
+
+MODE=normal
+DEBUG=0
+for t in $(cat /proc/cmdline 2>/dev/null); do
+  case "$t" in
+    spear_mode=*) MODE=${t#spear_mode=} ;;
+    spear_debug=1|debug) DEBUG=1 ;;
+  esac
+done
+[ "$MODE" = "debug" ] && DEBUG=1
+
+printf '\033[1;32m'
+cat <<'B'
+
+  SPEAR · KILROY — field-native system
+  disk + field MEMORY from host DRAM + GPU VRAM
+  physical pool real · field_logical MORE (sparse+PAK)
+B
+printf '\033[0m'
+echo "  mode=$MODE  debug=$DEBUG"
+echo "  cmdline: $(cat /proc/cmdline 2>/dev/null)"
+echo
+
+shell() {
+  export PS1='spear-debug:\w # '
+  [ "$DEBUG" = "1" ] && export PS1='spear-debug:\w # '
+  [ "$DEBUG" != "1" ] && export PS1='spear:\w # '
+  while :; do setsid cttyhack ash 2>/dev/null || ash || sh; sleep 1; done
+}
+
+spear_bin() { command -v spear >/dev/null && spear "$@"; }
+
+debug_banner() {
+  echo ">>> SPEAR OS DEBUG"
+  echo "    uname: $(uname -a 2>/dev/null)"
+  echo "    mem:   $(grep MemTotal /proc/meminfo 2>/dev/null)"
+  echo "    avail: $(grep MemAvailable /proc/meminfo 2>/dev/null)"
+  echo "    disks:"
+  for d in /sys/block/*; do
+    n=$(basename "$d")
+    case "$n" in loop*|ram*|sr*) continue ;; esac
+    sz=$(cat "$d/size" 2>/dev/null || echo 0)
+    echo "      /dev/$n  sectors=$sz  (~$((sz/2048)) MiB)"
+  done
+  echo "    spear:"
+  if command -v spear >/dev/null; then
+    spear version 2>/dev/null || true
+    spear elevate-status 2>/dev/null || true
+  else
+    echo "      MISSING"
+  fi
+}
+
+kilroy_field_native() {
+  echo ">>> KILROY field-native ensure"
+  if command -v spear >/dev/null; then
+    spear kilroy-ensure 2>/dev/null || {
+      spear fieldmem-ensure host 2>/dev/null || true
+      spear fieldmem-ensure gpu 2>/dev/null || true
+    }
+    spear storage-status 2>/dev/null || spear kilroy-status 2>/dev/null || true
+    if [ "$DEBUG" = "1" ]; then
+      echo ">>> DEBUG dict / chip"
+      spear dict-status 2>/dev/null || true
+      spear dict-verify 2>/dev/null || true
+      spear chip-status 2>/dev/null || true
+      spear fieldmem-status all 2>/dev/null || true
+      echo ">>> DEBUG block devices"
+      ls -la /dev/vd* /dev/sd* /dev/nvme* 2>/dev/null || true
+    fi
+  else
+    echo "    spear missing — rebuild initrd"
+  fi
+}
+
+case "$MODE" in
+  debug)
+    debug_banner
+    kilroy_field_native
+    echo ">>> debug shell (serial + tty0)"
+    echo "    try: spear storage-status | spear ffat-probe /dev/vdb | spear dict-status"
+    shell
+    ;;
+  fielddrive|create)
+    echo ">>> Create Field Drive"
+    if command -v spear-field-drive >/dev/null; then
+      spear-field-drive menu || true
+    else
+      echo "spear-field-drive missing"
+    fi
+    kilroy_field_native
+    shell
+    ;;
+  compat)
+    echo ">>> Compat"
+    spear_bin version 2>/dev/null || true
+    kilroy_field_native
+    shell
+    ;;
+  normal|*)
+    echo ">>> Normal"
+    if command -v spear-field-drive >/dev/null && spear-field-drive has-field-drive 2>/dev/null; then
+      echo "    Field Drive OK"
+      spear-field-drive mount-all 2>/dev/null || true
+    else
+      echo "    No Field Drive — Create Field Drive or Compat"
+      command -v spear-field-drive >/dev/null && spear-field-drive menu 2>/dev/null || true
+    fi
+    kilroy_field_native
+    shell
+    ;;
+esac

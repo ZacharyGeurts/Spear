@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en" data-field-surface="up-swallows">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <title>WORLD FLEET · area dossiers · map-synced</title>
+  <link rel="stylesheet" href="big-grin-eats.css?v=area-dossier4" />
+  <link rel="stylesheet" href="assets/spear-world-map.css?v=skull7" />
+  <script src="assets/spear-world-map.js?v=skull7" defer></script>
+  <style>
+    .hint { color: var(--muted); font-size: .82rem; margin: .25rem 0 .75rem; }
+    .zone-bar { display:flex; flex-wrap:wrap; gap:.4rem; margin:.5rem 0 1rem; }
+    .zone-bar button {
+      background:#1a1224; border:1px solid var(--line,#3a2450); color:inherit;
+      border-radius:8px; padding:.35rem .65rem; cursor:pointer; font-size:.8rem;
+    }
+    .zone-bar button.on, .region-tile.on { border-color:#5dffb0; box-shadow:0 0 0 1px #5dffb055; }
+    .region-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(128px,1fr));
+      gap:.4rem; max-height:28vh; overflow:auto; padding:.15rem; margin-bottom:1rem;
+    }
+    .region-tile {
+      background:var(--panel2,#120c18); border:1px solid var(--line,#3a2450);
+      border-radius:10px; padding:.5rem .55rem; cursor:pointer; font-size:.76rem; text-align:left;
+    }
+    .region-tile:hover { border-color:#7ad7ff; }
+    .region-tile .code { font-weight:800; color:#7ad7ff; letter-spacing:.04em; }
+    .region-tile .nm { color:var(--text); font-size:.7rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .region-tile .meta { color:var(--muted); font-size:.66rem; margin-top:.15rem; }
+    .ledger-layout { display:grid; grid-template-columns:1.1fr 1.1fr; gap:1rem; }
+    @media (max-width:1100px){ .ledger-layout { grid-template-columns:1fr; } }
+    .dossier {
+      background:#120c18; border:1px solid var(--line);
+      border-radius:12px; padding:.85rem 1rem; font-size:.84rem; min-height:280px;
+    }
+    .dossier h3 { margin:0 0 .5rem; color:#7ad7ff; font-size:1.05rem; }
+    .dossier .row { display:grid; grid-template-columns:7.2rem 1fr; gap:.25rem; margin:.18rem 0; }
+    .dossier .k { color:var(--muted); }
+    .dossier .v { font-family:ui-monospace,monospace; font-size:.78rem; word-break:break-word; }
+    .dossier pre { white-space:pre-wrap; background:#0a0810; border:1px solid var(--line); border-radius:8px; padding:.55rem; font-size:.72rem; max-height:28vh; overflow:auto; }
+    .gps-pill { color:#5dffb0; font-family:ui-monospace,monospace; font-size:.72rem; }
+    .export-bar { display:flex; flex-wrap:wrap; gap:.4rem; margin:.4rem 0; }
+    .export-bar a {
+      background:#1a1224; border:1px solid var(--line); color:inherit; border-radius:8px;
+      padding:.3rem .55rem; font-size:.75rem; text-decoration:none;
+    }
+    .inv-wrap { max-height:42vh; overflow:auto; border:1px solid var(--line); border-radius:12px; }
+    table.systems { width:100%; border-collapse:collapse; font-size:.78rem; }
+    table.systems th, table.systems td { padding:.35rem .45rem; border-bottom:1px solid #2a1a38; text-align:left; }
+    table.systems th { color:var(--muted); position:sticky; top:0; background:#120c18; }
+    .roles { display:flex; flex-wrap:wrap; gap:.35rem; margin:.4rem 0 .6rem; }
+    .roles span { background:#1a1224; border:1px solid #3a2450; border-radius:999px; padding:.15rem .5rem; font-size:.7rem; color:#c9a8c0; }
+  </style>
+</head>
+<body class="up-body">
+  <header class="up-top">
+    <div>
+      <p class="up-kicker">WORLD FLEET · 6000 racks / area · FLEET AREA DOSSIERS · no per-rack dossiers here</p>
+      <h1>WORLD <span class="bge-super">FLEET</span></h1>
+      <p class="up-sub">
+        Click a country or city pin/tile → <b>one area dossier</b> covering <b>all racks</b> in that area.
+        Map-synced equirectangular. Lazy region shards.
+        <a href="swallows.html">Big Grin</a> ·
+        <a href="dossiers.html">Kill dossiers</a> ·
+        <a href="terrorist-oust.html">OUST</a> ·
+        <a href="ironclad.html">Ironclad</a>
+      </p>
+    </div>
+    <div class="up-pills" id="pills"></div>
+  </header>
+
+  <section class="up-statusbar">
+    <span class="ap-dot"></span>
+    <strong>LIVE PLANET · AREA DOSSIERS · MAP-SYNCED</strong>
+    <span id="apStatus">Loading…</span>
+    <span class="muted" id="clock"></span>
+  </section>
+
+  <main class="up-main">
+    <div class="up-grid-stats" id="stats"></div>
+    <p class="hint">
+      Fleet panel shows <b>area dossiers only</b>. Selecting JP / RU / MOW / etc. boards every rack in that area into the area dossier inventory — not individual rack dossier cards.
+    </p>
+
+    <div class="zone-bar" id="zones"></div>
+    <div id="fleetMap" class="spear-world-map pirate-theme" aria-label="World fleet map"></div>
+    <div class="region-grid" id="tiles"></div>
+
+    <section id="areaPanel" hidden>
+      <div class="export-bar">
+        <a id="linkAreaApi" href="#" target="_blank">JSON · area dossier (all racks)</a>
+        <a id="linkAreaCsv" href="#" download>CSV · all racks GPS in area</a>
+        <a href="/api/dossiers/export.csv" download>CSV · full world export</a>
+      </div>
+      <div class="ledger-layout">
+        <aside class="dossier" id="dossierPanel">
+          <h3 id="areaTitle">Fleet area dossier</h3>
+          <p class="muted" id="dossierEmpty">Select an area on the map or tiles.</p>
+          <div id="dossierBody" hidden></div>
+        </aside>
+        <div>
+          <h3 style="margin:.2rem 0 .5rem;font-size:.95rem;color:#ffc857">All racks in this area</h3>
+          <div class="roles" id="rolePills"></div>
+          <div class="inv-wrap">
+            <table class="systems">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Name</th><th>Role</th><th>Status</th><th>GPS</th><th>IP</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+          <p class="muted" style="font-size:.75rem;margin:.4rem 0 0">
+            Inventory lists every rack for the area dossier. Per-rack dossier API still exists for other products; this page does not open them.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  const state = {
+    regions: [],
+    zoneFilter: "",
+    selectedArea: null,
+    areaDossier: null,
+    map: null,
+  };
+
+  function esc(s) {
+    return String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function gpsStr(s) {
+    if (s == null || s.lat == null) return "—";
+    return `${Number(s.lat).toFixed(4)}, ${Number(s.lon).toFixed(4)}`;
+  }
+  function filteredRegions() {
+    let list = state.regions;
+    if (state.zoneFilter) list = list.filter(r => r.zone === state.zoneFilter);
+    return list;
+  }
+
+  function renderStats() {
+    const regs = state.regions;
+    const total = regs.reduce((a, r) => a + (r.racks || 0), 0);
+    const online = regs.reduce((a, r) => a + (r.online || 0), 0);
+    const zones = new Set(regs.map(r => r.zone));
+    document.getElementById("stats").innerHTML = `
+      <div class="stat"><div class="n">${regs.length}</div><div class="l">fleet areas</div></div>
+      <div class="stat"><div class="n">${total.toLocaleString()}</div><div class="l">total racks</div></div>
+      <div class="stat"><div class="n" style="color:var(--good)">${online.toLocaleString()}</div><div class="l">online</div></div>
+      <div class="stat"><div class="n">6000</div><div class="l">racks / area</div></div>
+      <div class="stat"><div class="n">${zones.size}</div><div class="l">zones</div></div>
+      <div class="stat"><div class="n">${state.selectedArea || "—"}</div><div class="l">open area</div></div>
+    `;
+    document.getElementById("pills").innerHTML = `
+      <span class="pill">area dossiers</span>
+      <span class="pill">no rack cards</span>
+      <span class="pill">${regs.length} areas</span>
+      <span class="pill">${total.toLocaleString()} racks</span>
+    `;
+  }
+
+  function renderZones() {
+    const zset = [...new Set(state.regions.map(r => r.zone))].sort();
+    const bar = document.getElementById("zones");
+    bar.innerHTML = `<button type="button" data-z="" class="${!state.zoneFilter?"on":""}">All</button>` +
+      zset.map(z => `<button type="button" data-z="${esc(z)}" class="${state.zoneFilter===z?"on":""}">${esc(z)}</button>`).join("");
+    bar.querySelectorAll("button").forEach(b => {
+      b.onclick = () => {
+        state.zoneFilter = b.dataset.z || "";
+        renderZones(); renderTiles(); refreshMap();
+      };
+    });
+  }
+
+  function renderTiles() {
+    document.getElementById("tiles").innerHTML = filteredRegions().map(r => `
+      <button type="button" class="region-tile ${state.selectedArea===r.code?"on":""}" data-code="${esc(r.code)}">
+        <div class="code">${esc(r.code)}</div>
+        <div class="nm">${esc(r.name)}</div>
+        <div class="meta">${esc(r.online??r.racks)}/${esc(r.racks)} · ${esc(r.zone)}</div>
+      </button>
+    `).join("");
+    document.querySelectorAll(".region-tile").forEach(el => {
+      el.onclick = () => openArea(el.dataset.code);
+    });
+  }
+
+  function ensureMap() {
+    if (state.map || typeof SpearWorldMap === "undefined") return state.map;
+    state.map = new SpearWorldMap("#fleetMap", {
+      mapSrc: "assets/maps/world-equirectangular.jpg",
+      showFleet: true,
+      showThreats: true,
+      onSelect: (pt) => {
+        if (pt.threat || pt.kind === "threat") {
+          location.href = "dossiers.html";
+          return;
+        }
+        // fleet area only — never rack dossiers
+        const code = pt.region || pt.id;
+        if (code) openArea(code);
+      },
+    });
+    return state.map;
+  }
+
+  async function refreshMap() {
+    ensureMap();
+    if (!state.map) return;
+    const pts = await SpearWorldMap.loadDefaultPoints();
+    pts.forEach(p => {
+      if (p.region === state.selectedArea || p.id === state.selectedArea) p.selected = true;
+    });
+    state.map.setPoints(pts);
+  }
+
+  async function openArea(code) {
+    code = (code || "").toUpperCase();
+    state.selectedArea = code;
+    document.getElementById("areaPanel").hidden = false;
+    document.getElementById("dossierEmpty").hidden = true;
+    document.getElementById("dossierBody").hidden = false;
+    document.getElementById("dossierBody").innerHTML = `<p class="muted">Loading fleet area dossier for ${esc(code)}…</p>`;
+    document.getElementById("areaTitle").textContent = `Fleet area dossier · ${code}`;
+    document.getElementById("linkAreaApi").href = `/api/area-dossier?code=${encodeURIComponent(code)}`;
+    document.getElementById("linkAreaCsv").href = `/api/fleet-gps.csv?region=${encodeURIComponent(code)}`;
+    document.getElementById("linkAreaCsv").download = `fleet-area-${code}-gps.csv`;
+    renderTiles();
+    await refreshMap();
+
+    try {
+      const data = await (await fetch(`/api/area-dossier?code=${encodeURIComponent(code)}&ts=${Date.now()}`)).json();
+      if (data.error || data.ok === false) {
+        document.getElementById("dossierBody").innerHTML = `<p class="muted">Area not found: ${esc(code)}</p>`;
+        return;
+      }
+      const d = data.dossier || data;
+      state.areaDossier = d;
+      renderAreaDossier(d);
+      renderInventory(d.racks || []);
+      document.getElementById("apStatus").textContent =
+        `${code}: area dossier · ${d.racks_total || 0} racks · GPS ${d.gps?.format || "—"}`;
+    } catch (e) {
+      document.getElementById("dossierBody").innerHTML = `<p class="muted">Failed: ${esc(e)}</p>`;
+    }
+  }
+
+  function renderAreaDossier(d) {
+    const gps = d.gps || {};
+    const addr = d.address || {};
+    const mesh = d.mesh || {};
+    const ent = d.entropy || {};
+    const roles = d.role_counts || {};
+    const st = d.status_counts || {};
+    document.getElementById("areaTitle").textContent = `Fleet area · ${d.code} · ${d.name}`;
+    document.getElementById("rolePills").innerHTML = Object.entries(roles)
+      .sort((a,b)=>b[1]-a[1])
+      .map(([k,v]) => `<span>${esc(k)} · ${v}</span>`).join("");
+    document.getElementById("dossierBody").innerHTML = `
+      <div class="row"><span class="k">Area</span><span class="v">${esc(d.code)} · ${esc(d.name)}</span></div>
+      <div class="row"><span class="k">Kind / zone</span><span class="v">${esc(d.region_kind||"")} · ${esc(d.zone||"")}</span></div>
+      <div class="row"><span class="k">Racks</span><span class="v"><b>${esc(d.racks_total)}</b> total · ${esc(d.racks_online)} online</span></div>
+      <div class="row"><span class="k">Status mix</span><span class="v">${esc(JSON.stringify(st))}</span></div>
+      <div class="row"><span class="k">Centroid GPS</span><span class="v gps-pill">${esc(gps.format||"—")}</span></div>
+      <div class="row"><span class="k">BBox</span><span class="v">${gps.bbox ? esc(`${gps.bbox.min_lat.toFixed?.(3) ?? gps.bbox.min_lat}…${gps.bbox.max_lat.toFixed?.(3) ?? gps.bbox.max_lat} / ${gps.bbox.min_lon.toFixed?.(3) ?? gps.bbox.min_lon}…${gps.bbox.max_lon.toFixed?.(3) ?? gps.bbox.max_lon}`) : "—"}</span></div>
+      <div class="row"><span class="k">Map</span><span class="v">${gps.map?`<a href="${esc(gps.map)}" target="_blank" rel="noopener">OpenStreetMap</a>`:"—"}</span></div>
+      <div class="row"><span class="k">HQ facility</span><span class="v">${esc(addr.facility||"")}</span></div>
+      <div class="row"><span class="k">HQ address</span><span class="v">${esc(addr.display||"")}</span></div>
+      <div class="row"><span class="k">Mesh hub</span><span class="v">${esc(mesh.hub||"—")}</span></div>
+      <div class="row"><span class="k">Entropy</span><span class="v" style="font-size:.7rem">${esc(ent.path||"")}</span></div>
+      <div class="row"><span class="k">API</span><span class="v"><a href="/api/area-dossier?code=${encodeURIComponent(d.code)}" target="_blank">/api/area-dossier?code=${esc(d.code)}</a></span></div>
+      <div class="row"><span class="k">Export</span><span class="v"><a href="/api/fleet-gps.csv?region=${encodeURIComponent(d.code)}">all racks GPS CSV</a></span></div>
+      <pre>${esc(d.summary||"")}</pre>
+    `;
+  }
+
+  function renderInventory(racks) {
+    const tb = document.getElementById("tbody");
+    if (!racks.length) {
+      tb.innerHTML = `<tr><td colspan="6" class="muted">No racks in area</td></tr>`;
+      return;
+    }
+    // show all racks in area (scrollable) — part of area dossier, not clickable rack dossiers
+    tb.innerHTML = racks.map(s => `<tr>
+      <td><code>${esc(s.id)}</code></td>
+      <td>${esc(s.name)}<div class="muted" style="font-size:.7rem">${esc(s.label||"")}</div></td>
+      <td>${esc(s.role)}</td>
+      <td><span class="badge ${esc(s.status||"ok")}">${esc(s.status||"ok")}</span></td>
+      <td class="gps-pill">${esc(gpsStr(s))}</td>
+      <td><code>${esc(s.ip)}</code></td>
+    </tr>`).join("");
+  }
+
+  async function loadIndex() {
+    document.getElementById("clock").textContent = new Date().toLocaleString();
+    const data = await (await fetch("/api/regions?ts=" + Date.now())).json();
+    state.regions = data.regions || [];
+    renderStats();
+    renderZones();
+    renderTiles();
+    await refreshMap();
+    const st = await fetch("/api/status").then(r=>r.json()).catch(()=>({}));
+    const pl = st.planet_live ? "LIVE PLANET" : "planet offline";
+    document.getElementById("apStatus").textContent =
+      `${pl} · ${st.defending!=null?st.defending.toLocaleString()+' defending · ':''}${state.regions.length} areas · pick pin/tile`;
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    loadIndex().catch(e => {
+      document.getElementById("apStatus").textContent = "Index failed: " + e;
+    });
+  });
+  setTimeout(() => loadIndex().catch(()=>{}), 80);
+  setInterval(() => { loadIndex().catch(()=>{}); }, 45000);
+  setInterval(() => {
+    document.getElementById("clock").textContent = new Date().toLocaleString();
+  }, 1000);
+  </script>
+</body>
+</html>

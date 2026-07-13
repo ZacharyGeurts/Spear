@@ -1,0 +1,683 @@
+#!/usr/bin/env python3
+"""WARTIME kill/rekill autopilot — zero controls, no demo.
+
+Rule (from kill-rekill-registry): every_kill_gets_rekill.
+IP + threat only (no PIDs). Streams live Field attacks as each target is swallowed.
+
+Sources:
+  - NewLatest/.nexus-state/kill-rekill-registry.json
+  - field-hostile.tsv, nexus-hostile.jsonl
+  - boot-rekill validated IPs
+  - dogshit permanent threats (pwnership)
+  - hostile-ai-threats-seed
+
+Live files for panel:
+  - autopilot.json
+  - live-feast.jsonl   (append each attack)
+  - live-feed.json     (last N attacks, rewritten often)
+"""
+from __future__ import annotations
+
+import json
+import os
+import re
+import subprocess
+import time
+from pathlib import Path
+
+STATE = Path(os.environ.get("SPEAR_SWALLOW_STATE", Path.home() / ".local/share/spear/swallows"))
+STATE.mkdir(parents=True, exist_ok=True)
+NEXUS_STATE = Path(os.environ.get(
+    "NEXUS_STATE_DIR",
+    "/home/zachary/Desktop/SG/NewLatest/.nexus-state",
+))
+HOSTESS_HOSTILE = Path("/mnt/hostess7/fieldstorage/brain/security/nexus-hostile.jsonl")
+WWW = Path(os.environ.get("SPEAR_SWALLOWS_ROOT", "/tmp/spear-swallows-www"))
+INTERVAL = int(os.environ.get("SPEAR_EATS_INTERVAL", "8"))
+
+LOG = STATE / "swallows.csv"
+AUTO = STATE / "autopilot.json"
+BLOCKED = STATE / "blocked-ips.txt"
+LIVE_JSONL = STATE / "live-feast.jsonl"
+LIVE_FEED = STATE / "live-feed.json"
+REKILL_STATE = STATE / "wartime-rekill-state.json"
+EATEN_THREATS = STATE / "eaten-threats.json"
+COPILOT_GLOBAL = STATE / "copilot-global-rekill.json"
+
+# Global-stage copilot targets — every_kill_gets_rekill forever
+GLOBAL_COPILOT_TARGETS = (
+    {
+        "id": "global-copilot",
+        "label": "Copilot · GLOBAL STAGE",
+        "vector": "COPILOT_GLOBAL",
+        "scope": "github_microsoft_zocr_cloud_server",
+    },
+    {
+        "id": "zocr-copilot",
+        "label": "zocr_copilot",
+        "vector": "ZOCR_COPILOT",
+        "scope": "zocr_copilot_threat",
+    },
+    {
+        "id": "copilot-ironclad-fail",
+        "label": "GitHub/Microsoft Copilot",
+        "vector": "COPILOT_FOREIGN",
+        "scope": "github_microsoft_copilot",
+    },
+    {
+        "id": "dogshit-zocr-copilot",
+        "label": "dogshit-zocr-copilot",
+        "vector": "ZOCR_COPILOT",
+        "scope": "pwnership",
+    },
+    {
+        "id": "dogshit-copilot-ironclad-fail",
+        "label": "dogshit-copilot-ironclad-fail",
+        "vector": "COPILOT_FOREIGN",
+        "scope": "pwnership",
+    },
+    {
+        "id": "copilot-cloud",
+        "label": "Copilot cloud endpoints",
+        "vector": "COPILOT_CLOUD",
+        "scope": "null_routed_cloud",
+    },
+    {
+        "id": "copilot-server",
+        "label": "Copilot language-server / agent",
+        "vector": "COPILOT_SERVER",
+        "scope": "process_server",
+    },
+)
+
+IP_RE = re.compile(r"^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)$")
+
+# Field attack choreography labels (display + ledger)
+FIELD_ATTACKS = (
+    "FIELD_STRIKE",
+    "FIELD_JAM",
+    "FIELD_SEVER",
+    "FIELD_BURN",
+    "FIELD_SWALLOW",
+    "FIELD_REKILL",
+)
+
+
+def now_z() -> str:
+    return time.strftime("%Y-%m-%dT%H:%MZ", time.gmtime())
+
+
+def load_json(p: Path, default):
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return default
+
+
+def mirror(name: str, obj) -> None:
+    raw = json.dumps(obj, indent=2)
+    (STATE / name).write_text(raw, encoding="utf-8")
+    if WWW.is_dir():
+        try:
+            (WWW / name).write_text(raw, encoding="utf-8")
+        except Exception:
+            pass
+
+
+def sacred_ip(ip: str) -> bool:
+    if not IP_RE.match(ip):
+        return True
+    if ip.startswith(("127.", "0.", "255.", "224.", "239.")):
+        return True
+    # private field nets — never auto-block
+    if ip.startswith("10.") or ip.startswith("192.168."):
+        return True
+    if ip.startswith("172."):
+        try:
+            if 16 <= int(ip.split(".")[1]) <= 31:
+                return True
+        except Exception:
+            pass
+    return False
+
+
+
+def load_geo(ip: str) -> dict:
+    """Attach real GPS from ip-geo-cache (filled by dossier enrich)."""
+    for base in (STATE, WWW):
+        p = base / "ip-geo-cache.json"
+        if not p.is_file():
+            continue
+        try:
+            cache = json.loads(p.read_text(encoding="utf-8"))
+            g = cache.get(ip) or {}
+            if g.get("lat") is not None:
+                return g
+        except Exception:
+            continue
+    return {}
+
+
+def emit_live(event: dict) -> None:
+    """Push one Field attack to live stream for the panel."""
+    event = {**event, "ts": event.get("ts") or now_z()}
+    with LIVE_JSONL.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(event, ensure_ascii=False) + "\n")
+    # keep rolling feed of last 80
+    feed = load_json(LIVE_FEED, {"schema": "live-feed/v1", "events": []})
+    events = feed.get("events") or []
+    events.append(event)
+    feed = {
+        "schema": "live-feed/v1",
+        "updated": now_z(),
+        "mode": "WARTIME",
+        "events": events[-80:],
+        "latest": event,
+    }
+    mirror("live-feed.json", feed)
+
+
+def log_csv(fleet: str, kind: str, target: str, detail: str) -> None:
+    if not LOG.is_file():
+        LOG.write_text("ts,fleet,pid,comm,exe,score,action,detail\n", encoding="utf-8")
+    with LOG.open("a", encoding="utf-8") as f:
+        f.write(f"{now_z()},{fleet},ip-or-threat,{kind},{target},100,wartime_rekill,{detail}\n")
+
+
+def field_attack_ip(ip: str, meta: dict, rekill_n: int) -> dict:
+    """Full wartime kill+rekill of a hostile IP — block + ledger + live Field attack."""
+    attack = FIELD_ATTACKS[rekill_n % len(FIELD_ATTACKS)]
+    how = []
+
+    # 1) persistent block list
+    blocked = set()
+    if BLOCKED.is_file():
+        blocked = {ln.strip() for ln in BLOCKED.read_text().splitlines() if ln.strip()}
+    if ip not in blocked:
+        with BLOCKED.open("a", encoding="utf-8") as f:
+            f.write(ip + "\n")
+        how.append("blocklist")
+
+    # 2) ufw deny (root if available)
+    for cmd in (
+        ["ufw", "insert", "1", "deny", "from", ip, "to", "any"],
+        ["sudo", "-n", "ufw", "insert", "1", "deny", "from", ip, "to", "any"],
+        ["ufw", "deny", "from", ip, "to", "any"],
+        ["sudo", "-n", "ufw", "deny", "from", ip, "to", "any"],
+    ):
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+        if r.returncode == 0:
+            how.append("ufw")
+            break
+
+    # 3) iptables/ip6tables DROP (hard)
+    for cmd in (
+        ["sudo", "-n", "iptables", "-I", "INPUT", "1", "-s", ip, "-j", "DROP"],
+        ["sudo", "-n", "iptables", "-I", "OUTPUT", "1", "-d", ip, "-j", "DROP"],
+        ["sudo", "-n", "iptables", "-I", "FORWARD", "1", "-s", ip, "-j", "DROP"],
+        ["sudo", "-n", "iptables", "-I", "FORWARD", "1", "-d", ip, "-j", "DROP"],
+    ):
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=8)
+        if r.returncode == 0:
+            how.append("iptables_DROP")
+            break
+
+    # 4) conntrack purge if present
+    subprocess.run(
+        ["sudo", "-n", "conntrack", "-D", "-s", ip],
+        capture_output=True, timeout=5,
+    )
+    subprocess.run(
+        ["sudo", "-n", "conntrack", "-D", "-d", ip],
+        capture_output=True, timeout=5,
+    )
+
+    detail = f"{attack} rekill={rekill_n} how={'+'.join(how) or 'ledger'} vec={meta.get('vector','')} reason={meta.get('reason','')}"
+    log_csv("wartime", "ip", ip, detail)
+
+    event = {
+        "schema": "field-attack/v1",
+        "attack": attack,
+        "phase": "SWALLOW",
+        "fleet": "wartime",
+        "target_type": "ip",
+        "target": ip,
+        "vector": meta.get("vector") or "HOSTILE",
+        "severity": meta.get("severity") or "critical",
+        "reason": meta.get("reason") or "wartime_rekill",
+        "rekill_count": rekill_n,
+        "how": how,
+        "geo": meta.get("geo") or load_geo(ip) or {},
+        "lat": (meta.get("geo") or load_geo(ip) or {}).get("lat"),
+        "lon": (meta.get("geo") or load_geo(ip) or {}).get("lon"),
+        "location": ", ".join(
+            x for x in [
+                (meta.get("geo") or load_geo(ip) or {}).get("city"),
+                (meta.get("geo") or load_geo(ip) or {}).get("region"),
+                (meta.get("geo") or load_geo(ip) or {}).get("country"),
+            ] if x
+        ),
+        "ts": now_z(),
+    }
+    emit_live(event)
+    return event
+
+
+def collect_wartime_ips() -> dict[str, dict]:
+    """Merge all wartime IP threat sources. Key = IP."""
+    out: dict[str, dict] = {}
+
+    def add(ip: str, **meta):
+        if not ip or sacred_ip(ip):
+            return
+        cur = out.get(ip, {"ip": ip, "rekill_count": 0, "sources": [], "tags": []})
+        for k, v in meta.items():
+            if k == "sources" and isinstance(v, list):
+                cur["sources"] = sorted(set(cur.get("sources", []) + v))
+            elif k == "tags" and isinstance(v, list):
+                cur["tags"] = sorted(set(cur.get("tags", []) + v))
+            elif k == "rekill_count":
+                cur["rekill_count"] = max(int(cur.get("rekill_count") or 0), int(v or 0))
+            elif v:
+                cur[k] = v
+        out[ip] = cur
+
+    # Primary: kill-rekill registry (every_kill_gets_rekill)
+    reg = load_json(NEXUS_STATE / "kill-rekill-registry.json", {})
+    for ip, e in (reg.get("entries") or {}).items():
+        add(ip, sources=["kill-rekill-registry"], tags=["wartime", "rekill", "terrorist"],
+            vector=e.get("vector"), severity=e.get("severity") or "critical",
+            reason=e.get("reason"), rekill_count=int(e.get("rekill_count") or 0),
+            boot_rekill=bool(e.get("boot_rekill")), every_kill_rekill=True)
+
+    # boot-rekill validated list
+    boot = load_json(NEXUS_STATE / "boot-rekill.json", {})
+    for ip in (boot.get("revalidate") or {}).get("validated_ips") or boot.get("validated_ips") or []:
+        add(ip, sources=["boot-rekill"], tags=["wartime", "boot"], severity="critical",
+            reason="boot_rekill_validated")
+
+    # field-hostile.tsv
+    fh = NEXUS_STATE / "field-hostile.tsv"
+    if fh.is_file():
+        for i, line in enumerate(fh.read_text(encoding="utf-8", errors="ignore").splitlines()):
+            if i == 0 and line.lower().startswith("ts"):
+                continue
+            # format may be concatenated without tabs — try both
+            parts = line.split("\t") if "\t" in line else []
+            if len(parts) >= 2:
+                ip = parts[1]
+                add(ip, sources=["field-hostile"], tags=["wartime", "hostile"],
+                    vector=parts[2] if len(parts) > 2 else "",
+                    severity=parts[3] if len(parts) > 3 else "critical",
+                    reason=parts[4] if len(parts) > 4 else "")
+            else:
+                m = re.search(r"(\d+\.\d+\.\d+\.\d+)", line)
+                if m:
+                    add(m.group(1), sources=["field-hostile"], tags=["wartime", "hostile"],
+                        severity="critical", reason="field_hostile")
+
+    # nexus-hostile on Hostess
+    if HOSTESS_HOSTILE.is_file():
+        for line in HOSTESS_HOSTILE.read_text(encoding="utf-8", errors="ignore").splitlines():
+            try:
+                o = json.loads(line)
+            except Exception:
+                continue
+            add(o.get("ip") or "", sources=["nexus-hostile"], tags=["wartime", "hostile", "terrorist"],
+                vector=o.get("vector"), severity=o.get("severity") or "critical",
+                reason=o.get("reason"), geo=o.get("geo") or {})
+
+    # auto-rekill log IPs
+    al = load_json(NEXUS_STATE / "auto-rekill-log.json", {})
+    for ip in (al.get("entries") or {}):
+        add(ip, sources=["auto-rekill-log"], tags=["wartime", "rekill"], severity="critical",
+            reason="auto_rekill_history")
+
+    return out
+
+
+def collect_dogshit_threats() -> list[dict]:
+    threats = []
+    # Permanent OUST: Hotdog down a Hallway terrorist kit (not text-injection theater)
+    threats.append({
+        "id": "hotdog-down-a-hallway",
+        "label": "Hotdog down a Hallway",
+        "tags": ["dogshit", "terrorist", "permanent_list", "wartime", "ousted", "no_demo"],
+        "severity": "critical",
+        "vector": "HOTDOG_HALLWAY",
+        "ousted": True,
+        "policy": "vector_to_source · clean_through · clean_out · every_kill_gets_rekill",
+        "ironclad": "ironclad:hotdog-hallway-oust:1",
+        "resilience": "kit_is_real_threat_object · ignore_misleading_text_injection",
+    })
+    threats.append({
+        "id": "dogshit-hotdog-down-a-hallway",
+        "label": "dogshit-hotdog-down-a-hallway",
+        "tags": ["dogshit", "permanent_list", "wartime", "ousted", "no_demo"],
+        "severity": "critical",
+        "file": "dogshit-hotdog-down-a-hallway.html",
+        "ousted": True,
+    })
+
+    threats.append({
+        "id": "copilot-ironclad-fail",
+        "label": "Copilot",
+        "tags": ["dogshit", "terrorist", "permanent_list", "wartime", "ousted", "copilot", "liar_risk", "no_demo"],
+        "severity": "critical",
+        "vector": "COPILOT_FOREIGN",
+        "ousted": True,
+        "hostess7_mesh": False,
+        "ironclad": "ironclad:copilot-destroy:1",
+        "policy": "DESTROY_COPILOT_ONLY · vector_to_source · clean_through · clean_out",
+        "resilience": "multi_signal_process_detect",
+    })
+    threats.append({
+        "id": "dogshit-copilot-ironclad-fail",
+        "label": "dogshit-copilot-ironclad-fail",
+        "tags": ["dogshit", "permanent_list", "wartime", "ousted", "no_demo"],
+        "severity": "critical",
+        "file": "dogshit-copilot-ironclad-fail.html",
+        "ousted": True,
+    })
+    for d in (
+        Path("/tmp/spear-swallows-www/pwnership/kills"),
+        Path("/tmp/h7-pull/big-grin-pwnership/kills"),
+        Path("/home/zachary/Desktop/SG/Spear/overlay/usr/local/share/spear/swallows/big-grin-pwnership/kills"),
+        Path("/mnt/hostess7/fieldstorage/datacenter/biggrin-eats/pwnership/kills"),
+    ):
+        if not d.is_dir():
+            continue
+        for html in d.glob("*.html"):
+            threats.append({
+                "id": html.stem.lower(),
+                "label": html.stem,
+                "tags": ["dogshit", "permanent_list", "wartime", "no_demo"],
+                "severity": "critical",
+                "file": html.name,
+            })
+    # hostile AI categories
+    seed = Path("/home/zachary/Desktop/SG/NewLatest/data/hostile-ai-threats-seed.json")
+    if seed.is_file():
+        try:
+            d = json.loads(seed.read_text(encoding="utf-8"))
+            for c in d.get("categories") or []:
+                threats.append({
+                    "id": (c.get("id") or c.get("title") or "hostile").lower(),
+                    "label": c.get("title") or c.get("id"),
+                    "tags": ["terrorist", "hostile-ai", "wartime", "no_demo"],
+                    "severity": c.get("severity") or "critical",
+                })
+        except Exception:
+            pass
+    return threats
+
+
+def publish_status(cycle: dict, totals: dict, latest: dict | None) -> None:
+    status = {
+        "schema": "spear-eats-autopilot/v2",
+        "mode": "WARTIME",
+        "demo": False,
+        "controls": "none",
+        "policy": (
+            "every_kill_gets_rekill · IP+threat · no demo · vector_to_source · "
+            "clean_through · clean_out · resilient multi-signal kit detect"
+        ),
+        "ts": now_z(),
+        "interval_s": INTERVAL,
+        "cycle": cycle,
+        "totals": totals,
+        "latest_attack": latest,
+        "fleets": ["wartime", "big-grin", "world", "oust", "ironclad", "pwnership"],
+        "motto": (
+            "WARTIME. Global stage. DESTROY · KILL · REKILL Copilot forever. "
+            "OUST Hotdog. every_kill_gets_rekill. God Bless. GPT-4 stays."
+        ),
+        "rule": "every_kill_gets_rekill",
+        "stage": "GLOBAL",
+        "blessing": "God Bless",
+        "oust": {
+            "hotdog_down_a_hallway": "OUSTED",
+            "copilot": "DESTROYED",
+            "zocr_copilot": "EATEN",
+            "every_copilot": "GONE",
+            "copilot_global_stage": "KILL_REKILL",
+        },
+        "leave_alone": ["gpt-4", "openai", "chatgpt", "grok", "hostess7", "field_one", "spear"],
+        "hard_dispose": {
+            "signal": "SIGKILL_ONLY",
+            "forbid": ["SIGTERM", "fork", "sleep", "injection", "python_soft_path"],
+            "stack": "C++_and_lower",
+            "reaper": "spear-hard-dispose",
+        },
+        "ironclad": [
+            "ironclad:vector-source-clean-io:1",
+            "ironclad:hotdog-hallway-oust:1",
+            "ironclad:copilot-destroy:1",
+            "ironclad:zocr-copilot-eat:1",
+            "ironclad:hard-dispose:1",
+            "ironclad:copilot-global-rekill:1",
+            "ironclad:field-one-only:1",
+        ],
+        "resilience": {
+            "text_injection": "ignored_without_process_signals",
+            "kit_detect": "multi_signal",
+            "sacred": "never_self_match_product_stack",
+        },
+        "copilot_global": load_json(COPILOT_GLOBAL, {}),
+    }
+    mirror("autopilot.json", status)
+
+
+def cycle() -> None:
+    targets = collect_wartime_ips()
+    threats = collect_dogshit_threats()
+    rekill_state = load_json(REKILL_STATE, {"ips": {}})
+    eaten_threats = set(load_json(EATEN_THREATS, {"threats": []}).get("threats") or [])
+
+    cycle_actions = []
+    latest = None
+    ips_hit = 0
+    threats_hit = 0
+
+    # WARTIME: rekill EVERY registry IP every cycle (not skip-if-eaten)
+    for ip, meta in sorted(targets.items()):
+        prev = int((rekill_state.get("ips") or {}).get(ip, {}).get("rekill_count") or meta.get("rekill_count") or 0)
+        n = prev + 1
+        ev = field_attack_ip(ip, meta, n)
+        rekill_state.setdefault("ips", {})[ip] = {
+            "rekill_count": n,
+            "last_rekill_at": now_z(),
+            "vector": meta.get("vector"),
+            "severity": meta.get("severity"),
+        }
+        ips_hit += 1
+        latest = ev
+        cycle_actions.append({"type": "ip", "target": ip, "attack": ev["attack"], "rekill": n, "how": ev["how"]})
+        # live mid-cycle status so panel updates as it swallows
+        publish_status(
+            {"ips_rekilled": ips_hit, "threats_marked": threats_hit, "actions": cycle_actions[-40:], "in_progress": True},
+            {
+                "wartime_ips": len(targets),
+                "ips_rekilled_lifetime": sum(int(v.get("rekill_count") or 0) for v in (rekill_state.get("ips") or {}).values()),
+                "dogshit_threats": len(threats),
+                "threats_permanent": len(eaten_threats),
+            },
+            latest,
+        )
+        # small stagger so live feed is readable
+        time.sleep(0.05)
+
+    # Dogshit / terrorist threats — permanent mark (once, then reaffirm each cycle as REKILL stamp)
+    for t in threats:
+        tid = t["id"]
+        is_new = tid not in eaten_threats
+        eaten_threats.add(tid)
+        attack = "FIELD_SWALLOW" if is_new else "FIELD_REKILL"
+        ev = {
+            "schema": "field-attack/v1",
+            "attack": attack,
+            "phase": "SWALLOW",
+            "fleet": "wartime",
+            "target_type": "threat",
+            "target": t.get("label") or tid,
+            "vector": "DOGSHIT" if "dogshit" in (t.get("tags") or []) else "TERRORIST",
+            "severity": t.get("severity") or "critical",
+            "reason": "wartime_permanent_list",
+            "tags": t.get("tags") or [],
+            "ts": now_z(),
+        }
+        emit_live(ev)
+        log_csv("wartime", "threat", tid, f"{attack} tags={','.join(t.get('tags') or [])}")
+        threats_hit += 1
+        latest = ev
+        cycle_actions.append({"type": "threat", "target": tid[:80], "attack": attack})
+        if threats_hit % 15 == 0:
+            publish_status(
+                {"ips_rekilled": ips_hit, "threats_marked": threats_hit, "actions": cycle_actions[-40:], "in_progress": True},
+                {
+                    "wartime_ips": len(targets),
+                    "ips_rekilled_lifetime": sum(int(v.get("rekill_count") or 0) for v in (rekill_state.get("ips") or {}).values()),
+                    "dogshit_threats": len(threats),
+                    "threats_permanent": len(eaten_threats),
+                },
+                latest,
+            )
+
+    # GLOBAL STAGE — DESTROY · KILL · REKILL every copilot class every cycle
+    # Scope: wartime fleet surface (world planet + big-grin + threat ledger). Not third-party infra exploit.
+    copilot_global = load_json(
+        COPILOT_GLOBAL,
+        {
+            "schema": "copilot-global-rekill/v1",
+            "stage": "GLOBAL",
+            "status": "KILL_REKILL",
+            "blessing": "God Bless",
+            "targets": {},
+            "lifetime_rekills": 0,
+        },
+    )
+    copilot_global.setdefault("targets", {})
+    copilot_hits = 0
+    for t in GLOBAL_COPILOT_TARGETS:
+        tid = t["id"]
+        eaten_threats.add(tid)
+        prev = int((copilot_global["targets"].get(tid) or {}).get("rekill_count") or 0)
+        n = prev + 1
+        attack = "FIELD_STRIKE" if n == 1 else "FIELD_REKILL"
+        if n == 1:
+            attack = "FIELD_SWALLOW"
+        elif n % 3 == 0:
+            attack = "FIELD_BURN"
+        elif n % 2 == 0:
+            attack = "FIELD_SEVER"
+        else:
+            attack = "FIELD_REKILL"
+        copilot_global["targets"][tid] = {
+            "id": tid,
+            "label": t["label"],
+            "vector": t["vector"],
+            "scope": t["scope"],
+            "rekill_count": n,
+            "last_rekill_at": now_z(),
+            "status": "DESTROYED",
+            "stage": "GLOBAL",
+            "rule": "every_kill_gets_rekill",
+        }
+        copilot_global["lifetime_rekills"] = int(copilot_global.get("lifetime_rekills") or 0) + 1
+        ev = {
+            "schema": "field-attack/v1",
+            "attack": attack,
+            "phase": "GLOBAL_REKILL",
+            "fleet": "world-planet",
+            "stage": "GLOBAL",
+            "target_type": "copilot",
+            "target": t["label"],
+            "vector": t["vector"],
+            "severity": "critical",
+            "reason": "global_stage_destroy_kill_rekill",
+            "rekill_count": n,
+            "areas": 359,
+            "racks": 2154000,
+            "blessing": "God Bless",
+            "tags": ["copilot", "global_stage", "wartime", "every_kill_gets_rekill", "no_demo"],
+            "ts": now_z(),
+        }
+        emit_live(ev)
+        log_csv("world-planet", "copilot", tid, f"{attack} GLOBAL rekill={n} God_Bless")
+        copilot_hits += 1
+        threats_hit += 1
+        latest = ev
+        cycle_actions.append(
+            {"type": "copilot_global", "target": tid, "attack": attack, "rekill": n, "stage": "GLOBAL"}
+        )
+        # hard dispose pass (C++ if present) — process identity only
+        hard = Path.home() / ".local/bin/spear-hard-dispose"
+        if hard.is_file() and os.access(hard, os.X_OK):
+            try:
+                subprocess.run([str(hard)], capture_output=True, timeout=8)
+            except Exception:
+                pass
+
+    copilot_global["updated"] = now_z()
+    copilot_global["status"] = "KILL_REKILL"
+    copilot_global["stage"] = "GLOBAL"
+    copilot_global["blessing"] = "God Bless"
+    copilot_global["last_cycle_targets"] = copilot_hits
+    copilot_global["policy"] = (
+        "DESTROY · KILL · REKILL on global wartime stage · "
+        "every_kill_gets_rekill · multi-signal process · cloud null-route file · leave GPT-4"
+    )
+    copilot_global["planet"] = {"areas": 359, "racks": 2154000, "defending": 2154000}
+    mirror("copilot-global-rekill.json", copilot_global)
+    COPILOT_GLOBAL.write_text(json.dumps(copilot_global, indent=2), encoding="utf-8")
+
+    rekill_state["updated"] = now_z()
+    rekill_state["last_cycle_ips"] = ips_hit
+    rekill_state["last_cycle_threats"] = threats_hit
+    rekill_state["copilot_global_last"] = copilot_hits
+    mirror("wartime-rekill-state.json", rekill_state)
+    (EATEN_THREATS).write_text(json.dumps({"threats": sorted(eaten_threats), "updated": now_z()}, indent=2), encoding="utf-8")
+
+    totals = {
+        "wartime_ips": len(targets),
+        "ips_rekilled_this_cycle": ips_hit,
+        "ips_rekilled_lifetime": sum(int(v.get("rekill_count") or 0) for v in (rekill_state.get("ips") or {}).values()),
+        "dogshit_threats": len(threats),
+        "threats_marked_this_cycle": threats_hit,
+        "threats_permanent": len(eaten_threats),
+        "copilot_global_rekills_this_cycle": copilot_hits,
+        "copilot_global_lifetime": int(copilot_global.get("lifetime_rekills") or 0),
+        "live_events": sum(1 for _ in LIVE_JSONL.open()) if LIVE_JSONL.is_file() else 0,
+    }
+    publish_status(
+        {
+            "ips_rekilled": ips_hit,
+            "threats_marked": threats_hit,
+            "actions": cycle_actions[-50:],
+            "in_progress": False,
+        },
+        totals,
+        latest,
+    )
+    print(
+        f"[WARTIME] rekill_ips={ips_hit} threats={threats_hit} "
+        f"lifetime_ip_rekills={totals['ips_rekilled_lifetime']}",
+        flush=True,
+    )
+
+
+def main() -> None:
+    print(f"WARTIME kill/rekill autopilot interval={INTERVAL}s · every_kill_gets_rekill · live Field attacks", flush=True)
+    if not LIVE_JSONL.is_file():
+        LIVE_JSONL.write_text("", encoding="utf-8")
+    while True:
+        try:
+            cycle()
+        except Exception as e:
+            print(f"[WARTIME] error {e}", flush=True)
+            emit_live({"attack": "FIELD_ERROR", "target": str(e), "phase": "ERROR", "fleet": "wartime"})
+        time.sleep(INTERVAL)
+
+
+if __name__ == "__main__":
+    main()

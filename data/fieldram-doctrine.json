@@ -1,0 +1,28 @@
+{
+  "schema": "spear-fieldram/v1",
+  "title": "Field RAM — FFAT entropy store in RAM (KILROY)",
+  "motto": "tmpfs Field RAM · same ZERO/RLE/PAK/REF as Field1 · KILROY always ensures",
+  "path_default": "/dev/shm/spear-fieldram.img",
+  "path_kilroy": "/mnt/field/fieldram.img",
+  "format": "FFAT\\x03ENT (identical to Field1 disk)",
+  "size_policy": {
+    "default": "1/4 of MemAvailable after 512 MiB headroom",
+    "min_mib": 64,
+    "max_mib": 16384,
+    "override": "spear fieldram-ensure 4096  # MiB"
+  },
+  "accounting": {
+    "guaranteed": "pool worst-case RAW",
+    "address_space": "sparse map",
+    "pack_ratio": "measured after writes only"
+  },
+  "kilroy": {
+    "init": "ensure_fieldram on normal|compat|fielddrive",
+    "limine": "comments mention Field RAM",
+    "cli": ["fieldram-status", "fieldram-ensure", "fieldram-force", "storage-status"]
+  },
+  "field_research": {
+    "role": "Host-side field storage fabric (C0) until GPU Field Die SSBO path",
+    "not": "fake ×N capacity on RAM"
+  }
+}

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Field GIMP
+Exec=/usr/local/bin/field-gimp %U
+Icon=gimp
+Terminal=false
+Type=Application
+Categories=Graphics;

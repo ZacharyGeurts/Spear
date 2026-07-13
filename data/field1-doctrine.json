@@ -1,0 +1,53 @@
+{
+  "schema": "spear-field1/v2",
+  "title": "Field1 — claimed whole-disk Field Drive",
+  "updated": "2026-07-13",
+  "field1": {
+    "name": "Field1",
+    "state": "CLAIMED",
+    "ffat_label": "FIELD1",
+    "source_was": "FIELD_QUBES / Qubes whole disk",
+    "disk": "/dev/sdb",
+    "part": "/dev/sdb1",
+    "part_type": "0xE0",
+    "stable_ids": [
+      "/dev/disk/by-label/FIELD1",
+      "/dev/spear/field1",
+      "/dev/disk/by-id/ata-T-FORCE_1TB_TPBF2411190010300627"
+    ],
+    "model": "T-FORCE 1TB",
+    "serial": "TPBF2411190010300627",
+    "format": "SPEARMBR + SECURE01 + FFAT\\x03ENT v4 entropy/PAK",
+    "physical_bytes": 1024209543168,
+    "guaranteed_bytes": 1015618558976,
+    "address_space_bytes": 1466015502336,
+    "accounting": "guaranteed=pool worst-case; address_space=sparse map; pack_ratio measured; never fake ×N"
+  },
+  "backup": {
+    "target_label": "HOSTESS7_TEAM",
+    "target_dev": "/dev/nvme2n1",
+    "completed": "field1-backup-20260713-035640",
+    "claim_receipt": "HOSTESS7_TEAM/FIELD1_CLAIMED.txt"
+  },
+  "hostess": {
+    "label": "HOSTESS7_TEAM",
+    "dev": "/dev/nvme2n1",
+    "note": "not nvme1n1 (system); Hostess is nvme2n1"
+  },
+  "udev": "/etc/udev/rules.d/99-spear-field1.rules",
+  "workflow": [
+    "spear field1-status",
+    "spear ffat-probe /dev/disk/by-label/FIELD1",
+    "spear storage-status"
+  ],
+  "qemu": {
+    "default": "SPEAR_FIELD1=auto attaches host Field1 as virtio serial=FIELD1",
+    "image_standin": "SPEAR_FIELD1=img → out/field-disk.img",
+    "omit": "SPEAR_FIELD1=0"
+  },
+  "autoelevate": {
+    "polkit": false,
+    "model": "setuid /usr/local/bin/spear",
+    "install": "cd src && make && sudo install -o root -g root -m 4755 spear /usr/local/bin/spear"
+  }
+}

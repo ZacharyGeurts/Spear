@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Queen
+Comment=Queen Browser · Field Research · Spear
+Exec=/usr/local/bin/queen %u
+Icon=spear
+Terminal=false
+Type=Application
+Categories=Network;WebBrowser;
+StartupWMClass=Queen

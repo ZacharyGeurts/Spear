@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Field Terminal
+Exec=/usr/local/bin/field-terminal
+Icon=utilities-terminal
+Terminal=false
+Type=Application
+Categories=System;TerminalEmulator;

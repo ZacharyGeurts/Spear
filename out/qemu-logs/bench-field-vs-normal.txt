@@ -1,0 +1,5 @@
+=== Spear boot bench: Field vs Normal ===
+ISO=/home/zachary/Desktop/SG/NewLatest/Spear/out/spear-latest.iso FIELD1=/dev/sdb
+field ready_s=30.16 serial=/home/zachary/Desktop/SG/Spear/out/qemu-logs/bench-field-20260713-152206.log
+spear login: 
+normal TIMEOUT after 180.50s serial=/home/zachary/Desktop/SG/Spear/out/qemu-logs/bench-normal-20260713-152237.log

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" data-field-surface="big-grin-eats" data-theme="pirate-ship">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <title>BIG GRIN SWALLOWS · Pirate Ship · GPS Kills · Meme Deck</title>
+  <link rel="stylesheet" href="/assets/leaflet/leaflet.css" />
+  <link rel="stylesheet" href="/assets/big-grin-eats.css?v=pirate17" />
+</head>
+<body class="bge-body celebrate pirate-ship">
+  <!-- Deck rail: captain + mission -->
+  <header class="bge-top ship-bridge">
+    <div class="captain-block">
+      <img class="captain-portrait" id="captainArt"
+           src="/assets/big-grin-eats/23-amouranth-pirate-captain.jpg?v=1"
+           alt="Pirate captain · Amouranth theme" />
+      <div class="captain-meta">
+        <p class="bge-teeth">⚓ PIRATE SHIP · BIG GRIN SWALLOWS · DEATHBLOSSOM · GPS PER KILL</p>
+        <h1>BIG GRIN <span class="bge-super">SWALLOWS</span></h1>
+        <p class="bge-sub">
+          <b>Pirate plane</b> · full GPS + IP/port/proc per kill · old CSVs merge in ·
+          H7r hunt first · leave-alone data racks ·
+          <a href="/gladstone-eats">Gladstone</a> ·
+          <a href="/escanaba-eats">Escanaba</a> ·
+          <a href="/up-eats">UP</a> ·
+          <a href="/terrorist-oust">Oust</a>
+        </p>
+      </div>
+    </div>
+    <div class="bge-pills" id="pills"></div>
+  </header>
+
+  <section class="bge-autopilot" id="autoPilot" aria-live="polite">
+    <span class="ap-dot"></span>
+    <strong>SHIP LIVE · SWALLOWS</strong>
+    <span id="apStatus">Loading pirate Big Grin status…</span>
+    <span class="sip-meta" id="sipMeta"></span>
+  </section>
+
+  <!-- Plank pipeline -->
+  <section class="bge-pipeline" id="pipeline">
+    <div class="pipe super"><b>SPOT</b><span>GPS lock</span></div>
+    <div class="pipe arr">→</div>
+    <div class="pipe chew"><b>BOARD</b><span>dossier</span></div>
+    <div class="pipe arr">→</div>
+    <div class="pipe shred"><b>SWALLOW</b><span>one-shot</span></div>
+    <div class="pipe arr">→</div>
+    <div class="pipe burn"><b>LOG KILL</b><span>full detail</span></div>
+    <div class="pipe arr">→</div>
+    <div class="pipe nom"><b>SAIL ON</b><span>CSV + map</span></div>
+  </section>
+
+  <!-- Hero: meme gallery + celebrate stats -->
+  <section class="bge-hero-row ship-deck">
+    <section class="bge-art" id="artStage">
+      <img id="artFull" src="/assets/big-grin-eats/23-amouranth-pirate-captain.jpg?v=1" alt="Pirate captain" />
+      <button type="button" class="bge-nav prev" id="artPrev" aria-label="Previous">‹</button>
+      <button type="button" class="bge-nav next" id="artNext" aria-label="Next">›</button>
+      <div class="bge-thumbs" id="thumbs"></div>
+      <div class="bge-cap">
+        <span id="artCap">PIRATE CAPTAIN · Amouranth theme · Big Grin deck</span>
+        <span id="artIdx"></span>
+      </div>
+    </section>
+    <section class="bge-celebrate" id="celebrateStrip">
+      <div class="cel-head">
+        <h2>⚓ Bridge · live celebration</h2>
+        <div class="csv-actions" id="topCsv"></div>
+      </div>
+      <div class="bge-stats" id="stats"></div>
+      <div class="cel-banner" id="celBanner">Loading people &amp; GPS kills…</div>
+      <div class="meme-strip" id="memeStrip" aria-label="Pirate meme art">
+        <img src="/assets/big-grin-eats/24-pirate-ship-teeth-cannon.jpg" alt="Ship teeth cannon meme" />
+        <img src="/assets/big-grin-eats/25-pirate-gps-treasure-map.jpg" alt="GPS treasure map meme" />
+        <img src="/assets/big-grin-eats/26-pirate-captain-grin-wheel.jpg" alt="Captain grin wheel meme" />
+        <img src="/assets/big-grin-eats/27-pirate-deck-deathblossom-party.jpg" alt="Deck deathblossom party meme" />
+      </div>
+    </section>
+  </section>
+
+  <!-- Kill ledger: full details per kill -->
+  <section class="bge-people-block kill-ledger">
+    <div class="block-head">
+      <div>
+        <h2>☠ Kill ledger · GPS + full details per kill</h2>
+        <p class="muted" id="peopleCount">—</p>
+      </div>
+      <div class="csv-actions export-bar">
+        <a class="csv-btn" href="/assets/big-grin-eats/data/eat-people-gps-all.csv" download="eat-people-gps-all.csv">CSV · archive all</a>
+        <a class="csv-btn" href="/api/eat-people-gps.csv?scope=local" download="eat-people-local.csv">CSV · local</a>
+        <a class="csv-btn" href="/api/eat-people-gps.csv?scope=global" download="eat-people-global.csv">CSV · global</a>
+        <a class="csv-btn secondary" href="/api/eat-people-gps.csv" download="eat-people-all.csv">CSV · live all</a>
+        <a class="csv-btn secondary" href="/assets/big-grin-eats/data/eat-people-kills-full.json" download="eat-people-kills-full.json">JSON · full kills</a>
+        <a class="csv-btn secondary" href="/assets/big-grin-eats/data/field-hostile-legacy.tsv" download="field-hostile-legacy.tsv">TSV · legacy hostile</a>
+        <a class="csv-btn secondary" href="/terrorist-oust">Oust panel</a>
+      </div>
+    </div>
+    <div class="ledger-layout">
+      <div class="people-grid" id="peopleGrid"></div>
+      <aside class="kill-detail" id="killDetail" aria-live="polite">
+        <h3>Selected kill · full dossier</h3>
+        <p class="muted" id="killDetailEmpty">Click a kill card for GPS, IP, ports, procs, score, rekill, vectors, sources, reasons, and notes.</p>
+        <div id="killDetailBody" hidden></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Chart room: map -->
+  <section class="bge-fleet-block chart-room">
+    <div class="block-head">
+      <div>
+        <h2>🗺 Chart room · absolute GPS · fleet + kills</h2>
+        <p class="muted" id="fleetCount">—</p>
+      </div>
+      <div class="csv-actions map-toolbar export-bar">
+        <button type="button" class="csv-btn threat-toggle" id="threatToggle" aria-pressed="false">Threat · DEAD only</button>
+        <button type="button" class="csv-btn secondary" id="mapFitAll">Fit all</button>
+        <button type="button" class="csv-btn secondary" id="mapBasemap">Basemap · streets</button>
+        <a class="csv-btn" href="/api/fleet-global-125k.csv?scope=local" download="fleet-125k-local.csv">CSV · fleet local</a>
+        <a class="csv-btn" href="/api/fleet-global-125k.csv?scope=global" download="fleet-125k-global.csv">CSV · fleet global</a>
+        <a class="csv-btn secondary" href="/api/eat-export-bundle.json" download="eat-export-bundle.json">JSON · full bundle</a>
+        <button type="button" class="csv-btn secondary" id="dlCombined">CSV · people+fleet</button>
+      </div>
+    </div>
+    <div class="fleet-map-wrap">
+      <div class="fleet-map" id="fleetMap" aria-label="World fleet and kill GPS map"></div>
+      <div class="map-legend" id="mapLegend">
+        <span class="lg fleet"></span> fleet metro
+        <span class="lg person"></span> people
+        <span class="lg dead"></span> DEAD kill
+      </div>
+      <div class="dead-panel" id="deadPanel" hidden>
+        <h3>DEAD threats</h3>
+        <p class="muted" id="deadCount">—</p>
+        <div class="dead-list" id="deadList"></div>
+      </div>
+    </div>
+    <div class="fleet-grid" id="fleetGrid"></div>
+  </section>
+
+  <!-- Below decks -->
+  <div class="bge-main below-decks">
+    <aside class="bge-side">
+      <div class="bge-ph">Feeds · celebrate cards</div>
+      <div class="bge-scroll" id="feedList"></div>
+    </aside>
+    <section class="bge-mid">
+      <div class="bge-ph">Wave log · pirate swallows</div>
+      <div class="bge-scroll">
+        <div class="bge-card chew-card">
+          <h3>Ship doctrine</h3>
+          <ul class="bge-ideas">
+            <li><b>Kill ledger</b> — GPS + IP/port/proc/score/rekill/vectors/sources per kill</li>
+            <li><b>Chart room</b> — 125 metros · absolute lat/lon · DEAD pins</li>
+            <li><b>CSV hold</b> — live API + archived CSV + legacy hostile TSV merge</li>
+            <li><b>Leave-alone</b> — Hostess7 · H7r · FIELD_QUBES · data racks</li>
+          </ul>
+        </div>
+        <div class="bge-card">
+          <h3>Wave log</h3>
+          <div class="bge-log" id="waveLog">waiting…</div>
+        </div>
+      </div>
+    </section>
+    <section class="bge-right">
+      <div class="bge-ph" id="detailHead">Selected feed · pretty</div>
+      <div class="bge-scroll" id="detail">
+        <p class="muted">Pick a feed for highlights — never a raw JSON dump.</p>
+      </div>
+    </section>
+  </div>
+
+  <footer class="bge-foot">
+    <span><span class="dot"></span>pirate ship · GPS kills · CSV merge · ironclad:big-grin-pirate-ship:1</span>
+    <span>NOT ON ISO · H7r hunt first · <a href="/gladstone-eats">Gladstone →</a></span>
+  </footer>
+
+  <script src="/assets/leaflet/leaflet.js"></script>
+  <script src="/assets/big-grin-eats.js?v=pirate17"></script>
+</body>
+</html>

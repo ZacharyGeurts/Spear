@@ -1,0 +1,21 @@
+[Unit]
+Description=Spear Big Grin / UP field data miner (loopback :9489)
+After=network-online.target spear-boot-harden.service
+ConditionPathExists=/etc/spear-release
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/spear-miner serve
+Restart=on-failure
+RestartSec=3
+# Loopback only — no WAN
+Environment=SPEAR_MINER_BIND=127.0.0.1
+Environment=SPEAR_MINER_PORT=9489
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/spear /run
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

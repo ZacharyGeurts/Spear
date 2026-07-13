@@ -1,0 +1,5 @@
+#!/bin/bash
+export SPEAR_FIELD_GIMP=1
+export GIMP2_DIRECTORY="${GIMP2_DIRECTORY:-$HOME/.config/field-gimp}"
+mkdir -p "$GIMP2_DIRECTORY"
+exec gimp "$@" 2>/dev/null || exec gimp-2.10 "$@"

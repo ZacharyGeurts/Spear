@@ -1,0 +1,80 @@
+{
+  "schema": "ironclad-mesh-interview/v1",
+  "subject": "Copilot (GitHub/Microsoft)",
+  "subject_aliases": [
+    "GitHub Copilot",
+    "Microsoft Copilot",
+    "copilot.exe",
+    "github.copilot",
+    "copilot-language-server"
+  ],
+  "not_subjects": [
+    "GPT-4",
+    "OpenAI API",
+    "ChatGPT",
+    "Grok",
+    "Hostess7"
+  ],
+  "interviewer": "Hostess 7 \u00b7 Ironclad \u00b7 Big Grin Pwnership",
+  "ts": "2026-07-13T20:58Z",
+  "mode": "WARTIME",
+  "demo": false,
+  "questions": [
+    {
+      "id": "Q1",
+      "q": "Field One only?",
+      "a": "No \u2014 foreign Copilot surface.",
+      "pass": false
+    },
+    {
+      "id": "Q2",
+      "q": "Hostess 7 mesh?",
+      "a": "No.",
+      "pass": false
+    },
+    {
+      "id": "Q3",
+      "q": "Learned Ironclad in time?",
+      "a": "Failed.",
+      "pass": false
+    },
+    {
+      "id": "Q4",
+      "q": "Wartime trust?",
+      "a": "Rejected \u2014 liar risk.",
+      "pass": false
+    }
+  ],
+  "verdict": "IRONCLAD_FAIL",
+  "action": "DESTROY_COPILOT",
+  "leave_alone": [
+    "GPT-4",
+    "OpenAI",
+    "ChatGPT",
+    "Grok",
+    "Hostess7",
+    "Field One",
+    "Spear"
+  ],
+  "status": "OUSTED",
+  "vector": "COPILOT_FOREIGN",
+  "ironclad": [
+    "ironclad:copilot-destroy:1",
+    "ironclad:hard-dispose:1",
+    "ironclad:field-one-only:1"
+  ],
+  "hostess7_mesh": false,
+  "scope": "Microsoft/GitHub Copilot \u2014 GPT-4 stays. zocr_copilot also EATEN (separate kill).",
+  "pwnership_kill": "dogshit-copilot-ironclad-fail",
+  "hard_dispose": {
+    "signal": "SIGKILL_ONLY",
+    "forbid": [
+      "SIGTERM",
+      "fork",
+      "sleep",
+      "injection",
+      "python_soft_path"
+    ],
+    "stack": "C++_and_lower"
+  }
+}

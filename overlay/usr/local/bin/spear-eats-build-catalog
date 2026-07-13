@@ -1,0 +1,207 @@
+#!/usr/bin/env python3
+"""Build IP + threat catalog for fleet eats (no PIDs)."""
+from __future__ import annotations
+
+import json
+import re
+import time
+from pathlib import Path
+
+STATE = Path.home() / ".local/share/spear/swallows"
+STATE.mkdir(parents=True, exist_ok=True)
+OUT = STATE / "threat-catalog.json"
+WWW = Path("/tmp/spear-swallows-www")
+HOSTESS = Path("/mnt/hostess7/fieldstorage/datacenter/biggrin-eats")
+
+IP_RE = re.compile(r"\b(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\b")
+
+# Never block loopback / private field infra by default in auto-eat
+SACRED_IP_PREFIX = ("127.", "0.", "255.", "224.", "239.")
+SACRED_IPS = {"127.0.0.1", "0.0.0.0", "::1"}
+
+
+def sacred_ip(ip: str) -> bool:
+    if ip in SACRED_IPS:
+        return True
+    return any(ip.startswith(p) for p in SACRED_IP_PREFIX)
+
+
+def main() -> None:
+    threats: dict[str, dict] = {}
+    ips: dict[str, dict] = {}
+
+    def add_threat(tid: str, **kw):
+        tid = tid.strip()
+        if not tid or len(tid) < 2:
+            return
+        key = tid.lower()[:120]
+        cur = threats.get(key, {"id": key, "label": tid, "kind": "threat", "tags": [], "sources": [], "severity": "medium", "eaten": False})
+        for k, v in kw.items():
+            if k == "tags" and isinstance(v, list):
+                cur["tags"] = sorted(set(cur.get("tags", []) + v))
+            elif k == "sources" and isinstance(v, list):
+                cur["sources"] = sorted(set(cur.get("sources", []) + v))
+            elif v:
+                cur[k] = v
+        threats[key] = cur
+
+    def add_ip(ip: str, **kw):
+        if not IP_RE.fullmatch(ip) or sacred_ip(ip):
+            return
+        cur = ips.get(ip, {"ip": ip, "kind": "ip", "tags": [], "sources": [], "severity": "high", "eaten": False, "vector": "", "geo": {}})
+        for k, v in kw.items():
+            if k == "tags" and isinstance(v, list):
+                cur["tags"] = sorted(set(cur.get("tags", []) + v))
+            elif k == "sources" and isinstance(v, list):
+                cur["sources"] = sorted(set(cur.get("sources", []) + v))
+            elif k == "geo" and isinstance(v, dict):
+                cur["geo"] = {**cur.get("geo", {}), **v}
+            elif v:
+                cur[k] = v
+        ips[ip] = cur
+
+    # 1) nexus-hostile IPs
+    nh = Path("/mnt/hostess7/fieldstorage/brain/security/nexus-hostile.jsonl")
+    if nh.is_file():
+        for line in nh.read_text(encoding="utf-8", errors="ignore").splitlines():
+            try:
+                o = json.loads(line)
+            except Exception:
+                continue
+            ip = o.get("ip") or ""
+            tags = ["hostile", "terrorist" if "TERROR" in str(o.get("vector", "")).upper() or "terror" in str(o.get("reason", "")).lower() else "hostile"]
+            if o.get("permanent"):
+                tags.append("permanent")
+            add_ip(ip, sources=["nexus-hostile"], severity=o.get("severity") or "critical",
+                   vector=o.get("vector") or "", reason=o.get("reason") or "",
+                   tags=tags, geo=(o.get("geo") or {}), permanent=bool(o.get("permanent")))
+
+    # 2) dogshit pwnership kills → threat names
+    for d in [
+        Path("/tmp/h7-pull/big-grin-pwnership/kills"),
+        Path("/home/zachary/Desktop/SG/Spear/overlay/usr/local/share/spear/swallows/big-grin-pwnership/kills"),
+        Path("/mnt/hostess7/fieldstorage/datacenter/biggrin-eats/pwnership/kills"),
+    ]:
+        if not d.is_dir():
+            continue
+        for html in d.glob("*.html"):
+            stem = html.stem
+            label = stem.replace("dogshit-", "").replace("kill-", "").replace("-", " ")
+            tags = ["dogshit", "permanent_list"]
+            if stem.startswith("dogshit"):
+                tags.append("dogshit")
+            if "grok" in stem.lower():
+                tags.append("grok-interference")
+            if "terror" in stem.lower() or "hostile" in stem.lower():
+                tags.append("terrorist")
+            if stem.startswith("world-"):
+                tags.append("up-fleet")
+            # extract IPs from world-dns names
+            for ip in IP_RE.findall(stem):
+                add_ip(ip, sources=["pwnership-kills"], tags=["dogshit", "dns"], severity="high")
+            add_threat(stem, label=label, sources=["pwnership-kills"], tags=tags, severity="critical",
+                       status="permanent_list", file=html.name)
+
+    # 3) hostile AI seed categories as threats
+    for seed in [
+        Path("/home/zachary/Desktop/SG/NewLatest/data/hostile-ai-threats-seed.json"),
+        Path("/home/zachary/Desktop/SG/H7pics/fieldstorage/nexus-field/system/data/hostile-ai-threats-seed.json"),
+    ]:
+        if not seed.is_file():
+            continue
+        try:
+            d = json.loads(seed.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        for c in d.get("categories") or []:
+            add_threat(
+                c.get("id") or c.get("title") or "hostile",
+                label=c.get("title") or c.get("id"),
+                sources=["hostile-ai-seed"],
+                tags=["terrorist", "hostile-ai", c.get("vector") or ""],
+                severity=c.get("severity") or "critical",
+                detail=str(c.get("destroy_label") or c.get("detection") or "")[:200],
+            )
+
+    # 4) history.jsonl IPs + dogshit targets
+    hist = STATE / "history.jsonl"
+    if hist.is_file():
+        for line in hist.read_text(encoding="utf-8", errors="ignore").splitlines():
+            try:
+                o = json.loads(line)
+            except Exception:
+                continue
+            for ip in IP_RE.findall(json.dumps(o)):
+                add_ip(ip, sources=["history"], tags=["historic"], severity="high")
+            t = str(o.get("target") or "")
+            if t and not IP_RE.fullmatch(t):
+                tags = ["historic"]
+                low = t.lower()
+                if "dogshit" in low or "dogshit" in str(o.get("file", "")).lower():
+                    tags.append("dogshit")
+                if "terror" in low or "hostile" in low:
+                    tags.append("terrorist")
+                if o.get("source") == "pwnership-kills":
+                    tags.append("dogshit")
+                add_threat(t, sources=[o.get("source") or "history"], tags=tags,
+                           severity=o.get("severity") or "high", detail=str(o.get("detail") or "")[:160])
+
+    # 5) threat-ledger targets
+    tl = Path("/home/zachary/Desktop/SG/NewLatest/data/threat-ledger.jsonl")
+    if tl.is_file():
+        for line in tl.read_text(encoding="utf-8", errors="ignore").splitlines():
+            try:
+                o = json.loads(line)
+            except Exception:
+                continue
+            tgt = str(o.get("target") or o.get("detail") or "")
+            if tgt:
+                add_threat(tgt, sources=["threat-ledger"], tags=["ledger", o.get("type") or ""],
+                           severity=o.get("retaliate_level") or "medium")
+
+    # load prior eaten state
+    eaten_file = STATE / "eaten-set.json"
+    eaten = {"ips": [], "threats": []}
+    if eaten_file.is_file():
+        try:
+            eaten = json.loads(eaten_file.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    for ip in eaten.get("ips") or []:
+        if ip in ips:
+            ips[ip]["eaten"] = True
+    for tid in eaten.get("threats") or []:
+        if tid in threats:
+            threats[tid]["eaten"] = True
+
+    cat = {
+        "schema": "spear-threat-catalog/v1",
+        "updated": time.strftime("%Y-%m-%dT%H:%MZ", time.gmtime()),
+        "policy": "IP and threat only — no PIDs",
+        "counts": {
+            "ips": len(ips),
+            "threats": len(threats),
+            "dogshit": sum(1 for t in threats.values() if "dogshit" in t.get("tags", [])),
+            "terrorist": sum(1 for t in threats.values() if "terrorist" in t.get("tags", []) or "hostile-ai" in t.get("tags", [])),
+            "ips_eaten": sum(1 for t in ips.values() if t.get("eaten")),
+            "threats_eaten": sum(1 for t in threats.values() if t.get("eaten")),
+        },
+        "fleets": ["big-grin", "up", "gladstone", "escanaba", "oust"],
+        "ips": sorted(ips.values(), key=lambda x: (not x.get("eaten"), x.get("severity") != "critical", x["ip"])),
+        "threats": sorted(threats.values(), key=lambda x: (not x.get("eaten"), x.get("severity") != "critical", x["id"])),
+    }
+
+    OUT.write_text(json.dumps(cat, indent=2), encoding="utf-8")
+    if WWW.is_dir():
+        (WWW / "threat-catalog.json").write_text(json.dumps(cat, indent=2), encoding="utf-8")
+    try:
+        HOSTESS.mkdir(parents=True, exist_ok=True)
+        (HOSTESS / "threat-catalog.json").write_text(json.dumps(cat, indent=2), encoding="utf-8")
+    except Exception:
+        pass
+    print(json.dumps(cat["counts"], indent=2))
+    print("wrote", OUT)
+
+
+if __name__ == "__main__":
+    main()

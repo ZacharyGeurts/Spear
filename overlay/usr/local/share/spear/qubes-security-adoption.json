@@ -1,0 +1,11 @@
+{
+  "schema": "spear-qubes-security-adoption/v1",
+  "title": "Spear adopts Qubes security strengths",
+  "motto": "Compartmentalize trust. Least privilege. No surprise network. Explicit data flow.",
+  "implemented_now": [
+    "Field1 SPEARMBR detection",
+    "No auto browser on firstboot",
+    "NEXUS C2 loopback sealed",
+    "autoelevate allowlist"
+  ]
+}

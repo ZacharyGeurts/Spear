@@ -1,0 +1,215 @@
+{
+  "schema": "spear-swallows/v1",
+  "title": "Big Grin Swallows + UP Swallows \u2014 field antivirus",
+  "updated": "2026-07-13",
+  "motto": "C++ or lower only. No scripts. Global DESTROY\u00b7KILL\u00b7REKILL Copilot. every_kill_gets_rekill. God Bless.",
+  "language_stack": {
+    "allow": [
+      "C++",
+      "C",
+      "asm",
+      "lower"
+    ],
+    "forbid": [
+      "python",
+      "python3",
+      "bash",
+      "sh",
+      "scripts",
+      "soft_script_dispose_path"
+    ],
+    "note": "NO SCRIPTS. Everything we do is C++ or lower. spear-wartime \u00b7 spear-www \u00b7 spear-kill-copilot \u00b7 spear-hard-dispose."
+  },
+  "binaries": {
+    "wartime": "spear-wartime",
+    "www": "spear-www",
+    "kill": "spear-kill-copilot",
+    "dispose": "spear-hard-dispose",
+    "monitor": "spear-wartime"
+  },
+  "fleets": {
+    "big-grin": {
+      "title": "BIG GRIN SWALLOWS",
+      "panel": "big-grin-eats",
+      "github": "ZacharyGeurts/Hostess7 big-grin-eats",
+      "storage": "HOSTESS7_TEAM/fieldstorage/datacenter/biggrin-eats",
+      "miner": "127.0.0.1:9489"
+    },
+    "up": {
+      "title": "UP SWALLOWS",
+      "panel": "up-swallows",
+      "region": "MI-UP",
+      "count": 320,
+      "storage": "HOSTESS7_TEAM/fieldstorage/datacenter/up-swallows"
+    },
+    "wi": {
+      "title": "WI SWALLOWS",
+      "panel": "up-swallows",
+      "region": "Wisconsin",
+      "count": 320,
+      "linked_to": "up",
+      "storage": "HOSTESS7_TEAM/fieldstorage/datacenter/up-swallows"
+    },
+    "up-wi": {
+      "title": "UP+WI LINKED FLEET",
+      "count": 640,
+      "mode": "REAL",
+      "sandbox": false
+    }
+  },
+  "pipeline": [
+    "SPOT",
+    "VECTOR_SOURCE",
+    "COOK_FAT",
+    "QUEUE_REBURN",
+    "BURN",
+    "SCRUB",
+    "OUTLET_DESTROY",
+    "SEAL",
+    "LOG"
+  ],
+  "lethal": {
+    "kills": "LETHAL",
+    "rekills": "LETHAL",
+    "terror_exists": false,
+    "motto": "KILLS and REKILLS are lethal. Cook Field FAT. Queue reburn. Burn. Scrub. Destroy all the way to the wall outlet. We do not let terror exist.",
+    "cook_fat": "Field FAT entropy cook · freeze body",
+    "queue_reburn": "every_kill_gets_rekill · return for burning",
+    "burn": "SIGKILL hard dispose",
+    "scrub": "quarantine wipe · path neutralize",
+    "outlet_destroy": "planet › facility › rack › PDU › wall outlet · total destruction",
+    "seal": "terror does not exist"
+  },
+  "neutralize": {
+    "forbid": [
+      "polite TERM-wait as product model",
+      "SIGTERM soft theater",
+      "fork as dispose path",
+      "sleep as dispose path",
+      "shell injection points in reaper",
+      "python soft dispose path",
+      "pkill theater without quarantine",
+      "let_terror_persist",
+      "grace for terror"
+    ],
+    "require": [
+      "heuristic score",
+      "multi-signal process detect",
+      "cgroup freeze when available",
+      "cook Field FAT",
+      "queue reburn",
+      "quarantine non-system binary",
+      "hard dispose remains SIGKILL only",
+      "scrub remains",
+      "destroy to wall outlet",
+      "C++ or lower reaper binary"
+    ]
+  },
+  "cli": "spear-swallow",
+  "hard_reaper": "spear-hard-dispose",
+  "qubes_parallel": "Disposable untrusted work + no casual admin browsing; swallows are the pest domain",
+  "mode": "REAL",
+  "sandbox": false,
+  "ironclad": {
+    "cites": [
+      "ironclad:vector-source-clean-io:1",
+      "ironclad:hotdog-hallway-oust:1",
+      "ironclad:copilot-destroy:1",
+      "ironclad:zocr-copilot-eat:1",
+      "ironclad:hard-dispose:1",
+      "ironclad:field-one-only:1",
+      "ironclad:copilot-global-rekill:1"
+    ],
+    "vector_to_source": true,
+    "clean_through": true,
+    "clean_out": true,
+    "every_kill_gets_rekill": true,
+    "soft_term_theater": "FORBIDDEN",
+    "sigterm": "FORBIDDEN",
+    "fork_dispose": "FORBIDDEN",
+    "sleep_dispose": "FORBIDDEN",
+    "injection_points": "FORBIDDEN",
+    "python_product_path": "THREAT_FORBIDDEN",
+    "hard_signal": "SIGKILL_ONLY"
+  },
+  "oust": {
+    "hotdog_down_a_hallway": {
+      "status": "OUSTED",
+      "kind": "terrorist_hacker_kit",
+      "panel": "terrorist-oust.html",
+      "kill": "pwnership/kills/dogshit-hotdog-down-a-hallway.html"
+    },
+    "copilot": {
+      "status": "DESTROYED",
+      "scope": "github_microsoft_copilot",
+      "kill": "pwnership/kills/dogshit-copilot-ironclad-fail.html",
+      "leave": [
+        "gpt-4",
+        "openai",
+        "chatgpt",
+        "grok"
+      ]
+    },
+    "zocr_copilot": {
+      "status": "EATEN",
+      "scope": "zocr_copilot_threat",
+      "kill": "pwnership/kills/dogshit-zocr-copilot.html",
+      "interview": "ironclad-zocr-copilot-interview.json",
+      "former_leave_alone": "REVOKED",
+      "leave": [
+        "gpt-4",
+        "openai",
+        "chatgpt",
+        "grok",
+        "hostess7",
+        "field_one",
+        "spear"
+      ]
+    },
+    "every_copilot": {
+      "status": "GONE",
+      "scope": "all_copilot_process_module_server_cloud",
+      "cloud": "NULL_ROUTED",
+      "servers": "WIPED",
+      "reaper": "spear-hard-dispose",
+      "kill": "pwnership/kills/dogshit-zocr-copilot.html",
+      "updated": "2026-07-13T21:07Z"
+    },
+    "copilot_global_stage": {
+      "status": "KILL_REKILL",
+      "stage": "GLOBAL",
+      "rule": "every_kill_gets_rekill",
+      "blessing": "God Bless",
+      "kill": "pwnership/kills/dogshit-copilot-global-stage.html",
+      "ironclad": "ironclad:copilot-global-rekill:1",
+      "updated": "2026-07-13T21:15Z"
+    }
+  },
+  "pid_personal": {
+    "required_fields": [
+      "user",
+      "uid",
+      "gid",
+      "home",
+      "cwd",
+      "tty",
+      "ppid",
+      "parent_comm",
+      "cmdline",
+      "exe",
+      "start_s"
+    ],
+    "note": "Pest PID dossiers always board personal attribution from host /proc when available"
+  },
+  "leave_alone": {
+    "gpt4": true,
+    "openai": true,
+    "chatgpt": true,
+    "grok": true,
+    "hostess7": true,
+    "field_one": true,
+    "spear": true,
+    "zocr_copilot": false,
+    "note": "EVERY copilot GONE. No servers. No cloud. GPT-4/OpenAI stay."
+  }
+}

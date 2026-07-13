@@ -1,0 +1,5 @@
+#!/bin/bash
+export SPEAR=1
+exec gnome-terminal --title="Field Terminal" --window -- "$@" 2>/dev/null || \
+  exec x-terminal-emulator -T "Field Terminal" "$@" 2>/dev/null || \
+  exec xterm -T "Field Terminal" "$@"

@@ -1,0 +1,258 @@
+#!/usr/bin/env python3
+"""Import historic field eat/threat data into Swallows (fast, explicit paths)."""
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import re
+import time
+from pathlib import Path
+
+HOME = Path.home()
+STATE = Path(os.environ.get("SPEAR_SWALLOW_STATE", HOME / ".local/share/spear/swallows"))
+STATE.mkdir(parents=True, exist_ok=True)
+OUT = STATE / "history.jsonl"
+SUMMARY = STATE / "history-summary.json"
+HOSTESS = Path("/mnt/hostess7/fieldstorage/datacenter/biggrin-eats/history")
+WWW = Path("/tmp/spear-swallows-www")
+
+KILL_DIRS = [
+    Path("/tmp/h7-pull/big-grin-pwnership/kills"),
+    Path("/home/zachary/Desktop/SG/Spear/overlay/usr/local/share/spear/swallows/big-grin-pwnership/kills"),
+    Path("/mnt/hostess7/fieldstorage/datacenter/biggrin-eats/pwnership/kills"),
+]
+
+JSONL = [
+    (Path("/home/zachary/Desktop/SG/NewLatest/data/threat-ledger.jsonl"), "threat-ledger"),
+    (Path("/home/zachary/Desktop/SG/NewLatest/OBS-FieldVoiceFilter/data/threat-ledger.jsonl"), "obs-threat-ledger"),
+    (Path("/home/zachary/Desktop/SG/OBS-FieldVoiceFilter/data/threat-ledger.jsonl"), "obs-threat-ledger"),
+    (Path("/mnt/hostess7/fieldstorage/brain/security/nexus-hostile.jsonl"), "nexus-hostile"),
+]
+
+JSONS = [
+    (Path("/home/zachary/Desktop/SG/NewLatest/data/hostile-ai-threats-seed.json"), "hostile-ai-seed"),
+    (Path("/home/zachary/Desktop/SG/H7pics/fieldstorage/nexus-field/system/data/hostile-ai-threats-seed.json"), "hostile-ai-seed-h7"),
+    (Path("/home/zachary/Desktop/SG/NewLatest/Final_Eye/data/rekill-registry.json"), "rekill-registry"),
+    (Path("/home/zachary/Desktop/SG/NewLatest/.nexus-state/kill-rekill-registry.json"), "kill-rekill"),
+    (Path("/home/zachary/Desktop/SG/NewLatest/.nexus-state/auto-rekill-log.json"), "auto-rekill"),
+    (Path("/home/zachary/Desktop/SG/NewLatest/.nexus-field-drive/nexus-field/state/kill-rekill-registry.json"), "field-kill-rekill"),
+]
+
+TSVS = [
+    (Path("/home/zachary/Desktop/SG/NewLatest/.nexus-field-drive/nexus-field/state/pest-actions.tsv"), "pest-actions"),
+]
+
+
+def sha(s: str) -> str:
+    return hashlib.sha256(s.encode("utf-8", errors="ignore")).hexdigest()[:16]
+
+
+def emit(seen: set[str], rows: list[dict], row: dict) -> None:
+    key = row.get("id") or sha(json.dumps(row, sort_keys=True, default=str)[:800])
+    if key in seen:
+        return
+    seen.add(key)
+    row["id"] = key
+    rows.append(row)
+
+
+def import_kills(seen: set[str], rows: list[dict]) -> int:
+    n = 0
+    for d in KILL_DIRS:
+        if not d.is_dir():
+            continue
+        for html in d.glob("*.html"):
+            text = html.read_text(encoding="utf-8", errors="ignore")
+            title_m = re.search(r"<title>([^<]+)</title>", text, re.I)
+            h1_m = re.search(r"<h1[^>]*>([^<]+)</h1>", text, re.I)
+            why_m = re.search(r"<h3>([^<]+)</h3>\s*<p>([^<]+)</p>", text, re.I | re.S)
+            title = (title_m.group(1) if title_m else html.stem).replace(" — Killed", "").strip()
+            target = (h1_m.group(1) if h1_m else title).strip()
+            why = why_m.group(1) if why_m else "pwnership permanent kill"
+            detail = (why_m.group(2) if why_m else "")[:240]
+            fleet = "up" if html.name.startswith("world-") else "big-grin"
+            emit(seen, rows, {
+                "source": "pwnership-kills",
+                "fleet": fleet,
+                "kind": "historic_kill",
+                "target": target,
+                "file": html.name,
+                "why": why,
+                "detail": detail,
+                "status": "permanent_list",
+                "ts": time.strftime("%Y-%m-%dT%H:%MZ", time.gmtime(html.stat().st_mtime)),
+            })
+            n += 1
+    return n
+
+
+def import_jsonl(path: Path, seen: set[str], rows: list[dict], source: str) -> int:
+    if not path.is_file():
+        return 0
+    n = 0
+    for line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            o = json.loads(line)
+        except Exception:
+            continue
+        emit(seen, rows, {
+            "source": source,
+            "fleet": "big-grin",
+            "kind": o.get("type") or o.get("kind") or o.get("vector") or "ledger",
+            "target": o.get("target") or o.get("ip") or o.get("comm") or o.get("detail") or "unknown",
+            "action": o.get("action") or o.get("destroy") or o.get("verdict") or "",
+            "severity": o.get("severity") or o.get("retaliate_level") or "",
+            "detail": str(o.get("detail") or o.get("reason") or "")[:300],
+            "ip": o.get("ip") or "",
+            "ts": o.get("ts") or o.get("updated") or "",
+        })
+        n += 1
+    return n
+
+
+def import_json(path: Path, seen: set[str], rows: list[dict], source: str) -> int:
+    if not path.is_file():
+        return 0
+    try:
+        o = json.loads(path.read_text(encoding="utf-8", errors="ignore"))
+    except Exception:
+        return 0
+    n = 0
+    if isinstance(o, dict):
+        cats = o.get("categories") or o.get("entries") or o.get("kills") or o.get("items")
+        if isinstance(cats, list):
+            for c in cats:
+                if not isinstance(c, dict):
+                    continue
+                emit(seen, rows, {
+                    "source": source,
+                    "fleet": "big-grin",
+                    "kind": c.get("id") or c.get("type") or "registry",
+                    "target": c.get("title") or c.get("name") or c.get("target") or c.get("id") or "entry",
+                    "action": c.get("destroy") or c.get("action") or c.get("destroy_label") or "",
+                    "severity": c.get("severity") or "",
+                    "detail": str(c.get("detection") or c.get("vector") or "")[:300],
+                    "ts": o.get("updated") or "",
+                })
+                n += 1
+        else:
+            # flat registry maps
+            for k, v in o.items():
+                if k in ("schema", "title", "updated", "version", "motto"):
+                    continue
+                if isinstance(v, (dict, list)):
+                    emit(seen, rows, {
+                        "source": source,
+                        "fleet": "big-grin",
+                        "kind": "registry_key",
+                        "target": str(k)[:80],
+                        "detail": str(v)[:200],
+                        "ts": o.get("updated") or "",
+                    })
+                    n += 1
+    return n
+
+
+def import_tsv(path: Path, seen: set[str], rows: list[dict], source: str) -> int:
+    if not path.is_file():
+        return 0
+    lines = path.read_text(encoding="utf-8", errors="ignore").splitlines()
+    if len(lines) < 2:
+        return 0
+    headers = lines[0].split("\t")
+    n = 0
+    for line in lines[1:]:
+        parts = line.split("\t")
+        d = {headers[i] if i < len(headers) else str(i): (parts[i] if i < len(parts) else "") for i in range(max(len(parts), len(headers)))}
+        emit(seen, rows, {
+            "source": source,
+            "fleet": "big-grin",
+            "kind": d.get("vector") or d.get("actions") or "pest",
+            "target": d.get("ip") or d.get("pid") or d.get("id") or "pest",
+            "action": d.get("result") or d.get("actions") or "",
+            "detail": d.get("detail") or "",
+            "ts": d.get("ts") or "",
+        })
+        n += 1
+    return n
+
+
+def main() -> None:
+    seen: set[str] = set()
+    rows: list[dict] = []
+    stats: dict[str, int] = {}
+
+    def add(name: str, c: int) -> None:
+        if c:
+            stats[name] = stats.get(name, 0) + c
+
+    add("pwnership_kills", import_kills(seen, rows))
+    for p, name in JSONL:
+        add(name, import_jsonl(p, seen, rows, name))
+    for p, name in JSONS:
+        add(name, import_json(p, seen, rows, name))
+    for p, name in TSVS:
+        add(name, import_tsv(p, seen, rows, name))
+
+    csvp = STATE / "swallows.csv"
+    if csvp.is_file():
+        n = 0
+        for line in csvp.read_text(encoding="utf-8", errors="ignore").splitlines()[1:]:
+            parts = line.split(",")
+            if len(parts) < 7:
+                continue
+            emit(seen, rows, {
+                "source": "live-swallows-csv",
+                "fleet": parts[1],
+                "kind": "swallowed",
+                "target": parts[3],
+                "action": parts[6],
+                "detail": ",".join(parts[7:]),
+                "pid": parts[2],
+                "ts": parts[0],
+            })
+            n += 1
+        add("live-swallows-csv", n)
+
+    rows.sort(key=lambda r: r.get("ts") or "", reverse=True)
+    with OUT.open("w", encoding="utf-8") as f:
+        for r in rows:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+
+    summary = {
+        "schema": "spear-eats-history-summary/v1",
+        "updated": time.strftime("%Y-%m-%dT%H:%MZ", time.gmtime()),
+        "total": len(rows),
+        "by_source": stats,
+        "fleets": {
+            "big-grin": sum(1 for r in rows if r.get("fleet") == "big-grin"),
+            "up": sum(1 for r in rows if r.get("fleet") == "up"),
+        },
+        "output": str(OUT),
+        "window_note": "~12 days field work · late Jun → mid Jul 2026 · undeleted into eats",
+    }
+    SUMMARY.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+
+    try:
+        HOSTESS.mkdir(parents=True, exist_ok=True)
+        (HOSTESS / "history.jsonl").write_bytes(OUT.read_bytes())
+        (HOSTESS / "history-summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    except Exception as e:
+        summary["hostess_error"] = str(e)
+
+    if WWW.is_dir():
+        (WWW / "history-summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+        (WWW / "history-recent.json").write_text(
+            json.dumps({"total": len(rows), "recent": rows[:500]}, indent=2),
+            encoding="utf-8",
+        )
+
+    print(json.dumps(summary, indent=2))
+
+
+if __name__ == "__main__":
+    main()

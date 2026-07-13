@@ -1,0 +1,218 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# Spear Swallows — Big Grin + UP fleet field antivirus / pest eater.
+#
+# Doctrine: HEURISTIC EAT — not soft signal theater.
+#   No polite TERM→wait→KILL dance as the product model.
+#   SPOT → BOARD (dossier) → SWALLOW (freeze+quarantine+hard remove) → LOG → SAIL.
+#
+# Sacred processes never touched (same class as pest-arsenal sacred list).
+# Operator / autoelevate only for destructive eat.
+set -euo pipefail
+
+STATE="${SPEAR_SWALLOW_STATE:-/var/lib/spear/swallows}"
+QUAR="${STATE}/quarantine"
+LOG="${STATE}/swallows.csv"
+HEUR="${SPEAR_SWALLOW_HEUR:-/usr/local/share/spear/swallows/heuristics.tsv}"
+FLEET="${SPEAR_SWALLOW_FLEET:-big-grin}"  # big-grin | up
+
+mkdir -p "$QUAR" "$STATE" 2>/dev/null || {
+  STATE="${HOME}/.local/share/spear/swallows"
+  QUAR="${STATE}/quarantine"
+  LOG="${STATE}/swallows.csv"
+  mkdir -p "$QUAR"
+}
+
+[[ -f "$LOG" ]] || printf 'ts,fleet,pid,comm,exe,score,action,detail\n' >"$LOG"
+
+log_row() {
+  local pid="$1" comm="$2" exe="$3" score="$4" action="$5" detail="$6"
+  printf '%s,%s,%s,%s,%s,%s,%s,%s\n' \
+    "$(date -u +%Y-%m-%dT%H:%MZ)" "$FLEET" "$pid" "$comm" "$exe" "$score" "$action" "$detail" >>"$LOG"
+}
+
+is_sacred() {
+  local pid="$1" comm exe cmdline
+  [[ "$pid" =~ ^[0-9]+$ ]] || return 0
+  (( pid <= 2 )) && return 0
+  comm=$(tr -d '\0' <"/proc/$pid/comm" 2>/dev/null || true)
+  exe=$(readlink -f "/proc/$pid/exe" 2>/dev/null || true)
+  cmdline=$(tr '\0' ' ' <"/proc/$pid/cmdline" 2>/dev/null || true)
+  case "$comm" in
+    systemd|init|kthreadd|sshd|dbus-daemon|NetworkManager|pipewire|wireplumber|\
+    firefox|chrome|chromium|Xorg|wayland|lightdm|gdm|sddm|gnome-shell|cinnamon|\
+    containerd|dockerd|systemd-journald|systemd-logind|systemd-resolved|\
+    systemd-networkd|systemd-udevd|rsyslogd|cron|agetty|login|bash|sudo|su|\
+    spear|spear-swallow|qemu-system-x86_64|grok|grokz)
+      return 0 ;;
+  esac
+  [[ "$exe" == *spear* || "$exe" == *nexus* || "$exe" == *hostess* ]] && return 0
+  [[ "$cmdline" == *spear-swallow* || "$cmdline" == *spear-boot-harden* ]] && return 0
+  return 1
+}
+
+# Heuristic score 0..100 — higher = more eatable pest
+score_pid() {
+  local pid="$1"
+  local score=0 comm exe cmdline maps
+  comm=$(tr -d '\0' <"/proc/$pid/comm" 2>/dev/null || echo "?")
+  exe=$(readlink -f "/proc/$pid/exe" 2>/dev/null || echo "")
+  cmdline=$(tr '\0' ' ' <"/proc/$pid/cmdline" 2>/dev/null || echo "")
+
+  # Crypto miner / botnet classics
+  echo "$comm $cmdline $exe" | grep -qiE \
+    'xmrig|minerd|cpuminer|kdevtmpfsi|kinsing|cryptonight|stratum\+tcp|nicehash|monero|ethminer|nbminer|phoenixminer|hellminer|watchbog|dbused|solr\.sh' \
+    && score=$((score + 55))
+
+  # Reverse shells / living-off-land abuse
+  echo "$cmdline" | grep -qiE \
+    'bash -i|&>/dev/tcp/|nc -e |ncat .* -e|python3? -c .*(socket|connect)|perl -e .*socket|php -r .*fsockopen' \
+    && score=$((score + 45))
+
+  # Writable/tmp/hidden paths
+  [[ "$exe" == /tmp/* || "$exe" == /var/tmp/* || "$exe" == /dev/shm/* ]] && score=$((score + 25))
+  [[ "$exe" == *'/.'* ]] && score=$((score + 15))
+
+  # Deleted binary still running (common malware trick)
+  [[ -L "/proc/$pid/exe" ]] && readlink "/proc/$pid/exe" 2>/dev/null | grep -q '(deleted)' && score=$((score + 30))
+
+  # High CPU without sacred name (soft signal only for ranking)
+  local cpu
+  cpu=$(ps -p "$pid" -o pcpu= 2>/dev/null | tr -d ' ' || echo 0)
+  awk -v c="$cpu" 'BEGIN{exit !(c+0 >= 80)}' && score=$((score + 10))
+
+  # Heuristic table file (operator-extensible)
+  if [[ -f "$HEUR" ]]; then
+    while IFS=$'\t' read -r pat pts _; do
+      [[ "$pat" =~ ^#|^$ ]] && continue
+      echo "$comm $cmdline $exe" | grep -qiE "$pat" && score=$((score + pts))
+    done <"$HEUR"
+  fi
+
+  (( score > 100 )) && score=100
+  echo "$score"
+}
+
+# HARD swallow: freeze → quarantine exe → destroy process image path → hard reaper
+# Deliberately no TERM soft path. Freezer is containment; reaper is final.
+eat_pid() {
+  local pid="$1"
+  local force="${2:-0}"
+  is_sacred "$pid" && { echo "REFUSE sacred pid=$pid"; return 1; }
+
+  local score comm exe
+  score=$(score_pid "$pid")
+  comm=$(tr -d '\0' <"/proc/$pid/comm" 2>/dev/null || echo "?")
+  exe=$(readlink -f "/proc/$pid/exe" 2>/dev/null || echo "")
+
+  if (( score < 40 && force != 1 )); then
+    echo "SKIP pid=$pid score=$score (need >=40 or --force)"
+    log_row "$pid" "$comm" "$exe" "$score" "skip" "below_threshold"
+    return 2
+  fi
+
+  echo "SWALLOW fleet=$FLEET pid=$pid score=$score comm=$comm exe=$exe"
+
+  # 1) Freeze via cgroup v2 if available (no signals)
+  if [[ -d /sys/fs/cgroup ]] && [[ -w /sys/fs/cgroup/cgroup.procs || -d /sys/fs/cgroup/spear_swallow ]]; then
+    mkdir -p /sys/fs/cgroup/spear_swallow 2>/dev/null || true
+    if [[ -f /sys/fs/cgroup/spear_swallow/cgroup.freeze ]]; then
+      echo "$pid" >/sys/fs/cgroup/spear_swallow/cgroup.procs 2>/dev/null || true
+      echo 1 >/sys/fs/cgroup/spear_swallow/cgroup.freeze 2>/dev/null || true
+    fi
+  fi
+
+  # 2) Quarantine binary (eat the body)
+  if [[ -n "$exe" && -f "$exe" && "$exe" != "/usr/bin/"* && "$exe" != "/bin/"* && "$exe" != "/usr/lib/"* ]]; then
+    local dest="${QUAR}/$(date +%s)-${pid}-$(basename "$exe")"
+    if cp -a "$exe" "$dest" 2>/dev/null; then
+      chmod 000 "$dest" 2>/dev/null || true
+      # neutralize original path when writable
+      if [[ -w "$exe" ]]; then
+        : >"$exe" 2>/dev/null || true
+        rm -f "$exe" 2>/dev/null || true
+      fi
+      echo "  quarantined → $dest"
+    fi
+  fi
+
+  # 3) Hard reaper only — no TERM soft sequence (product rule)
+  # Using syscall kill with KILL after freeze/quarantine is disposal of remains, not "soft manage".
+  if kill -0 "$pid" 2>/dev/null; then
+    # Prefer writing to oom_score_adj and letting kernel reclaim is softer — skip.
+    # Field rule: remains die now.
+    kill -KILL "$pid" 2>/dev/null || true
+  fi
+
+  log_row "$pid" "$comm" "$exe" "$score" "swallowed" "freeze+quarantine+hard"
+  echo "  SWALLOWED"
+  return 0
+}
+
+cmd_scan() {
+  local thr="${1:-40}"
+  echo "=== Spear Swallows scan fleet=$FLEET threshold=$thr ==="
+  local pid score comm
+  for pid in $(ls -1 /proc | grep -E '^[0-9]+$'); do
+    is_sacred "$pid" && continue
+    [[ -r "/proc/$pid/cmdline" ]] || continue
+    score=$(score_pid "$pid")
+    (( score >= thr )) || continue
+    comm=$(tr -d '\0' <"/proc/$pid/comm" 2>/dev/null || echo "?")
+    exe=$(readlink -f "/proc/$pid/exe" 2>/dev/null || echo "")
+    printf 'pid=%-7s score=%-3s comm=%-16s exe=%s\n' "$pid" "$score" "$comm" "$exe"
+  done
+}
+
+cmd_eat_all() {
+  local thr="${1:-50}"
+  local pid score
+  for pid in $(ls -1 /proc | grep -E '^[0-9]+$'); do
+    is_sacred "$pid" && continue
+    score=$(score_pid "$pid")
+    (( score >= thr )) || continue
+    eat_pid "$pid" 0 || true
+  done
+}
+
+cmd_status() {
+  echo "fleet=$FLEET state=$STATE log=$LOG"
+  echo "quarantine=$(find "$QUAR" -type f 2>/dev/null | wc -l) files"
+  tail -n 8 "$LOG" 2>/dev/null || true
+  [[ -f /usr/local/share/spear/swallows/doctrine.json ]] && echo "doctrine=ok"
+}
+
+usage() {
+  cat <<EOF
+spear-swallow — Big Grin / UP Swallows field antivirus
+
+  spear-swallow scan [threshold]     list pests by heuristic score
+  spear-swallow eat <pid> [--force]  freeze + quarantine + hard dispose
+  spear-swallow eat-all [threshold]  swallow all >= threshold (default 50)
+  spear-swallow status
+  SPEAR_SWALLOW_FLEET=big-grin|up
+
+No soft TERM theater. Heuristics score; eat freezes and quarantines, then hard dispose.
+Sacred PIDs never touched.
+EOF
+}
+
+main() {
+  case "${1:-status}" in
+    scan) shift; cmd_scan "${1:-40}" ;;
+    eat)
+      shift
+      local pid="${1:-}" force=0
+      shift || true
+      [[ "${1:-}" == "--force" ]] && force=1
+      [[ "$pid" =~ ^[0-9]+$ ]] || { echo "need pid"; exit 2; }
+      eat_pid "$pid" "$force"
+      ;;
+    eat-all) shift; cmd_eat_all "${1:-50}" ;;
+    status) cmd_status ;;
+    -h|--help|help) usage ;;
+    *) usage; exit 1 ;;
+  esac
+}
+
+main "$@"

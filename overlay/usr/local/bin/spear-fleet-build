@@ -1,0 +1,646 @@
+#!/usr/bin/env python3
+"""Build infinite-scale region-sharded fleet — 500 racks per country worldwide.
+
+Writes:
+  fleet/index.json          — region summary only (tiny)
+  fleet/r/{CODE}.json       — compact 500 racks per country
+  fleet/meta.json
+  fleet/status.json skeleton
+
+Browser never loads all racks — one country at a time.
+"""
+from __future__ import annotations
+
+import json
+import os
+import random
+import time
+from pathlib import Path
+
+RACKS_PER = int(os.environ.get("SPEAR_FLEET_RACKS", "6000"))
+SEED = int(os.environ.get("SPEAR_FLEET_SEED", "600050"))
+
+ROOTS = [
+    Path(os.environ.get("SPEAR_SWALLOWS_ROOT", "/tmp/spear-swallows-www")),
+    Path(os.environ.get("SPEAR_SWALLOW_STATE", Path.home() / ".local/share/spear/swallows")),
+    Path(os.environ.get(
+        "SPEAR_FLEET_CANON",
+        "/home/zachary/Desktop/SG/Spear/overlay/usr/local/share/spear/swallows",
+    )),
+]
+HOSTESS = Path(os.environ.get(
+    "SPEAR_HOSTESS_FLEET",
+    "/mnt/hostess7/fieldstorage/datacenter/up-swallows",
+))
+
+# (code, name, kind, lat, lon, zone)
+# World countries + key territories — equirectangular centroids for map sync
+COUNTRIES = [
+    ("AF", "Afghanistan", "country", 33.9391, 67.7100, "AS"),
+    ("AL", "Albania", "country", 41.1533, 20.1683, "EU"),
+    ("DZ", "Algeria", "country", 28.0339, 1.6596, "AF"),
+    ("AD", "Andorra", "country", 42.5063, 1.5218, "EU"),
+    ("AO", "Angola", "country", -11.2027, 17.8739, "AF"),
+    ("AG", "Antigua and Barbuda", "country", 17.0608, -61.7964, "CARIB"),
+    ("AR", "Argentina", "country", -38.4161, -63.6167, "SA"),
+    ("AM", "Armenia", "country", 40.0691, 45.0382, "AS"),
+    ("AU", "Australia", "country", -25.2744, 133.7751, "OC"),
+    ("AT", "Austria", "country", 47.5162, 14.5501, "EU"),
+    ("AZ", "Azerbaijan", "country", 40.1431, 47.5769, "AS"),
+    ("BS", "Bahamas", "country", 25.0343, -77.3963, "CARIB"),
+    ("BH", "Bahrain", "country", 26.0667, 50.5577, "AS"),
+    ("BD", "Bangladesh", "country", 23.6850, 90.3563, "AS"),
+    ("BB", "Barbados", "country", 13.1939, -59.5432, "CARIB"),
+    ("BY", "Belarus", "country", 53.7098, 27.9534, "EU"),
+    ("BE", "Belgium", "country", 50.5039, 4.4699, "EU"),
+    ("BZ", "Belize", "country", 17.1899, -88.4976, "CA"),
+    ("BJ", "Benin", "country", 9.3077, 2.3158, "AF"),
+    ("BT", "Bhutan", "country", 27.5142, 90.4336, "AS"),
+    ("BO", "Bolivia", "country", -16.2902, -63.5887, "SA"),
+    ("BA", "Bosnia and Herzegovina", "country", 43.9159, 17.6791, "EU"),
+    ("BW", "Botswana", "country", -22.3285, 24.6849, "AF"),
+    ("BR", "Brazil", "country", -14.2350, -51.9253, "SA"),
+    ("BN", "Brunei", "country", 4.5353, 114.7277, "AS"),
+    ("BG", "Bulgaria", "country", 42.7339, 25.4858, "EU"),
+    ("BF", "Burkina Faso", "country", 12.2383, -1.5616, "AF"),
+    ("BI", "Burundi", "country", -3.3731, 29.9189, "AF"),
+    ("CV", "Cabo Verde", "country", 16.5388, -23.0418, "AF"),
+    ("KH", "Cambodia", "country", 12.5657, 104.9910, "AS"),
+    ("CM", "Cameroon", "country", 7.3697, 12.3547, "AF"),
+    ("CA", "Canada", "country", 56.1304, -106.3468, "NA"),
+    ("CF", "Central African Republic", "country", 6.6111, 20.9394, "AF"),
+    ("TD", "Chad", "country", 15.4542, 18.7322, "AF"),
+    ("CL", "Chile", "country", -35.6751, -71.5430, "SA"),
+    ("CN", "China", "country", 35.8617, 104.1954, "AS"),
+    ("CO", "Colombia", "country", 4.5709, -74.2973, "SA"),
+    ("KM", "Comoros", "country", -11.6455, 43.3333, "AF"),
+    ("CG", "Congo", "country", -0.2280, 15.8277, "AF"),
+    ("CD", "DR Congo", "country", -4.0383, 21.7587, "AF"),
+    ("CR", "Costa Rica", "country", 9.7489, -83.7534, "CA"),
+    ("CI", "Côte d'Ivoire", "country", 7.5400, -5.5471, "AF"),
+    ("HR", "Croatia", "country", 45.1000, 15.2000, "EU"),
+    ("CU", "Cuba", "country", 21.5218, -77.7812, "CARIB"),
+    ("CY", "Cyprus", "country", 35.1264, 33.4299, "EU"),
+    ("CZ", "Czechia", "country", 49.8175, 15.4730, "EU"),
+    ("DK", "Denmark", "country", 56.2639, 9.5018, "EU"),
+    ("DJ", "Djibouti", "country", 11.8251, 42.5903, "AF"),
+    ("DM", "Dominica", "country", 15.4150, -61.3710, "CARIB"),
+    ("DO", "Dominican Republic", "country", 18.7357, -70.1627, "CARIB"),
+    ("EC", "Ecuador", "country", -1.8312, -78.1834, "SA"),
+    ("EG", "Egypt", "country", 26.8206, 30.8025, "AF"),
+    ("SV", "El Salvador", "country", 13.7942, -88.8965, "CA"),
+    ("GQ", "Equatorial Guinea", "country", 1.6508, 10.2679, "AF"),
+    ("ER", "Eritrea", "country", 15.1794, 39.7823, "AF"),
+    ("EE", "Estonia", "country", 58.5953, 25.0136, "EU"),
+    ("SZ", "Eswatini", "country", -26.5225, 31.4659, "AF"),
+    ("ET", "Ethiopia", "country", 9.1450, 40.4897, "AF"),
+    ("FJ", "Fiji", "country", -17.7134, 178.0650, "OC"),
+    ("FI", "Finland", "country", 61.9241, 25.7482, "EU"),
+    ("FR", "France", "country", 46.2276, 2.2137, "EU"),
+    ("GA", "Gabon", "country", -0.8037, 11.6094, "AF"),
+    ("GM", "Gambia", "country", 13.4432, -15.3101, "AF"),
+    ("GE", "Georgia", "country", 42.3154, 43.3569, "AS"),
+    ("DE", "Germany", "country", 51.1657, 10.4515, "EU"),
+    ("GH", "Ghana", "country", 7.9465, -1.0232, "AF"),
+    ("GR", "Greece", "country", 39.0742, 21.8243, "EU"),
+    ("GD", "Grenada", "country", 12.1165, -61.6790, "CARIB"),
+    ("GT", "Guatemala", "country", 15.7835, -90.2308, "CA"),
+    ("GN", "Guinea", "country", 9.9456, -9.6966, "AF"),
+    ("GW", "Guinea-Bissau", "country", 11.8037, -15.1804, "AF"),
+    ("GY", "Guyana", "country", 4.8604, -58.9302, "SA"),
+    ("HT", "Haiti", "country", 18.9712, -72.2852, "CARIB"),
+    ("HN", "Honduras", "country", 15.2000, -86.2419, "CA"),
+    ("HU", "Hungary", "country", 47.1625, 19.5033, "EU"),
+    ("IS", "Iceland", "country", 64.9631, -19.0208, "EU"),
+    ("IN", "India", "country", 20.5937, 78.9629, "AS"),
+    ("ID", "Indonesia", "country", -0.7893, 113.9213, "AS"),
+    ("IR", "Iran", "country", 32.4279, 53.6880, "AS"),
+    ("IQ", "Iraq", "country", 33.2232, 43.6793, "AS"),
+    ("IE", "Ireland", "country", 53.1424, -7.6921, "EU"),
+    ("IL", "Israel", "country", 31.0461, 34.8516, "AS"),
+    ("IT", "Italy", "country", 41.8719, 12.5674, "EU"),
+    ("JM", "Jamaica", "country", 18.1096, -77.2975, "CARIB"),
+    ("JP", "Japan", "country", 36.2048, 138.2529, "AS"),
+    ("JO", "Jordan", "country", 30.5852, 36.2384, "AS"),
+    ("KZ", "Kazakhstan", "country", 48.0196, 66.9237, "AS"),
+    ("KE", "Kenya", "country", -0.0236, 37.9062, "AF"),
+    ("KI", "Kiribati", "country", -3.3704, -168.7340, "OC"),
+    ("KP", "North Korea", "country", 40.3399, 127.5101, "AS"),
+    ("KR", "South Korea", "country", 35.9078, 127.7669, "AS"),
+    ("KW", "Kuwait", "country", 29.3117, 47.4818, "AS"),
+    ("KG", "Kyrgyzstan", "country", 41.2044, 74.7661, "AS"),
+    ("LA", "Laos", "country", 19.8563, 102.4955, "AS"),
+    ("LV", "Latvia", "country", 56.8796, 24.6032, "EU"),
+    ("LB", "Lebanon", "country", 33.8547, 35.8623, "AS"),
+    ("LS", "Lesotho", "country", -29.6100, 28.2336, "AF"),
+    ("LR", "Liberia", "country", 6.4281, -9.4295, "AF"),
+    ("LY", "Libya", "country", 26.3351, 17.2283, "AF"),
+    ("LI", "Liechtenstein", "country", 47.1660, 9.5554, "EU"),
+    ("LT", "Lithuania", "country", 55.1694, 23.8813, "EU"),
+    ("LU", "Luxembourg", "country", 49.8153, 6.1296, "EU"),
+    ("MG", "Madagascar", "country", -18.7669, 46.8691, "AF"),
+    ("MW", "Malawi", "country", -13.2543, 34.3015, "AF"),
+    ("MY", "Malaysia", "country", 4.2105, 101.9758, "AS"),
+    ("MV", "Maldives", "country", 3.2028, 73.2207, "AS"),
+    ("ML", "Mali", "country", 17.5707, -3.9962, "AF"),
+    ("MT", "Malta", "country", 35.9375, 14.3754, "EU"),
+    ("MH", "Marshall Islands", "country", 7.1315, 171.1845, "OC"),
+    ("MR", "Mauritania", "country", 21.0079, -10.9408, "AF"),
+    ("MU", "Mauritius", "country", -20.3484, 57.5522, "AF"),
+    ("MX", "Mexico", "country", 23.6345, -102.5528, "NA"),
+    ("FM", "Micronesia", "country", 7.4256, 150.5508, "OC"),
+    ("MD", "Moldova", "country", 47.4116, 28.3699, "EU"),
+    ("MC", "Monaco", "country", 43.7384, 7.4246, "EU"),
+    ("MN", "Mongolia", "country", 46.8625, 103.8467, "AS"),
+    ("ME", "Montenegro", "country", 42.7087, 19.3744, "EU"),
+    ("MA", "Morocco", "country", 31.7917, -7.0926, "AF"),
+    ("MZ", "Mozambique", "country", -18.6657, 35.5296, "AF"),
+    ("MM", "Myanmar", "country", 21.9162, 95.9560, "AS"),
+    ("NA", "Namibia", "country", -22.9576, 18.4904, "AF"),
+    ("NR", "Nauru", "country", -0.5228, 166.9315, "OC"),
+    ("NP", "Nepal", "country", 28.3949, 84.1240, "AS"),
+    ("NL", "Netherlands", "country", 52.1326, 5.2913, "EU"),
+    ("NZ", "New Zealand", "country", -40.9006, 174.8860, "OC"),
+    ("NI", "Nicaragua", "country", 12.8654, -85.2072, "CA"),
+    ("NE", "Niger", "country", 17.6078, 8.0817, "AF"),
+    ("NG", "Nigeria", "country", 9.0820, 8.6753, "AF"),
+    ("MK", "North Macedonia", "country", 41.6086, 21.7453, "EU"),
+    ("NO", "Norway", "country", 60.4720, 8.4689, "EU"),
+    ("OM", "Oman", "country", 21.4735, 55.9754, "AS"),
+    ("PK", "Pakistan", "country", 30.3753, 69.3451, "AS"),
+    ("PW", "Palau", "country", 7.5150, 134.5825, "OC"),
+    ("PS", "Palestine", "country", 31.9522, 35.2332, "AS"),
+    ("PA", "Panama", "country", 8.5380, -80.7821, "CA"),
+    ("PG", "Papua New Guinea", "country", -6.3150, 143.9555, "OC"),
+    ("PY", "Paraguay", "country", -23.4425, -58.4438, "SA"),
+    ("PE", "Peru", "country", -9.1900, -75.0152, "SA"),
+    ("PH", "Philippines", "country", 12.8797, 121.7740, "AS"),
+    ("PL", "Poland", "country", 51.9194, 19.1451, "EU"),
+    ("PT", "Portugal", "country", 39.3999, -8.2245, "EU"),
+    ("QA", "Qatar", "country", 25.3548, 51.1839, "AS"),
+    ("RO", "Romania", "country", 45.9432, 24.9668, "EU"),
+    ("RU", "Russia", "country", 61.5240, 105.3188, "AS"),
+    ("RW", "Rwanda", "country", -1.9403, 29.8739, "AF"),
+    ("KN", "Saint Kitts and Nevis", "country", 17.3578, -62.7830, "CARIB"),
+    ("LC", "Saint Lucia", "country", 13.9094, -60.9789, "CARIB"),
+    ("VC", "Saint Vincent and the Grenadines", "country", 12.9843, -61.2872, "CARIB"),
+    ("WS", "Samoa", "country", -13.7590, -172.1046, "OC"),
+    ("SM", "San Marino", "country", 43.9424, 12.4578, "EU"),
+    ("ST", "Sao Tome and Principe", "country", 0.1864, 6.6131, "AF"),
+    ("SA", "Saudi Arabia", "country", 23.8859, 45.0792, "AS"),
+    ("SN", "Senegal", "country", 14.4974, -14.4524, "AF"),
+    ("RS", "Serbia", "country", 44.0165, 21.0059, "EU"),
+    ("SC", "Seychelles", "country", -4.6796, 55.4920, "AF"),
+    ("SL", "Sierra Leone", "country", 8.4606, -11.7799, "AF"),
+    ("SG", "Singapore", "country", 1.3521, 103.8198, "AS"),
+    ("SK", "Slovakia", "country", 48.6690, 19.6990, "EU"),
+    ("SI", "Slovenia", "country", 46.1512, 14.9955, "EU"),
+    ("SB", "Solomon Islands", "country", -9.6457, 160.1562, "OC"),
+    ("SO", "Somalia", "country", 5.1521, 46.1996, "AF"),
+    ("ZA", "South Africa", "country", -30.5595, 22.9375, "AF"),
+    ("SS", "South Sudan", "country", 6.8770, 31.3070, "AF"),
+    ("ES", "Spain", "country", 40.4637, -3.7492, "EU"),
+    ("LK", "Sri Lanka", "country", 7.8731, 80.7718, "AS"),
+    ("SD", "Sudan", "country", 12.8628, 30.2176, "AF"),
+    ("SR", "Suriname", "country", 3.9193, -56.0278, "SA"),
+    ("SE", "Sweden", "country", 60.1282, 18.6435, "EU"),
+    ("CH", "Switzerland", "country", 46.8182, 8.2275, "EU"),
+    ("SY", "Syria", "country", 34.8021, 38.9968, "AS"),
+    ("TW", "Taiwan", "country", 23.6978, 120.9605, "AS"),
+    ("TJ", "Tajikistan", "country", 38.8610, 71.2761, "AS"),
+    ("TZ", "Tanzania", "country", -6.3690, 34.8888, "AF"),
+    ("TH", "Thailand", "country", 15.8700, 100.9925, "AS"),
+    ("TL", "Timor-Leste", "country", -8.8742, 125.7275, "AS"),
+    ("TG", "Togo", "country", 8.6195, 0.8248, "AF"),
+    ("TO", "Tonga", "country", -21.1790, -175.1982, "OC"),
+    ("TT", "Trinidad and Tobago", "country", 10.6918, -61.2225, "CARIB"),
+    ("TN", "Tunisia", "country", 33.8869, 9.5375, "AF"),
+    ("TR", "Türkiye", "country", 38.9637, 35.2433, "AS"),
+    ("TM", "Turkmenistan", "country", 38.9697, 59.5563, "AS"),
+    ("TV", "Tuvalu", "country", -7.1095, 177.6493, "OC"),
+    ("UG", "Uganda", "country", 1.3733, 32.2903, "AF"),
+    ("UA", "Ukraine", "country", 48.3794, 31.1656, "EU"),
+    ("AE", "United Arab Emirates", "country", 23.4241, 53.8478, "AS"),
+    ("GB", "United Kingdom", "country", 55.3781, -3.4360, "EU"),
+    ("US", "United States", "country", 37.0902, -95.7129, "NA"),
+    ("UY", "Uruguay", "country", -32.5228, -55.7658, "SA"),
+    ("UZ", "Uzbekistan", "country", 41.3775, 64.5853, "AS"),
+    ("VU", "Vanuatu", "country", -15.3767, 166.9592, "OC"),
+    ("VA", "Vatican City", "country", 41.9029, 12.4534, "EU"),
+    ("VE", "Venezuela", "country", 6.4238, -66.5897, "SA"),
+    ("VN", "Vietnam", "country", 14.0583, 108.2772, "AS"),
+    ("YE", "Yemen", "country", 15.5527, 48.5164, "AS"),
+    ("ZM", "Zambia", "country", -13.1339, 27.8493, "AF"),
+    ("ZW", "Zimbabwe", "country", -19.0154, 29.1549, "AF"),
+    # US areas + territories (also full 500 each)
+    ("DC", "District of Columbia", "district", 38.9072, -77.0369, "NA"),
+    ("PR", "Puerto Rico", "territory", 18.2208, -66.5901, "CARIB"),
+    ("GU", "Guam", "territory", 13.4443, 144.7937, "OC"),
+    ("VI", "U.S. Virgin Islands", "territory", 18.3358, -64.8963, "CARIB"),
+    ("AS", "American Samoa", "territory", -14.2710, -170.1322, "OC"),
+    ("MP", "Northern Mariana Islands", "territory", 15.0979, 145.6739, "OC"),
+    ("UP", "Michigan Upper Peninsula", "subregion", 46.25, -87.00, "NA"),
+    ("GL", "Greenland", "territory", 71.7069, -42.6043, "NA"),
+    ("HK", "Hong Kong", "territory", 22.3193, 114.1694, "AS"),
+    ("MO", "Macao", "territory", 22.1987, 113.5439, "AS"),
+    ("XK", "Kosovo", "country", 42.6026, 20.9030, "EU"),
+]
+
+
+# Dense city fleets (extra 1500 each) — Russia, Ukraine, Israel, Iran, Poland, Taiwan, Vietnam, Philippines + global hubs
+CITY_FLEETS = [
+    ("MOW", "Moscow", "city", 55.7558, 37.6173, "AS"),
+    ("LED", "Saint Petersburg", "city", 59.9311, 30.3609, "AS"),
+    ("OVB", "Novosibirsk", "city", 55.0084, 82.9357, "AS"),
+    ("VVO", "Vladivostok", "city", 43.1155, 131.8855, "AS"),
+    ("IEV", "Kyiv", "city", 50.4501, 30.5234, "EU"),
+    ("LWO", "Lviv", "city", 49.8397, 24.0297, "EU"),
+    ("ODS", "Odesa", "city", 46.4825, 30.7233, "EU"),
+    ("HRK", "Kharkiv", "city", 49.9935, 36.2304, "EU"),
+    ("TLV", "Tel Aviv", "city", 32.0853, 34.7818, "AS"),
+    ("JRS", "Jerusalem", "city", 31.7683, 35.2137, "AS"),
+    ("HFA", "Haifa", "city", 32.7940, 34.9896, "AS"),
+    ("THR", "Tehran", "city", 35.6892, 51.3890, "AS"),
+    ("IFN", "Isfahan", "city", 32.6539, 51.6660, "AS"),
+    ("MHD", "Mashhad", "city", 36.2605, 59.6168, "AS"),
+    ("WAW", "Warsaw", "city", 52.2297, 21.0122, "EU"),
+    ("KRK", "Krakow", "city", 50.0647, 19.9450, "EU"),
+    ("GDN", "Gdansk", "city", 54.3520, 18.6466, "EU"),
+    ("TPE", "Taipei", "city", 25.0330, 121.5654, "AS"),
+    ("KHH", "Kaohsiung", "city", 22.6273, 120.3014, "AS"),
+    ("TXG", "Taichung", "city", 24.1477, 120.6736, "AS"),
+    ("HAN", "Hanoi", "city", 21.0278, 105.8342, "AS"),
+    ("SGN", "Ho Chi Minh City", "city", 10.8231, 106.6297, "AS"),
+    ("DAD", "Da Nang", "city", 16.0544, 108.2022, "AS"),
+    ("MNL", "Manila", "city", 14.5995, 120.9842, "AS"),
+    ("CEB", "Cebu", "city", 10.3157, 123.8854, "AS"),
+    ("DVO", "Davao", "city", 7.1907, 125.4553, "AS"),
+    # more global density hubs
+    ("NYC", "New York City", "city", 40.7128, -74.0060, "NA"),
+    ("LAX", "Los Angeles", "city", 34.0522, -118.2437, "NA"),
+    ("CHI", "Chicago", "city", 41.8781, -87.6298, "NA"),
+    ("LON", "London City", "city", 51.5074, -0.1278, "EU"),
+    ("PAR", "Paris City", "city", 48.8566, 2.3522, "EU"),
+    ("BER", "Berlin City", "city", 52.5200, 13.4050, "EU"),
+    ("TYO", "Tokyo City", "city", 35.6762, 139.6503, "AS"),
+    ("SHA", "Shanghai", "city", 31.2304, 121.4737, "AS"),
+    ("PEK", "Beijing City", "city", 39.9042, 116.4074, "AS"),
+    ("DEL", "Delhi City", "city", 28.7041, 77.1025, "AS"),
+    ("BOM", "Mumbai", "city", 19.0760, 72.8777, "AS"),
+    ("SYD", "Sydney", "city", -33.8688, 151.2093, "OC"),
+    ("SAO", "Sao Paulo", "city", -23.5505, -46.6333, "SA"),
+    ("MEX", "Mexico City Metro", "city", 19.4326, -99.1332, "NA"),
+    ("CAI", "Cairo City", "city", 30.0444, 31.2357, "AF"),
+    ("JNB", "Johannesburg", "city", -26.2041, 28.0473, "AF"),
+    ("LAG", "Lagos", "city", 6.5244, 3.3792, "AF"),
+    ("IST", "Istanbul", "city", 41.0082, 28.9784, "AS"),
+    ("DXB", "Dubai", "city", 25.2048, 55.2708, "AS"),
+    ("SIN", "Singapore City", "city", 1.3521, 103.8198, "AS"),
+    ("SEL", "Seoul City", "city", 37.5665, 126.9780, "AS"),
+    ("BKK", "Bangkok City", "city", 13.7563, 100.5018, "AS"),
+    ("HAV", "Havana City", "city", 23.1136, -82.3666, "CARIB"),
+]
+
+
+
+EXTRA_DIVERSITY = [
+    ("KGD", "Kaliningrad", "city", 54.7104, 20.4522, "EU"),
+    ("SVX", "Yekaterinburg", "city", 56.8389, 60.6057, "AS"),
+    ("KJA", "Krasnoyarsk", "city", 56.0153, 92.8932, "AS"),
+    ("ROV", "Rostov-on-Don", "city", 47.2357, 39.7015, "AS"),
+    ("DNK", "Dnipro", "city", 48.4647, 35.0462, "EU"),
+    ("VIN", "Vinnytsia", "city", 49.2331, 28.4682, "EU"),
+    ("ZPR", "Zaporizhzhia", "city", 47.8388, 35.1396, "EU"),
+    ("BEY", "Beirut", "city", 33.8938, 35.5018, "AS"),
+    ("AMM", "Amman", "city", 31.9454, 35.9284, "AS"),
+    ("DAM", "Damascus", "city", 33.5138, 36.2765, "AS"),
+    ("BGW", "Baghdad City", "city", 33.3152, 44.3661, "AS"),
+    ("DOH", "Doha", "city", 25.2854, 51.5310, "AS"),
+    ("RUH", "Riyadh City", "city", 24.7136, 46.6753, "AS"),
+    ("JED", "Jeddah", "city", 21.4858, 39.1925, "AS"),
+    ("KHI", "Karachi", "city", 24.8607, 67.0011, "AS"),
+    ("LHE", "Lahore", "city", 31.5204, 74.3587, "AS"),
+    ("DAC", "Dhaka City", "city", 23.8103, 90.4125, "AS"),
+    ("CCU", "Kolkata", "city", 22.5726, 88.3639, "AS"),
+    ("BLR", "Bengaluru", "city", 12.9716, 77.5946, "AS"),
+    ("MAA", "Chennai", "city", 13.0827, 80.2707, "AS"),
+    ("CGK", "Jakarta City", "city", -6.2088, 106.8456, "AS"),
+    ("SUB", "Surabaya", "city", -7.2575, 112.7521, "AS"),
+    ("QZN", "Quezon City", "city", 14.6760, 121.0437, "AS"),
+    ("MCT", "Mactan Cebu", "city", 10.3070, 123.9790, "AS"),
+    ("PQC", "Phu Quoc", "city", 10.2270, 103.9670, "AS"),
+    ("HUI", "Hue", "city", 16.4637, 107.5909, "AS"),
+    ("NRT", "Narita Corridor", "city", 35.7647, 140.3864, "AS"),
+    ("OSA", "Osaka", "city", 34.6937, 135.5023, "AS"),
+    ("FUK", "Fukuoka", "city", 33.5904, 130.4017, "AS"),
+    ("ICN", "Incheon", "city", 37.4563, 126.7052, "AS"),
+    ("PUS", "Busan", "city", 35.1796, 129.0756, "AS"),
+    ("TNN", "Tainan", "city", 22.9997, 120.2270, "AS"),
+    ("HNL", "Honolulu", "city", 21.3069, -157.8583, "OC"),
+    ("ANC", "Anchorage", "city", 61.2181, -149.9003, "NA"),
+    ("YVR", "Vancouver", "city", 49.2827, -123.1207, "NA"),
+    ("YYZ", "Toronto", "city", 43.6532, -79.3832, "NA"),
+    ("YUL", "Montreal", "city", 45.5017, -73.5673, "NA"),
+    ("MIA", "Miami", "city", 25.7617, -80.1918, "NA"),
+    ("SEA", "Seattle", "city", 47.6062, -122.3321, "NA"),
+    ("DEN", "Denver", "city", 39.7392, -104.9903, "NA"),
+    ("ATL", "Atlanta", "city", 33.7490, -84.3880, "NA"),
+    ("DFW", "Dallas", "city", 32.7767, -96.7970, "NA"),
+    ("BOG", "Bogota City", "city", 4.7110, -74.0721, "SA"),
+    ("LIM", "Lima City", "city", -12.0464, -77.0428, "SA"),
+    ("SCL", "Santiago City", "city", -33.4489, -70.6693, "SA"),
+    ("EZE", "Buenos Aires City", "city", -34.6037, -58.3816, "SA"),
+    ("GIG", "Rio de Janeiro", "city", -22.9068, -43.1729, "SA"),
+    ("CPT", "Cape Town", "city", -33.9249, 18.4241, "AF"),
+    ("NBO", "Nairobi City", "city", -1.2921, 36.8219, "AF"),
+    ("ACC", "Accra", "city", 5.6037, -0.1870, "AF"),
+    ("ADD", "Addis Ababa City", "city", 9.0320, 38.7469, "AF"),
+    ("CAS", "Casablanca", "city", 33.5731, -7.5898, "AF"),
+    ("ALG", "Algiers", "city", 36.7538, 3.0588, "AF"),
+    ("TUN", "Tunis", "city", 36.8065, 10.1815, "AF"),
+    ("ATH", "Athens City", "city", 37.9838, 23.7275, "EU"),
+    ("MAD", "Madrid City", "city", 40.4168, -3.7038, "EU"),
+    ("BCN", "Barcelona", "city", 41.3874, 2.1686, "EU"),
+    ("ROM", "Rome City", "city", 41.9028, 12.4964, "EU"),
+    ("MIL", "Milan", "city", 45.4642, 9.1900, "EU"),
+    ("VIE", "Vienna City", "city", 48.2082, 16.3738, "EU"),
+    ("PRG", "Prague City", "city", 50.0755, 14.4378, "EU"),
+    ("LOD", "Lodz", "city", 51.7592, 19.4560, "EU"),
+    ("WRO", "Wroclaw", "city", 51.1079, 17.0385, "EU"),
+    ("HEL", "Helsinki City", "city", 60.1699, 24.9384, "EU"),
+    ("STO", "Stockholm City", "city", 59.3293, 18.0686, "EU"),
+    ("OSL", "Oslo City", "city", 59.9139, 10.7522, "EU"),
+    ("REK", "Reykjavik", "city", 64.1466, -21.9426, "EU"),
+    ("TLL", "Tallinn", "city", 59.4370, 24.7536, "EU"),
+    ("RIX", "Riga", "city", 56.9496, 24.1052, "EU"),
+    ("VNO", "Vilnius", "city", 54.6872, 25.2797, "EU"),
+    ("KIV", "Chisinau", "city", 47.0105, 28.8638, "EU"),
+    ("TBS", "Tbilisi", "city", 41.7151, 44.8271, "AS"),
+    ("EVN", "Yerevan", "city", 40.1792, 44.4991, "AS"),
+    ("BAK", "Baku", "city", 40.4093, 49.8671, "AS"),
+    ("ALA", "Almaty", "city", 43.2220, 76.8512, "AS"),
+    ("TAS", "Tashkent", "city", 41.2995, 69.2401, "AS"),
+    ("ULN", "Ulaanbaatar", "city", 47.8864, 106.9057, "AS"),
+    ("PNH", "Phnom Penh", "city", 11.5564, 104.9282, "AS"),
+    ("RGN", "Yangon", "city", 16.8661, 96.1951, "AS"),
+    ("VTE", "Vientiane", "city", 17.9757, 102.6331, "AS"),
+    ("CMB", "Colombo", "city", 6.9271, 79.8612, "AS"),
+    ("KTM", "Kathmandu", "city", 27.7172, 85.3240, "AS"),
+    ("MEL", "Melbourne", "city", -37.8136, 144.9631, "OC"),
+    ("AKL", "Auckland", "city", -36.8485, 174.7633, "OC"),
+    ("PPT", "Papeete", "city", -17.5516, -149.5585, "OC"),
+    ("GUM", "Hagatna Guam", "city", 13.4757, 144.7489, "OC"),
+    ("SPN", "Saipan City", "city", 15.1778, 145.7509, "OC"),
+    ("SJU", "San Juan PR", "city", 18.4655, -66.1057, "CARIB"),
+    ("POS", "Port of Spain", "city", 10.6918, -61.2225, "CARIB"),
+    ("KIN", "Kingston JM", "city", 18.0179, -76.8099, "CARIB"),
+    ("PAP", "Port-au-Prince", "city", 18.5944, -72.3074, "CARIB"),
+    ("SCU", "Santiago de Cuba", "city", 20.0169, -75.8300, "CARIB"),
+    ("NUK", "Nuuk", "city", 64.1814, -51.6941, "NA"),
+    ("FAI", "Fairbanks", "city", 64.8378, -147.7164, "NA"),
+    ("YFB", "Iqaluit", "city", 63.7467, -68.5170, "NA"),
+    ("TRD", "Tromso", "city", 69.6492, 18.9553, "EU"),
+    ("LYR", "Longyearbyen", "city", 78.2232, 15.6267, "EU"),
+    ("USH", "Ushuaia", "city", -54.8019, -68.3030, "SA"),
+    ("PMC", "Puerto Montt", "city", -41.4693, -72.9424, "SA"),
+    ("MQT", "Marquette UP", "city", 46.5436, -87.3954, "NA"),
+    ("ESC", "Escanaba", "city", 45.7453, -87.0646, "NA"),
+    ("GRB", "Green Bay", "city", 44.5133, -88.0133, "NA"),
+    ("MSN", "Madison WI", "city", 43.0731, -89.4012, "NA"),
+]
+
+
+ROLES = [
+    ("field-node", "FIE", "Field Node"),
+    ("school", "SCH", "School"),
+    ("library", "LIB", "Library"),
+    ("municipal", "MUN", "Municipal"),
+    ("clinic", "CLI", "Clinic"),
+    ("fire", "FIR", "Fire"),
+    ("sheriff", "SHE", "Sheriff"),
+    ("water-plant", "WAT", "Water Plant"),
+    ("tower", "TOW", "Tower"),
+    ("co-op", "COO", "Co-op"),
+    ("campus", "CAM", "Campus"),
+    ("museum", "MUS", "Museum"),
+    ("harbor", "HAR", "Harbor"),
+    ("airport", "AIR", "Airport"),
+    ("ranger", "RAN", "Ranger"),
+    ("ems", "EMS", "EMS"),
+    ("court", "COU", "Court"),
+    ("post", "POS", "Post"),
+    ("fiber-hut", "FIB", "Fiber Hut"),
+    ("substation", "SUB", "Substation"),
+]
+
+
+def now_z() -> str:
+    return time.strftime("%Y-%m-%dT%H:%MZ", time.gmtime())
+
+
+def jitter_for(code: str) -> float:
+    tiny = {"VA", "MC", "SM", "LI", "AD", "MT", "SG", "HK", "MO", "DC", "NR", "TV", "BH"}
+    if code in tiny:
+        return 0.08
+    if code in ("RU", "CA", "US", "CN", "BR", "AU"):
+        return 8.0
+    return 1.2
+
+
+def compact_system(code: str, n: int, lat0: float, lon0: float, name: str, rng: random.Random) -> dict:
+    role_slug, role_code, role_label = ROLES[(n - 1) % len(ROLES)]
+    j = jitter_for(code)
+    lat = round(lat0 + rng.uniform(-j, j), 5)
+    lon = round(lon0 + rng.uniform(-j, j), 5)
+    # clamp lat
+    lat = max(-85.0, min(85.0, lat))
+    if lon > 180:
+        lon -= 360
+    if lon < -180:
+        lon += 360
+    site = f"{name} Site {(n - 1) % 40 + 1}"
+    return {
+        "id": f"{code.lower()}{n:04d}",
+        "name": f"{code}-{role_code}-{n:04d}",
+        "label": f"{site} {role_label}",
+        "town": site,
+        "county": name,
+        "role": role_slug,
+        "lat": lat,
+        "lon": lon,
+        "ip": f"10.{(abs(hash(code)) % 200) + 20}.{(n // 250) + 1}.{(n % 250) + 1}",
+    }
+
+
+def build_region(code, name, kind, lat, lon, zone, racks):
+    rng = random.Random(SEED + abs(hash(code)) % 10_000_000)
+    systems = [compact_system(code, i, lat, lon, name, rng) for i in range(1, racks + 1)]
+    shard = {
+        "schema": "spear-fleet-region/v1",
+        "code": code,
+        "name": name,
+        "kind": kind,
+        "zone": zone,
+        "racks": racks,
+        "centroid": {"lat": lat, "lon": lon},
+        "systems": systems,
+    }
+    summary = {
+        "code": code,
+        "name": name,
+        "kind": kind,
+        "zone": zone,
+        "racks": racks,
+        "lat": lat,
+        "lon": lon,
+        "online": racks,
+        "ok": racks,
+        "status": "ok",
+    }
+    return shard, summary
+
+
+def write_tree(base: Path, index: dict, shards: dict, meta: dict) -> None:
+    fleet = base / "fleet"
+    rdir = fleet / "r"
+    # wipe old shards that are no longer in index (optional keep for safety — replace all)
+    if rdir.is_dir():
+        for old in rdir.glob("*.json"):
+            old.unlink(missing_ok=True)
+    rdir.mkdir(parents=True, exist_ok=True)
+    (fleet / "index.json").write_text(json.dumps(index, separators=(",", ":")) + "\n", encoding="utf-8")
+    (fleet / "meta.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+    for code, shard in shards.items():
+        (rdir / f"{code}.json").write_text(
+            json.dumps(shard, separators=(",", ":")) + "\n", encoding="utf-8"
+        )
+    status = {
+        "schema": "spear-fleet-status/v5",
+        "mode": "REAL",
+        "sandbox": False,
+        "updated": now_z(),
+        "total": index["total_racks"],
+        "regions": index["region_count"],
+        "racks_per_region": RACKS_PER,
+        "by_region": {
+            s["code"]: {"online": s["online"], "ok": s["ok"], "status": s["status"]}
+            for s in index["regions"]
+        },
+        "zones": index["zones"],
+        "map": {
+            "image": "assets/maps/world-equirectangular.jpg",
+            "projection": "equirectangular",
+            "sync": "lat/lon → percent on image",
+        },
+        "motto": f"World fleet · {RACKS_PER}/country · map-synced · lazy load",
+    }
+    (fleet / "status.json").write_text(json.dumps(status, separators=(",", ":")) + "\n", encoding="utf-8")
+
+
+def main() -> None:
+    t0 = time.time()
+    # de-dupe codes (last wins)
+    seen = {}
+    for row in COUNTRIES:
+        seen[row[0]] = row
+    for row in CITY_FLEETS:
+        seen[row[0]] = row
+    for row in EXTRA_DIVERSITY:
+        if 2 <= len(row[0]) <= 3:
+            seen[row[0]] = row
+    regions = list(seen.values())
+
+    shards = {}
+    summaries = []
+    zones: dict[str, list[str]] = {}
+    for code, name, kind, lat, lon, zone in regions:
+        shard, summary = build_region(code, name, kind, lat, lon, zone, RACKS_PER)
+        shards[code] = shard
+        summaries.append(summary)
+        zones.setdefault(zone, []).append(code)
+
+    total = len(summaries) * RACKS_PER
+    index = {
+        "schema": "spear-fleet-index/v2",
+        "updated": now_z(),
+        "racks_per_region": RACKS_PER,
+        "region_count": len(summaries),
+        "total_racks": total,
+        "scalable": True,
+        "lazy": True,
+        "world": True,
+        "map": {
+            "image": "/assets/maps/world-equirectangular.jpg",
+            "projection": "equirectangular",
+            "x": "(lon + 180) / 360",
+            "y": "(90 - lat) / 180",
+        },
+        "regions": summaries,
+        "zones": {z: {"regions": codes, "racks": len(codes) * RACKS_PER} for z, codes in zones.items()},
+        "api": {
+            "regions": "/api/regions",
+            "systems": "/api/systems?region=CODE&limit=50&offset=0",
+            "dossier": "/api/dossier?id=",
+            "export_csv": "/api/dossiers/export.csv",
+            "export_json": "/api/dossiers/export.json",
+        },
+        "note": f"{RACKS_PER} racks per country · map pins sync to centroids · never fetch all racks",
+    }
+    meta = {
+        "schema": "spear-fleet-meta/v2",
+        "doctrine": "world countries + city fleets · 1500 racks each · map-synced equirectangular · no thrash",
+        "racks_per_region": RACKS_PER,
+        "regions": len(summaries),
+        "total_racks": total,
+        "map_projection": "equirectangular",
+        "updated": now_z(),
+    }
+
+    roots = list(ROOTS)
+    if HOSTESS.parent.is_dir():
+        try:
+            HOSTESS.mkdir(parents=True, exist_ok=True)
+            roots.append(HOSTESS)
+        except Exception:
+            pass
+
+    for base in roots:
+        try:
+            base.mkdir(parents=True, exist_ok=True)
+            write_tree(base, index, shards, meta)
+            stub = {
+                "schema": "up-swallows-fleet/v4-world-sharded",
+                "title": f"World fleet · {total} racks · {RACKS_PER}/country",
+                "mode": "REAL",
+                "sandbox": False,
+                "sharded": True,
+                "world": True,
+                "total": total,
+                "racks_per_region": RACKS_PER,
+                "region_count": len(summaries),
+                "index": "fleet/index.json",
+                "map": index["map"],
+                "systems": [],
+                "count": total,
+                "online": total,
+                "note": "Use /api/systems?region=XX — full map on up-swallows.html",
+            }
+            (base / "up-systems.json").write_text(json.dumps(stub, indent=2) + "\n", encoding="utf-8")
+            print(f"wrote {base}/fleet regions={len(summaries)} racks={total}")
+        except Exception as e:
+            print(f"skip {base}: {e}")
+
+    sample = ROOTS[0] / "fleet"
+    if sample.is_dir():
+        sizes = [p.stat().st_size for p in (sample / "r").glob("*.json")]
+        total_b = sum(sizes) + (sample / "index.json").stat().st_size
+        print(
+            f"disk shards={len(sizes)} total_MB={total_b/1e6:.2f} "
+            f"avg_KB={ (sum(sizes)/max(len(sizes),1))/1e3 :.1f} "
+            f"index_KB={(sample/'index.json').stat().st_size/1e3:.1f} "
+            f"build_s={time.time()-t0:.2f}"
+        )
+
+
+if __name__ == "__main__":
+    main()

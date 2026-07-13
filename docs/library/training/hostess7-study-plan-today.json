@@ -1,0 +1,90 @@
+{
+  "schema": "hostess7-study-plan/v1",
+  "title": "Hostess 7 studies today \u2014 field training shelf",
+  "updated": "2026-07-13T22:52Z",
+  "motto": "Every battery sealed, curriculum done \u2014 plain books, no H7c thrash",
+  "ironclad": "ironclad:training:study-plan:1",
+  "order": [
+    {
+      "step": 1,
+      "book": "exploring_ironclad",
+      "curriculum": "truth_doctrine",
+      "xp": 8
+    },
+    {
+      "step": 2,
+      "book": "exploring_hostess7_angel",
+      "curriculum": "self_brief",
+      "xp": 8
+    },
+    {
+      "step": 3,
+      "book": "exploring_shannon_field",
+      "curriculum": "tools_docs",
+      "xp": 10
+    },
+    {
+      "step": 4,
+      "book": "exploring_ffat_storage",
+      "curriculum": "tools_docs",
+      "note": "existing"
+    },
+    {
+      "step": 5,
+      "book": "exploring_field_drive",
+      "curriculum": "tools_docs",
+      "xp": 10
+    },
+    {
+      "step": 6,
+      "book": "exploring_spear_wartime",
+      "curriculum": "intelligence_flow",
+      "xp": 12
+    },
+    {
+      "step": 7,
+      "book": "exploring_world_dns",
+      "curriculum": "world_brief",
+      "xp": 10
+    },
+    {
+      "step": 8,
+      "book": "exploring_combinatronic",
+      "curriculum": "imagine_corpus",
+      "xp": 8
+    },
+    {
+      "step": 9,
+      "book": "exploring_live_planet",
+      "curriculum": "world_brief",
+      "xp": 10
+    }
+  ],
+  "books_added": [
+    "exploring_ironclad",
+    "exploring_hostess7_angel",
+    "exploring_shannon_field",
+    "exploring_field_drive",
+    "exploring_spear_wartime",
+    "exploring_world_dns",
+    "exploring_combinatronic",
+    "exploring_live_planet"
+  ],
+  "word_counts": {
+    "exploring_ironclad": 900,
+    "exploring_hostess7_angel": 623,
+    "exploring_shannon_field": 573,
+    "exploring_field_drive": 410,
+    "exploring_spear_wartime": 454,
+    "exploring_world_dns": 354,
+    "exploring_combinatronic": 382,
+    "exploring_live_planet": 339
+  },
+  "policy": {
+    "format": "h7",
+    "h7c": "forbidden for new training books",
+    "images": "h7fig later",
+    "corrections": "footer on every book"
+  },
+  "blessing": "God Bless"
+}

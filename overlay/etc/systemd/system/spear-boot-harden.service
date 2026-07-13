@@ -1,0 +1,16 @@
+[Unit]
+Description=Spear boot harden and speed (Qubes-informed)
+DefaultDependencies=no
+After=local-fs.target systemd-sysctl.service
+Before=multi-user.target graphical.target network-online.target
+ConditionPathExists=/etc/spear-release
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/lib/spear/boot-harden.sh
+RemainAfterExit=yes
+TimeoutStartSec=30
+Nice=-5
+
+[Install]
+WantedBy=multi-user.target graphical.target

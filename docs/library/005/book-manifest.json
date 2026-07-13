@@ -1,0 +1,63 @@
+{
+  "schema": "hostess7-exploring-book/v1",
+  "id": "exploring_ffat_storage",
+  "title": "Exploring FFAT Storage",
+  "author": "Spear Field \u00b7 Hostess 7 Field Press",
+  "edition": "1.1.0-plain-h7",
+  "year": 2026,
+  "dewey": "005",
+  "shelf": "005-data",
+  "formats": {
+    "h7": "exploring_ffat_storage/exploring_ffat_storage.h7",
+    "txt": "exploring_ffat_storage/exploring_ffat_storage.txt"
+  },
+  "h7c": false,
+  "h7c_retired": true,
+  "updated": "2026-07-13T22:46Z",
+  "char_count": 5154,
+  "chapter_count": 10,
+  "chapters": [
+    {
+      "num": 1,
+      "title": "What FFAT Is"
+    },
+    {
+      "num": 2,
+      "title": "Honesty First (Shannon)"
+    },
+    {
+      "num": 3,
+      "title": "Accounting Words"
+    },
+    {
+      "num": 4,
+      "title": "Peak\u2013Angle Pack (PAK)"
+    },
+    {
+      "num": 5,
+      "title": "Map Entry Kinds"
+    },
+    {
+      "num": 6,
+      "title": "Virtual AMMOFAT (Bus Only)"
+    },
+    {
+      "num": 7,
+      "title": "Field Drive Identity"
+    },
+    {
+      "num": 8,
+      "title": "Operator Rituals"
+    },
+    {
+      "num": 9,
+      "title": "This Book\u2019s Format (plain H7)"
+    },
+    {
+      "num": 10,
+      "title": "Motto"
+    }
+  ],
+  "motto": "Measure entropy. Pack only when pack wins. Never invent capacity. No H7c.",
+  "ironclad": "ironclad:ffat-storage:1"
+}

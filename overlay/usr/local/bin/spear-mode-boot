@@ -1,0 +1,74 @@
+#!/bin/bash
+# spear_mode= from cmdline. Field is the FAST path (no desktop nag/wizard).
+MODE="normal"
+FAST=0
+for tok in $(cat /proc/cmdline 2>/dev/null); do
+  case "$tok" in
+    spear_mode=*) MODE="${tok#spear_mode=}" ;;
+    spear_fast=1) FAST=1 ;;
+  esac
+done
+export SPEAR_MODE="$MODE"
+export SPEAR_FAST="$FAST"
+
+has_fd() {
+  if [[ -f /run/spear-field-drive.status ]]; then
+    grep -q 'field_drive=1' /run/spear-field-drive.status 2>/dev/null && return 0
+    return 1
+  fi
+  /usr/local/bin/spear-field-drive has-field-drive 2>/dev/null && return 0
+  if command -v spear >/dev/null 2>&1; then
+    spear field1-status 2>/dev/null | grep -q 'CLAIMED' && return 0
+  fi
+  return 1
+}
+
+# Record ready timestamp for bench (monotonic boot seconds if available)
+ready_mark() {
+  local tag="$1"
+  local up
+  up=$(cut -d. -f1 /proc/uptime 2>/dev/null || echo 0)
+  echo "spear_ready mode=$MODE tag=$tag uptime_s=$up ts=$(date -u +%Y-%m-%dT%H:%MZ)" \
+    | tee /run/spear-ready.stamp >/dev/console 2>/dev/null || true
+  echo "$up" >/run/spear-ready.uptime
+}
+
+case "$MODE" in
+  fielddrive)
+    if [[ -t 1 ]]; then clear 2>/dev/null || true; fi
+    echo "Spear mode: Create Field Drive"
+    /usr/local/bin/spear-field-drive menu || true
+    ready_mark fielddrive
+    if [[ -t 1 ]]; then exec /bin/bash; fi
+    ;;
+  field)
+    # FAST PATH: no zenity, no wizard, no browser, optional field ensure
+    export SPEAR_FIELD_DRIVE=0
+    if has_fd; then
+      export SPEAR_FIELD_DRIVE=1
+      echo "Spear Field: Field1/Field Drive present"
+    else
+      echo "Spear Field: no Field Drive yet (attach Field1 or use Create Field Drive)"
+    fi
+    # Bring up field stack without blocking on desktop
+    if command -v spear >/dev/null 2>&1; then
+      # non-fatal, timed
+      timeout 8 spear kilroy-ensure 2>/dev/null || timeout 5 spear fieldmem-ensure host 2>/dev/null || true
+    fi
+    ready_mark field
+    # multi-user: nothing else — getty is ready
+    exit 0
+    ;;
+  normal|compat|debug|*)
+    if has_fd; then
+      export SPEAR_FIELD_DRIVE=1
+      exit 0
+    fi
+    # Missing field drive on desktop path: warn only, never force wizard
+    if [[ -n "${DISPLAY:-}" ]]; then
+      zenity --warning --title="Spear" --width=480 \
+        --text="<b>Field Drive not detected</b>\n\nDesktop still works. Attach Field1 for full field stack." 2>/dev/null || true
+    fi
+    ready_mark normal
+    ;;
+esac

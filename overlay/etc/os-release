@@ -1,0 +1,12 @@
+NAME="Spear"
+VERSION="22.3 (Field)"
+ID=spear
+ID_LIKE="ubuntu debian"
+PRETTY_NAME="Spear 22.3"
+VERSION_ID="22.3"
+HOME_URL="https://github.com/ZacharyGeurts"
+VERSION_CODENAME=field
+UBUNTU_CODENAME=noble
+VARIANT="Spear"
+VARIANT_ID=spear
+LOGO=spear

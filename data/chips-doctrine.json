@@ -1,0 +1,30 @@
+{
+  "schema": "spear-chips/v1",
+  "title": "Spear CHIPs / Field Die plane",
+  "motto": "Field work routes through Field Die CHIPs — not HostCPU casual paths",
+  "not": [
+    "claim that host silicon is powered off",
+    "full ring-0 x86 guest emulator in spear (that is AMOURANTHRTX FieldX86Core)"
+  ],
+  "yes": [
+    "FieldX86-class die slots + belt dispatch (AMOURANTHRTX / Grok16 field_opt)",
+    "EntropyFold (phi blend) + WavePhase multi-band",
+    "PeakScan structural density for PAK pack pick",
+    "Die L1 frame cache for FFAT get/put speed",
+    "PackPick ZERO/RLE/PAK/RAW from die scores — measured shrink only"
+  ],
+  "perfect_x86": {
+    "meaning": "Complete Field Die ISA for storage/field ops",
+    "ops": ["EntropyFold", "WavePhase", "Shannon", "PeakScan", "PackPick", "FnvMix", "Add", "Mul", "Xor"],
+    "vs_fieldx86core": "libx86emu guest path lives in AMOURANTHRTX Navigator; spear uses die plane for FFAT"
+  },
+  "ffat_hooks": {
+    "capacity": "chip pack pick prefers PAK when peak/angle density high (even if Shannon high)",
+    "speed": "64-slot die L1 frame cache; belt-chunked die dispatch",
+    "honesty": "codecs still must shrink payload; RAW if no win"
+  },
+  "amouranthrtx": {
+    "ref": "Navigator/engine FieldX86Native · FieldX86Runtime · CHIPS/* · Grok16 entropy_fold"
+  },
+  "cli": ["spear chip-status", "spear chip-bench", "spear ffat-put (auto chip path)"]
+}

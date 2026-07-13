@@ -1,0 +1,18 @@
+{
+  "schema": "angel-seal-status/v2",
+  "ts": "2026-07-13T22:34Z",
+  "sealed": true,
+  "final_eye_sealed": true,
+  "commander": "Forever Watchguard Angel",
+  "hostess7_commander": "hostess7",
+  "rank": "ANGEL",
+  "status": "SEALED_UP",
+  "stack": "C++",
+  "component_count": 61,
+  "owned_live_bindings": 61,
+  "root_seal": "7d75c625c7baf409545727feabc6d81195072a3dabe5c02862aba0f78a338e1b",
+  "dns_dhcp_related": ["znetwork", "field_dns"],
+  "seal_path": "/home/zachary/Desktop/SG/zpics/hostess7-component-seal.json",
+  "final_eye_path": "/home/zachary/Desktop/SG/zpics/final-eye-seal.json",
+  "note": "multi-doc seal file: first object is hostess7-component-seal-event/v1; trailing control-panel doc ignored for seal truth"
+}

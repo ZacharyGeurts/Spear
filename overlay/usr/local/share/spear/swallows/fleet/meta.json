@@ -1,0 +1,9 @@
+{
+  "schema": "spear-fleet-meta/v2",
+  "doctrine": "world countries + city fleets \u00b7 1500 racks each \u00b7 map-synced equirectangular \u00b7 no thrash",
+  "racks_per_region": 6000,
+  "regions": 359,
+  "total_racks": 2154000,
+  "map_projection": "equirectangular",
+  "updated": "2026-07-13T20:53Z"
+}

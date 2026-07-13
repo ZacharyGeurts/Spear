@@ -1,0 +1,317 @@
+#!/usr/bin/env bash
+# spear-field-drive — detect Field1 (FFAT) + legacy SPEARFIELD; optional create wizard
+set -euo pipefail
+
+MARKER_LABEL="SPEARFIELD"
+MARKER_FS="ext4"
+MARKER_FILE=".spear-field-drive"
+DOCTRINE="/usr/local/share/spear/field-big-drive-doctrine.json"
+
+red() { printf '\033[31m%s\033[0m\n' "$*"; }
+grn() { printf '\033[32m%s\033[0m\n' "$*"; }
+ylw() { printf '\033[33m%s\033[0m\n' "$*"; }
+bold() { printf '\033[1m%s\033[0m\n' "$*"; }
+
+need_root() {
+  if [[ "$(id -u)" -ne 0 ]]; then
+    exec sudo -E "$0" "$@"
+  fi
+}
+
+human() {
+  local b="${1:-0}"
+  if command -v numfmt >/dev/null; then
+    numfmt --to=iec-i --suffix=B "$b" 2>/dev/null || echo "${b}B"
+  else
+    echo "${b}B"
+  fi
+}
+
+# True if whole disk (or its FFAT) is a Spear Field Drive / Field1.
+is_field_drive() {
+  local dev="$1"
+  [[ -b "$dev" || -r "$dev" ]] || return 1
+
+  # 1) C++ spear FFAT / SPEARMBR (Field1 path of record)
+  if command -v spear >/dev/null 2>&1; then
+    local out
+    out=$(spear ffat-probe "$dev" 2>/dev/null || true)
+    if echo "$out" | grep -qE 'ffat=yes'; then
+      return 0
+    fi
+    if echo "$out" | grep -qiE 'label=FIELD1|mbr=yes'; then
+      # mbr=yes alone can be true with empty probe noise — prefer SPEARMBR below
+      :
+    fi
+  fi
+
+  # 2) Raw SPEARMBR magic at MBR offset 3 (Field1 claimed)
+  if dd if="$dev" bs=1 skip=3 count=8 status=none 2>/dev/null | grep -aq SPEARMBR; then
+    return 0
+  fi
+
+  # 3) QEMU virtio serial FIELD1 (host Field1 passthrough)
+  local serial
+  serial=$(lsblk -dno SERIAL "$dev" 2>/dev/null | tr -d '[:space:]')
+  [[ "$serial" == "FIELD1" ]] && return 0
+
+  # 4) Legacy ext4 SPEARFIELD labels (older wizard)
+  local lab mp p
+  lab=$(lsblk -no LABEL "$dev" 2>/dev/null | head -1 | tr -d ' ')
+  [[ "$lab" == "$MARKER_LABEL" || "$lab" == "FIELDDRIVE" || "$lab" == "SPEAR_FIELD" || "$lab" == "FIELD1" ]] && return 0
+  mp=$(lsblk -no MOUNTPOINT "$dev" 2>/dev/null | head -1)
+  if [[ -n "$mp" && -f "$mp/$MARKER_FILE" ]]; then
+    return 0
+  fi
+  for p in $(lsblk -lnpo NAME,TYPE "$dev" 2>/dev/null | awk '$2=="part"{print $1}'); do
+    lab=$(lsblk -no LABEL "$p" 2>/dev/null | head -1 | tr -d ' ')
+    [[ "$lab" == "$MARKER_LABEL" || "$lab" == "FIELDDRIVE" || "$lab" == "FIELD1" ]] && return 0
+    mp=$(lsblk -no MOUNTPOINT "$p" 2>/dev/null | head -1)
+    [[ -n "$mp" && -f "$mp/$MARKER_FILE" ]] && return 0
+    if dd if="$p" bs=1 skip=3 count=8 status=none 2>/dev/null | grep -aq SPEARMBR; then
+      return 0
+    fi
+    if command -v spear >/dev/null 2>&1; then
+      out=$(spear ffat-probe "$p" 2>/dev/null || true)
+      echo "$out" | grep -qE 'ffat=yes' && return 0
+    fi
+  done
+  return 1
+}
+
+detect_field_drives() {
+  local d found=0
+  for d in $(lsblk -dnpo NAME,TYPE 2>/dev/null | awk '$2=="disk"{print $1}'); do
+    if is_field_drive "$d"; then
+      echo "$d"
+      found=1
+    fi
+  done
+  # also whole-disk by-label FIELD1 if present
+  if [[ -e /dev/disk/by-label/FIELD1 ]]; then
+    local real
+    real=$(readlink -f /dev/disk/by-label/FIELD1 2>/dev/null || true)
+    if [[ -n "$real" ]]; then
+      # print disk once
+      echo "$real" | grep -q . && { echo "$real"; found=1; }
+    fi
+  fi
+  return $((1-found))
+}
+
+list_drives_detailed() {
+  bold "════════════════════════════════════════════════════════════"
+  bold "  SPEAR — block devices (pick carefully before wipe)"
+  bold "════════════════════════════════════════════════════════════"
+  echo
+  if [[ -f "$DOCTRINE" ]]; then
+    ylw "Field Drive doctrine: permanent field home (not a random USB stick)."
+    echo "  See: $DOCTRINE"
+    echo
+  fi
+
+  local dev
+  local i=0
+  mapfile -t DISKS < <(lsblk -dnpo NAME,TYPE 2>/dev/null | awk '$2=="disk"{print $1}')
+  if [[ ${#DISKS[@]} -eq 0 ]]; then
+    red "No disks found."
+    return 1
+  fi
+
+  for dev in "${DISKS[@]}"; do
+    i=$((i+1))
+    local size model serial tran rota ro rm vendor
+    size=$(lsblk -dnbo SIZE "$dev" 2>/dev/null || echo 0)
+    model=$(lsblk -dno MODEL "$dev" 2>/dev/null | sed 's/[[:space:]]\+/ /g')
+    serial=$(lsblk -dno SERIAL "$dev" 2>/dev/null)
+    tran=$(lsblk -dno TRAN "$dev" 2>/dev/null)
+    rota=$(lsblk -dno ROTA "$dev" 2>/dev/null)
+    ro=$(lsblk -dno RO "$dev" 2>/dev/null)
+    rm=$(lsblk -dno RM "$dev" 2>/dev/null)
+    vendor=$(lsblk -dno VENDOR "$dev" 2>/dev/null)
+    local media="fixed"
+    [[ "$rm" == "1" ]] && media="removable"
+    local kind="SSD/flash"
+    [[ "$rota" == "1" ]] && kind="HDD (rotational)"
+    local fd_flag=""
+    if is_field_drive "$dev"; then
+      fd_flag="  ★ FIELD DRIVE / Field1"
+      if command -v spear >/dev/null 2>&1; then
+        local pr
+        pr=$(spear ffat-probe "$dev" 2>/dev/null | tr '\n' ' ' || true)
+        [[ -n "$pr" ]] && fd_flag="$fd_flag (FFAT)"
+      fi
+    fi
+
+    bold "[$i] $dev  $(human "$size")$fd_flag"
+    echo "    MODEL   : ${model:-unknown}"
+    echo "    VENDOR  : ${vendor:-unknown}"
+    echo "    SERIAL  : ${serial:-unknown}"
+    echo "    BUS     : ${tran:-unknown}"
+    echo "    MEDIA   : $media · $kind · RO=$ro"
+    if command -v udevadm >/dev/null; then
+      local wwn id_path
+      wwn=$(udevadm info --query=property --name="$dev" 2>/dev/null | awk -F= '/^ID_WWN=/{print $2}')
+      id_path=$(udevadm info --query=property --name="$dev" 2>/dev/null | awk -F= '/^ID_PATH=/{print $2}')
+      [[ -n "$wwn" ]] && echo "    WWN     : $wwn"
+      [[ -n "$id_path" ]] && echo "    PATH    : $id_path"
+    fi
+    echo "    PARTITIONS:"
+    lsblk -o NAME,SIZE,FSTYPE,LABEL,UUID,MOUNTPOINT,PARTUUID "$dev" 2>/dev/null | sed 's/^/      /'
+    if lsblk -no MOUNTPOINT "$dev" 2>/dev/null | grep -qE '^/$|^/boot'; then
+      red "    ⚠  SYSTEM DISK (has / or /boot mounted) — do NOT wipe unless intentional"
+    fi
+    echo
+  done
+
+  DRIVE_LIST=("${DISKS[@]}")
+}
+
+wipe_and_create() {
+  local dev="$1"
+  [[ -b "$dev" ]] || { red "Not a block device: $dev"; return 1; }
+
+  bold "About to WIPE ALL DATA on $dev"
+  lsblk -o NAME,SIZE,FSTYPE,LABEL,MOUNTPOINT "$dev"
+  echo
+  red "Type the device path exactly to confirm: $dev"
+  read -r -p "> " confirm
+  [[ "$confirm" == "$dev" ]] || { red "Aborted (mismatch)."; return 1; }
+  read -r -p "Final confirm — type YES: " yes
+  [[ "$yes" == "YES" ]] || { red "Aborted."; return 1; }
+
+  local p
+  for p in $(lsblk -lnpo NAME,TYPE "$dev" | awk '$2=="part"{print $1}'); do
+    umount "$p" 2>/dev/null || umount -l "$p" 2>/dev/null || true
+  done
+  umount "$dev" 2>/dev/null || true
+
+  ylw "Prefer Field1 FFAT (spear) when available…"
+  if command -v spear >/dev/null 2>&1; then
+    if spear ffat-force "$dev" 2>/dev/null || spear ffat-ensure "$dev" 2>/dev/null; then
+      grn "Field1 FFAT ready on $dev"
+      spear ffat-probe "$dev" 2>/dev/null || true
+      return 0
+    fi
+  fi
+
+  ylw "Fallback: GPT + ext4 label=$MARKER_LABEL…"
+  wipefs -a "$dev" 2>/dev/null || true
+  sgdisk --zap-all "$dev" 2>/dev/null || dd if=/dev/zero of="$dev" bs=1M count=8 status=none
+  partprobe "$dev" 2>/dev/null || true
+  sleep 1
+
+  if command -v sgdisk >/dev/null; then
+    sgdisk -n 1:0:0 -t 1:8300 -c 1:"Spear Field Drive" "$dev"
+  else
+    printf 'g\nn\n1\n\n\nw\n' | fdisk "$dev"
+  fi
+  partprobe "$dev" 2>/dev/null || true
+  sleep 1
+
+  local part="${dev}1"
+  [[ -b "$part" ]] || part="${dev}p1"
+  [[ -b "$part" ]] || { red "Partition not found after create"; return 1; }
+
+  mkfs.ext4 -F -L "$MARKER_LABEL" "$part"
+  local mnt
+  mnt=$(mktemp -d /tmp/spear-fd.XXXXXX)
+  mount "$part" "$mnt"
+  cat >"$mnt/$MARKER_FILE" << META
+{
+  "schema": "spear-field-drive/v1",
+  "label": "$MARKER_LABEL",
+  "created": "$(date -u +%Y-%m-%dT%H:%MZ)",
+  "device": "$dev",
+  "partition": "$part",
+  "product": "Spear"
+}
+META
+  mkdir -p "$mnt"/{field,research,library,work,stack}
+  echo "Spear Field Drive — Normal boot target" >"$mnt/README.txt"
+  sync
+  umount "$mnt"
+  rmdir "$mnt" 2>/dev/null || true
+  grn "Field Drive ready: $part  label=$MARKER_LABEL"
+}
+
+cmd_status() {
+  echo "Field drives / Field1 detected:"
+  local any=0
+  local d
+  while read -r d; do
+    [[ -z "$d" ]] && continue
+    any=1
+    grn "  $d"
+    if command -v spear >/dev/null 2>&1; then
+      spear ffat-probe "$d" 2>/dev/null | sed 's/^/    /' || true
+    fi
+    lsblk -o NAME,SIZE,FSTYPE,LABEL,MOUNTPOINT,SERIAL "$d" 2>/dev/null | sed 's/^/    /'
+  done < <(detect_field_drives 2>/dev/null | sort -u)
+  if [[ "$any" -eq 0 ]]; then
+    ylw "  (none) — use: spear-field-drive create   or attach host Field1"
+    return 1
+  fi
+  return 0
+}
+
+cmd_create() {
+  need_root "$@"
+  list_drives_detailed
+  echo
+  read -r -p "Enter disk number or full path (e.g. 2 or /dev/sdb): " pick
+  local dev=""
+  if [[ "$pick" =~ ^[0-9]+$ ]]; then
+    dev="${DRIVE_LIST[$((pick-1))]:-}"
+  else
+    dev="$pick"
+  fi
+  [[ -n "$dev" && -b "$dev" ]] || { red "Invalid selection"; exit 1; }
+  wipe_and_create "$dev"
+}
+
+cmd_menu() {
+  clear 2>/dev/null || true
+  bold "SPEAR — Field Drive / Field1"
+  echo
+  if cmd_status; then
+    echo
+    grn "Field Drive present. Normal desktop is allowed."
+    read -r -p "Create another Field Drive anyway? [y/N] " a
+    [[ "$a" == "y" || "$a" == "Y" ]] || exit 0
+  else
+    echo "No Field Drive detected yet. Create one (wipe) or attach Field1."
+    echo
+  fi
+  cmd_create
+}
+
+usage() {
+  cat << EOF
+spear-field-drive — Field Drive / Field1 tools (Spear)
+
+  spear-field-drive status          list / detect Field Drives + Field1 FFAT
+  spear-field-drive list            full device detail
+  spear-field-drive create          wipe selected disk → Field Drive
+  spear-field-drive menu            interactive wizard
+  spear-field-drive has-field-drive exit 0 if Field1/FFAT/SPEARFIELD present
+
+Detects: SPEARMBR+FFAT (Field1), virtio serial FIELD1, label SPEARFIELD/FIELD1
+EOF
+}
+
+main() {
+  case "${1:-menu}" in
+    status) cmd_status ;;
+    list) list_drives_detailed ;;
+    create) cmd_create ;;
+    menu) cmd_menu ;;
+    has-field-drive)
+      detect_field_drives >/dev/null 2>&1 && exit 0 || exit 1
+      ;;
+    -h|--help|help) usage ;;
+    *) usage; exit 1 ;;
+  esac
+}
+
+main "$@"

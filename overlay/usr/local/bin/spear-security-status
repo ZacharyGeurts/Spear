@@ -1,0 +1,42 @@
+#!/bin/bash
+# Qubes-inspired security posture summary for Spear live/desktop.
+set -euo pipefail
+
+echo "=== Spear security posture (Qubes-informed) ==="
+echo
+
+# Isolation / field drive
+if /usr/local/bin/spear-field-drive has-field-drive 2>/dev/null; then
+  echo "[ok] Field Drive / Field1 present (trusted field storage)"
+  /usr/local/bin/spear-field-drive status 2>/dev/null | sed 's/^/     /' | head -20
+else
+  echo "[!!] No Field Drive detected — create or attach Field1"
+fi
+
+# No surprise network admin surface
+if [[ -f /usr/local/share/spear/qubes-security-adoption.json ]] || [[ -f /usr/local/share/spear/spear-doctrine.json ]]; then
+  echo "[ok] Doctrine present under /usr/local/share/spear/"
+fi
+
+# C2 loopback expectation
+if [[ -f /usr/local/share/spear/qubes-security-adoption.json ]]; then
+  echo "[ok] Qubes adoption doctrine installed"
+fi
+
+# Browser autostart should be absent
+if grep -Rqs 'xdg-open.*/opt/field-research' /usr/local/bin/spear-firstboot 2>/dev/null; then
+  echo "[!!] firstboot still auto-opens docs in browser — fix required"
+else
+  echo "[ok] firstboot does not auto-open browser (Qubes: no casual net in admin)"
+fi
+
+# autoelevate / setuid spear
+if [[ -u /usr/local/bin/spear ]] || [[ -x /usr/local/bin/spear ]]; then
+  ls -l /usr/local/bin/spear | sed 's/^/[ok] spear tool: /'
+else
+  echo "[!!] spear binary missing"
+fi
+
+echo
+echo "Principles: isolation · least privilege · disposable untrusted work · explicit C2 gates"
+echo "See: /usr/local/share/spear/qubes-security-adoption.json"
