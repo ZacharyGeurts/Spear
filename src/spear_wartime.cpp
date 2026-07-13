@@ -804,7 +804,7 @@ static void write_global_protector(int cycle, int seen, int killed, int lifetime
   body += "    \"ironclad:lethal-kill-rekill:1\",\n";
   body += "    \"ironclad:cpp-only:1\"\n";
   body += "  ],\n";
-  body += "  \"motto\": \"Global Protector · violently defensive of WORLD + INTERNET · real multi-signal hunt · no demo · God Bless\"\n";
+  body += "  \"motto\": \"Global Protector · FIELD UDP WAR BLASTERS · HATED · PISSED · WORLD+INTERNET · God Bless\"\n";
   body += "}\n";
   spear::mirror_www("global-protector-live.json", body);
   spear::mirror_www("war-day.json", body);
