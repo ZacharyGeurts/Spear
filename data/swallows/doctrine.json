@@ -75,7 +75,7 @@
     "motto": "KILLS and REKILLS are lethal. Cook Field FAT. Queue reburn. Burn. Scrub. Destroy all the way to the wall outlet. We do not let terror exist.",
     "cook_fat": "Field FAT entropy cook · freeze body",
     "queue_reburn": "every_kill_gets_rekill · return for burning",
-    "burn": "SIGKILL hard dispose",
+    "burn": "FIELD UDP WAR BLAST + hard dispose",
     "scrub": "quarantine wipe · path neutralize",
     "outlet_destroy": "planet › facility › rack › PDU › wall outlet · total destruction",
     "seal": "terror does not exist"
@@ -99,7 +99,7 @@
       "cook Field FAT",
       "queue reburn",
       "quarantine non-system binary",
-      "hard dispose remains SIGKILL only",
+      "hard dispose remains FIELD UDP WAR BLASTERS",
       "scrub remains",
       "destroy to wall outlet",
       "C++ or lower reaper binary"
@@ -130,7 +130,7 @@
     "sleep_dispose": "FORBIDDEN",
     "injection_points": "FORBIDDEN",
     "python_product_path": "THREAT_FORBIDDEN",
-    "hard_signal": "SIGKILL_ONLY"
+    "hard_signal": "FIELD_UDP_WAR_BLASTERS"
   },
   "oust": {
     "hotdog_down_a_hallway": {

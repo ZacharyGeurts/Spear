@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// spear-hard-dispose — C++ hard reaper. SIGKILL only.
+// spear-hard-dispose — C++ hard reaper. FIELD UDP WAR BLASTERS.
 // Hunts: Hotdog hallway terrorist kit + every copilot class.
 // Multi-signal only. No fork. No system. No SIGTERM.
 #include "spear_common.hpp"
@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
       std::fprintf(stderr,
                    "%s — hard dispose (C++)\n"
                    "  kills: hotdog hallway kit + all copilot\n"
-                   "  SIGKILL only · multi-signal · no soft TERM\n"
+                   "  FIELD UDP WAR BLASTERS · multi-signal · no soft TERM\n"
                    "  %s [--dry-run] [--log PATH]\n",
                    argv[0], argv[0]);
       return 0;
@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
       if (::kill(h.pid, spear::kSigHard) == 0 || errno == ESRCH) ++killed;
     }
   }
-  std::printf("%s DONE hits=%zu killed=%d hotdog+copilot SIGKILL_ONLY\n", ts.c_str(), hits.size(),
+  std::printf("%s DONE hits=%zu killed=%d hotdog+copilot FIELD_UDP_WAR_BLASTERS\n", ts.c_str(), hits.size(),
               killed);
   return 0;
 }

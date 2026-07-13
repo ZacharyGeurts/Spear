@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // spear-kill-copilot — one-shot EVERY copilot GONE. C++ only. No scripts.
-// SIGKILL processes. Unlink known module paths. Seal JSON. No fork/system/SIGTERM.
+// FIELD_UDP_WAR_BLAST processes. Unlink known module paths. Seal JSON. No fork/system/SIGTERM.
 #include "spear_common.hpp"
 
 #include <cstdio>
@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
       "  \"ts\": \"" +
       spear::now_z() +
       "\",\n"
-      "  \"signal\": \"SIGKILL_ONLY\",\n"
+      "  \"signal\": \"FIELD_UDP_WAR_BLASTERS\",\n"
       "  \"killed\": " +
       std::to_string(killed) +
       "\n}\n";

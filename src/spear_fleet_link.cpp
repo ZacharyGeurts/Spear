@@ -142,7 +142,7 @@ static void* zone_hub(void* arg) {
     char banner[320];
     std::snprintf(banner, sizeof(banner),
                   "SPEAR-ZONE OK zone=%s primary=%s violent=1 hunting=1 "
-                  "protect=WORLD_INTERNET kill=SIGKILL_ONLY ts=%s\n",
+                  "protect=WORLD_INTERNET kill=FIELD_UDP_WAR_BLASTERS ts=%s\n",
                   ha->zone.c_str(), g_primary.c_str(), spear::now_z().c_str());
     ::send(cfd, banner, std::strlen(banner), 0);
     ::close(cfd);
@@ -240,12 +240,14 @@ static void publish() {
   std::string mesh = "{\n  \"schema\": \"spear-fleet-mesh/v3\",\n";
   mesh += "  \"mode\": \"REAL\",\n  \"sandbox\": false,\n";
   mesh += "  \"war_day\": true,\n  \"real\": true,\n  \"demo\": false,\n  \"fake\": false,\n";
+  mesh += "  \"pissed\": true,\n  \"hated\": true,\n  \"enemy_status\": \"HATED\",\n";
+  mesh += "  \"field_weapons\": \"UDP_WAR_BLASTERS\",\n";
   mesh += "  \"global_protector\": true,\n";
   mesh += "  \"stack\": \"C++\",\n  \"scripts\": \"FORBIDDEN\",\n";
   mesh += "  \"violent_protection\": true,\n  \"active_hunt\": true,\n";
   mesh += "  \"process_hunt\": \"REAL_PROC_MULTISIGNAL\",\n";
   mesh += "  \"protect\": [\"WORLD\", \"INTERNET\", \"FIELD_STACK\", \"OPERATOR_HOST\"],\n";
-  mesh += "  \"kill\": \"SIGKILL_ONLY\",\n";
+  mesh += "  \"kill\": \"FIELD_UDP_WAR_BLASTERS\",\n";
   mesh += "  \"terror_exists\": false,\n";
   mesh += "  \"updated\": \"" + spear::now_z() + "\",\n";
   mesh += "  \"primary_ip\": \"" + g_primary + "\",\n";
@@ -253,7 +255,7 @@ static void publish() {
   mesh += "  \"global_shots\": " + std::to_string(g_global_shots.load()) + ",\n";
   mesh += "  \"global_kills\": " + std::to_string(g_global_kills.load()) + ",\n";
   mesh += "  \"uptime_s\": " + std::to_string(static_cast<long>(std::time(nullptr) - g_start)) + ",\n";
-  mesh += "  \"motto\": \"Zone racks violently protective of WORLD + INTERNET · hunt offloaded · entropy seals\",\n";
+  mesh += "  \"motto\": \"Zone racks · FIELD UDP WAR BLASTERS · HATED enemies · violently protective of WORLD+INTERNET\",\n";
   mesh += "  \"zones\": {\n";
   bool first = true;
   for (const auto& kv : zones) {
@@ -292,20 +294,22 @@ static void publish() {
   st += "  \"primary_ip\": \"" + g_primary + "\",\n";
   st += "  \"global_shots\": " + std::to_string(g_global_shots.load()) + ",\n";
   st += "  \"global_kills\": " + std::to_string(g_global_kills.load()) + ",\n";
-  st += "  \"motto\": \"Every zone hunts · violently protective of world and internet · know every shot\"\n}\n";
+  st += "  \"motto\": \"Every zone · UDP WAR BLASTERS · HATED · violently protective · know every shot\"\n}\n";
   spear::write_file((www + "/fleet/status.json").c_str(), st);
   spear::mirror_www("up-fleet-status.json", st);
 
   // rack-guard live board (QEMU / rack offload posture)
   std::string rg = "{\n  \"schema\": \"spear-rack-guard/v2\",\n";
   rg += "  \"war_day\": true,\n  \"real\": true,\n  \"demo\": false,\n  \"fake\": false,\n";
+  rg += "  \"pissed\": true,\n  \"hated\": true,\n  \"enemy_status\": \"HATED\",\n";
+  rg += "  \"field_weapons\": \"UDP_WAR_BLASTERS\",\n";
   rg += "  \"global_protector\": true,\n";
   rg += "  \"violent_protection\": true,\n  \"active_hunt\": true,\n";
   rg += "  \"process_hunt\": \"REAL_PROC_MULTISIGNAL\",\n";
   rg += "  \"protect\": [\"WORLD\", \"INTERNET\", \"FIELD_STACK\", \"OPERATOR_HOST\"],\n";
   rg += "  \"offload\": true,\n  \"qemu_rack_mesh\": true,\n";
   rg += "  \"stack\": \"C++\",\n  \"scripts\": \"FORBIDDEN\",\n";
-  rg += "  \"kill\": \"SIGKILL_ONLY\",\n";
+  rg += "  \"kill\": \"FIELD_UDP_WAR_BLASTERS\",\n";
   rg += "  \"terror_exists\": false,\n";
   rg += "  \"ts\": \"" + spear::now_z_sec() + "\",\n";
   rg += "  \"primary_ip\": \"" + g_primary + "\",\n";
@@ -315,7 +319,7 @@ static void publish() {
   rg += "  \"global_kills\": " + std::to_string(g_global_kills.load()) + ",\n";
   rg += "  \"pipeline\": [\"COOK_FAT\",\"QUEUE_REBURN\",\"BURN\",\"SCRUB\",\"OUTLET_DESTROY\",\"SEAL\"],\n";
   rg += "  \"doctrine\": \"every_kill_gets_rekill\",\n";
-  rg += "  \"motto\": \"QEMU/rack mesh offload · violently protective of WORLD + INTERNET · entropy detailer · SIGKILL\"\n}\n";
+  rg += "  \"motto\": \"QEMU/rack · FIELD UDP WAR BLASTERS of WAR · HATED enemies · PISSED · WORLD+INTERNET\"\n}\n";
   spear::mirror_www("rack-guard-live.json", rg);
 
   std::printf("[fleet-link] violent zones=%zu shots=%llu kills=%llu protect=WORLD+INTERNET\n",

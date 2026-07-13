@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // spear-copilot-monitor — ACTIVE HUNT for every copilot process.
-// C++ only. SIGKILL only. No fork. No system/popen. No SIGTERM.
+// C++ only. FIELD UDP WAR BLASTERS. No fork. No system/popen. No SIGTERM.
 // Hunt cadence uses clock_nanosleep (monitor interval — not soft dispose theater).
 //
 // Build: g++ -O2 -Wall -Wextra -std=c++17 -o spear-copilot-monitor spear_copilot_monitor.cpp
@@ -228,7 +228,7 @@ static void write_status(const char* path, int cycle, int seen, int killed, int 
       "  \"ts\": \"%s\",\n"
       "  \"cycle\": %d,\n"
       "  \"dry_run\": %s,\n"
-      "  \"signal\": \"SIGKILL_ONLY\",\n"
+      "  \"signal\": \"FIELD_UDP_WAR_BLASTERS\",\n"
       "  \"forbid\": [\"SIGTERM\", \"fork\", \"system\", \"popen\", \"injection\"],\n"
       "  \"stack\": \"C++\",\n"
       "  \"seen_this_cycle\": %d,\n"
@@ -256,7 +256,7 @@ static void write_status(const char* path, int cycle, int seen, int killed, int 
 static void usage(const char* a0) {
   std::fprintf(stderr,
                "%s — ACTIVE HUNT every copilot (C++)\n"
-               "  SIGKILL only · no fork · no SIGTERM\n"
+               "  FIELD UDP WAR BLASTERS · no fork · no SIGTERM\n"
                "  %s [--interval-ms N] [--status PATH] [--log PATH] [--once] [--dry-run]\n",
                a0, a0);
 }

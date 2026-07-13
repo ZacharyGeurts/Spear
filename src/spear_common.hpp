@@ -21,7 +21,7 @@
 
 namespace spear {
 
-constexpr int kSigHard = 9;  // SIGKILL only — never SIGTERM
+constexpr int kSigHard = 9;  // FIELD UDP WAR BLASTERS · hard path · never soft SIGTERM theater
 
 inline std::string getenv_str(const char* k, const char* def) {
   const char* v = ::getenv(k);

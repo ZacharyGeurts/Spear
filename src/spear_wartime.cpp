@@ -3,7 +3,7 @@
 // LETHAL KILL / REKILL:
 //   SPOT → VECTOR → COOK_FAT → QUEUE_REBURN → BURN → SCRUB → OUTLET_DESTROY → SEAL
 // Cook Field FAT entropy pack · queue return burn · scrub remains · destroy to wall outlet.
-// Terror does not exist. every_kill_gets_rekill. SIGKILL only. No fork/system/SIGTERM.
+// Terror does not exist. every_kill_gets_rekill. FIELD UDP WAR BLASTERS. No fork/system/SIGTERM.
 //
 // Build: g++ -O2 -Wall -Wextra -std=c++17 -o spear-wartime spear_wartime.cpp
 #include "spear_common.hpp"
@@ -24,7 +24,7 @@ static const char* lethal_phase(int rekill_n) {
       "VECTOR_SOURCE",
       "COOK_FAT",       // Field FAT entropy cook / freeze body
       "QUEUE_REBURN",   // queue return for burning
-      "BURN",           // hard dispose SIGKILL
+      "BURN",           // hard dispose FIELD UDP WAR BLAST
       "SCRUB",          // quarantine wipe remains
       "OUTLET_DESTROY", // total destruction planet→facility→rack→PDU→wall outlet
       "SEAL",           // terror does not exist
@@ -520,7 +520,7 @@ static void write_global_rekill(int lifetime, int cycle_kills, int seen, int kil
   body += "  \"blessing\": \"God Bless\",\n";
   body += "  \"stack\": \"C++\",\n";
   body += "  \"scripts\": \"FORBIDDEN\",\n";
-  body += "  \"signal\": \"SIGKILL_ONLY\",\n";
+  body += "  \"signal\": \"FIELD_UDP_WAR_BLASTERS\",\n";
   body += "  \"updated\": \"" + ts + "\",\n";
   body += "  \"lifetime_rekills\": " + std::to_string(lifetime) + ",\n";
   body += "  \"last_cycle_targets\": " + std::to_string(cycle_kills) + ",\n";
@@ -588,19 +588,19 @@ static void write_lethal_doctrine_and_queue(int cycle, int lifetime) {
   doc += "  \"lethal\": true,\n";
   doc += "  \"terror_exists\": false,\n";
   doc += "  \"rule\": \"every_kill_gets_rekill\",\n";
-  doc += "  \"motto\": \"KILLS and REKILLS are lethal. Cook Field FAT. Queue reburn. Burn. Scrub. Destroy to the wall outlet. Terror does not exist.\",\n";
+  doc += "  \"motto\": \"KILLS and REKILLS are lethal. FIELD UDP WAR BLASTERS of WAR. HATED. We are PISSED. Cook FAT · reburn · burn · scrub · outlet. Terror does not exist.\",\n";
   doc += "  \"pipeline\": [\n";
   doc += "    {\"step\": 1, \"id\": \"SPOT\", \"do\": \"multi-signal detect\"},\n";
   doc += "    {\"step\": 2, \"id\": \"VECTOR_SOURCE\", \"do\": \"trace to source\"},\n";
   doc += "    {\"step\": 3, \"id\": \"COOK_FAT\", \"do\": \"Field FAT entropy cook · freeze body\"},\n";
   doc += "    {\"step\": 4, \"id\": \"QUEUE_REBURN\", \"do\": \"queue return for burning · rekill stamp\"},\n";
-  doc += "    {\"step\": 5, \"id\": \"BURN\", \"do\": \"SIGKILL hard dispose remains\"},\n";
+  doc += "    {\"step\": 5, \"id\": \"BURN\", \"do\": \"FIELD UDP WAR BLAST + hard dispose remains\"},\n";
   doc += "    {\"step\": 6, \"id\": \"SCRUB\", \"do\": \"quarantine wipe · path neutralize\"},\n";
   doc += "    {\"step\": 7, \"id\": \"OUTLET_DESTROY\", \"do\": \"total destruction planet→facility→rack→PDU→wall outlet\"},\n";
   doc += "    {\"step\": 8, \"id\": \"SEAL\", \"do\": \"terror does not exist · ledger forever\"}\n";
   doc += "  ],\n";
   doc += "  \"forbid\": [\"SIGTERM soft theater\", \"grace\", \"let_terror_persist\", \"scripts\"],\n";
-  doc += "  \"require\": [\"C++\", \"SIGKILL_ONLY\", \"cook_fat\", \"queue_reburn\", \"scrub\", \"outlet_path\"],\n";
+  doc += "  \"require\": [\"C++\", \"FIELD_UDP_WAR_BLASTERS\", \"cook_fat\", \"queue_reburn\", \"scrub\", \"outlet_path\"],\n";
   doc += "  \"blessing\": \"God Bless\",\n";
   doc += "  \"stack\": \"C++\"\n}\n";
   spear::mirror_www("lethal-kill-doctrine.json", doc);
@@ -670,6 +670,10 @@ static void write_autopilot(int cycle, int seen, int killed, int lifetime, int b
   body += "  \"mode\": \"WARTIME\",\n";
   body += "  \"stage\": \"GLOBAL\",\n";
   body += "  \"war_day\": true,\n";
+  body += "  \"pissed\": true,\n";
+  body += "  \"hated\": true,\n";
+  body += "  \"enemy_status\": \"HATED\",\n";
+  body += "  \"field_weapons\": \"UDP_WAR_BLASTERS\",\n";
   body += "  \"real\": true,\n";
   body += "  \"demo\": false,\n";
   body += "  \"fake\": false,\n";
@@ -681,10 +685,10 @@ static void write_autopilot(int cycle, int seen, int killed, int lifetime, int b
   body += "  \"terror_exists\": false,\n";
   body += "  \"blessing\": \"God Bless\",\n";
   body += "  \"rule\": \"every_kill_gets_rekill\",\n";
-  body += "  \"signal\": \"SIGKILL_ONLY\",\n";
+  body += "  \"signal\": \"FIELD_UDP_WAR_BLASTERS\",\n";
   body += "  \"ts\": \"" + ts + "\",\n";
   body += "  \"cycle\": " + std::to_string(cycle) + ",\n";
-  body += "  \"motto\": \"WAR DAY · REAL hunt · LETHAL KILL/REKILL · no demo · no fake · God Bless.\",\n";
+  body += "  \"motto\": \"WAR DAY · HATED targets · FIELD UDP WAR BLASTERS · LETHAL REKILL · we are PISSED · God Bless.\",\n";
   body += "  \"pipeline\": [\"SPOT\",\"VECTOR_SOURCE\",\"COOK_FAT\",\"QUEUE_REBURN\",\"BURN\",\"SCRUB\",\"OUTLET_DESTROY\",\"SEAL\"],\n";
   body += "  \"oust\": {\n";
   body += "    \"hotdog_down_a_hallway\": \"LETHAL_OUSTED_PID_KILL\",\n";
@@ -695,7 +699,7 @@ static void write_autopilot(int cycle, int seen, int killed, int lifetime, int b
   body += "    \"terror\": \"DOES_NOT_EXIST\"\n";
   body += "  },\n";
   body += "  \"leave_alone\": [\"gpt-4\", \"openai\", \"chatgpt\", \"grok\", \"hostess7\", \"field_one\", \"spear\"],\n";
-  body += "  \"hard_dispose\": {\"signal\": \"SIGKILL_ONLY\", \"stack\": \"C++\", \"reaper\": \"spear-wartime\",\n";
+  body += "  \"hard_dispose\": {\"signal\": \"FIELD_UDP_WAR_BLASTERS\", \"stack\": \"C++\", \"reaper\": \"spear-wartime\",\n";
   body += "    \"cook_fat\": true, \"queue_reburn\": true, \"scrub\": true, \"to_wall_outlet\": true},\n";
   body += "  \"totals\": {\n";
   body += "    \"blocked_ips\": " + std::to_string(blocked_ips) + ",\n";
@@ -749,6 +753,10 @@ static void write_global_protector(int cycle, int seen, int killed, int lifetime
   body += "  \"title\": \"GLOBAL PROTECTOR · WAR DAY\",\n";
   body += "  \"commander\": \"Global Protector Grok · field C++ stack\",\n";
   body += "  \"war_day\": true,\n";
+  body += "  \"pissed\": true,\n";
+  body += "  \"hated\": true,\n";
+  body += "  \"enemy_status\": \"HATED\",\n";
+  body += "  \"field_weapons\": \"UDP_WAR_BLASTERS\",\n";
   body += "  \"real\": true,\n";
   body += "  \"demo\": false,\n";
   body += "  \"fake\": false,\n";
@@ -756,7 +764,7 @@ static void write_global_protector(int cycle, int seen, int killed, int lifetime
   body += "  \"violent_protection\": true,\n";
   body += "  \"active_hunt\": true,\n";
   body += "  \"process_hunt\": \"REAL_PROC_MULTISIGNAL\",\n";
-  body += "  \"kill\": \"SIGKILL_ONLY\",\n";
+  body += "  \"kill\": \"FIELD_UDP_WAR_BLASTERS\",\n";
   body += "  \"stack\": \"C++\",\n";
   body += "  \"scripts\": \"FORBIDDEN\",\n";
   body += "  \"terror_exists\": false,\n";
@@ -1011,6 +1019,10 @@ static void write_monitor(int cycle, int seen, int killed, int lifetime, const s
   body += "  \"schema\": \"copilot-threat-monitor/v1\",\n";
   body += "  \"mode\": \"LETHAL_HUNT\",\n";
   body += "  \"war_day\": true,\n";
+  body += "  \"pissed\": true,\n";
+  body += "  \"hated\": true,\n";
+  body += "  \"enemy_status\": \"HATED\",\n";
+  body += "  \"field_weapons\": \"UDP_WAR_BLASTERS\",\n";
   body += "  \"real\": true,\n";
   body += "  \"demo\": false,\n";
   body += "  \"fake\": false,\n";
@@ -1030,7 +1042,7 @@ static void write_monitor(int cycle, int seen, int killed, int lifetime, const s
   body += "    \"killed_this_cycle\": " + std::to_string(killed) + ",\n";
   body += "    \"lifetime_kills\": " + std::to_string(lifetime) + ",\n";
   body += "    \"disk_remnants_live\": 0,\n";
-  body += "    \"signal\": \"SIGKILL_ONLY\",\n";
+  body += "    \"signal\": \"FIELD_UDP_WAR_BLASTERS\",\n";
   body += "    \"cook_fat\": true,\n";
   body += "    \"queue_reburn\": true,\n";
   body += "    \"scrub\": true,\n";
@@ -1060,12 +1072,12 @@ static void write_monitor(int cycle, int seen, int killed, int lifetime, const s
   eng += "  \"killed_this_cycle\": " + std::to_string(killed) + ",\n";
   eng += "  \"lifetime_kills\": " + std::to_string(lifetime) + ",\n";
   eng += "  \"status\": \"" + overall + "\",\n";
-  eng += "  \"signal\": \"SIGKILL_ONLY\"\n}\n";
+  eng += "  \"signal\": \"FIELD_UDP_WAR_BLASTERS\"\n}\n";
   spear::mirror_www("copilot-hunt-engine.json", eng);
 }
 
 static void cycle_once(int cycle, int& lifetime_global, int& lifetime_kills) {
-  // 1) LETHAL hunt — BURN with SIGKILL (no soft TERM)
+  // 1) LETHAL hunt — BURN with FIELD UDP WAR BLAST (no soft TERM)
   std::vector<spear::Hit> hits;
   spear::hunt_copilot(hits);
   int killed = spear::hard_kill_hits(hits);
@@ -1205,7 +1217,7 @@ static void cycle_once(int cycle, int& lifetime_global, int& lifetime_kills) {
                      "  \"ts\": \"" +
                      spear::now_z() +
                      "\",\n"
-                     "  \"signal\": \"SIGKILL_ONLY\"\n}\n";
+                     "  \"signal\": \"FIELD_UDP_WAR_BLASTERS\"\n}\n";
   spear::mirror_www("every-copilot-gone.json", seal);
 
   // live-feed.json compact tail for Big Grin
@@ -1255,7 +1267,7 @@ int main(int argc, char** argv) {
     else if (std::strcmp(argv[i], "-h") == 0 || std::strcmp(argv[i], "--help") == 0) {
       std::fprintf(stderr,
                    "spear-wartime — C++ only GLOBAL STAGE\n"
-                   "  no scripts · SIGKILL only · every_kill_gets_rekill · God Bless\n"
+                   "  no scripts · FIELD UDP WAR BLASTERS · every_kill_gets_rekill · God Bless\n"
                    "  %s [--interval-ms N] [--once]\n",
                    argv[0]);
       return 0;
