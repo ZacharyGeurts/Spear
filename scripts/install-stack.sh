@@ -21,6 +21,7 @@ BINS=(
   spear-hard-dispose
   spear-kill-copilot
   spear-copilot-monitor
+  field-nvtop
 )
 
 mkdir -p "$OVER" "$LIB" "$SHARE" "$HOME/.local/bin"
@@ -29,6 +30,12 @@ for b in "${BINS[@]}"; do
   [[ -x "$SRC/$b" ]] || { echo "missing $SRC/$b"; exit 1; }
   install -m 0755 "$SRC/$b" "$OVER/$b"
   install -m 0755 "$SRC/$b" "$HOME/.local/bin/$b"
+done
+
+# AMOURANTHRTX GPU top aliases (take over nvtop / nv-top)
+for a in nv-top nvtop field-gpu amouranthrtx-gpu; do
+  ln -sfn field-nvtop "$OVER/$a"
+  ln -sfn "$HOME/.local/bin/field-nvtop" "$HOME/.local/bin/$a"
 done
 
 # spear primary may need setuid on real install (optional)

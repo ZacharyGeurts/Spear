@@ -8,7 +8,9 @@ CORE_HDRS = spear_ffat.hpp spear_elevate.hpp spear_field1.hpp spear_chip.hpp spe
 
 .PHONY: all clean install wartime field
 
-all: spear spear-hard-dispose spear-copilot-monitor spear-wartime spear-kill-copilot spear-www spear-planet spear-export spear-fleet-link
+FIELD_TOOLS = field-nvtop
+
+all: spear spear-hard-dispose spear-copilot-monitor spear-wartime spear-kill-copilot spear-www spear-planet spear-export spear-fleet-link $(FIELD_TOOLS)
 
 spear: $(CORE_SRCS) $(CORE_HDRS)
 	$(CXX) $(CXXFLAGS) -o $@ $(CORE_SRCS) -lm
@@ -37,17 +39,23 @@ spear-export: spear_export.cpp spear_common.hpp
 spear-fleet-link: spear_fleet_link.cpp spear_common.hpp
 	$(CXX) $(CXXFLAGS) -o $@ spear_fleet_link.cpp -lpthread
 
+field-nvtop: field_nvtop.cpp spear_common.hpp
+	$(CXX) $(CXXFLAGS) -o $@ field_nvtop.cpp -lpthread
+
 wartime: spear-wartime spear-kill-copilot spear-hard-dispose spear-www spear-planet spear-export spear-fleet-link
 field: all
 
 install: all
-	install -m 0755 spear-hard-dispose spear-copilot-monitor spear-wartime spear-kill-copilot spear-www spear-planet spear-export spear-fleet-link \
+	install -m 0755 spear-hard-dispose spear-copilot-monitor spear-wartime spear-kill-copilot spear-www spear-planet spear-export spear-fleet-link field-nvtop \
 	  $(HOME)/.local/bin/ 2>/dev/null || true
-	install -m 0755 spear-hard-dispose spear-copilot-monitor spear-wartime spear-kill-copilot spear-www spear-planet spear-export spear-fleet-link \
+	install -m 0755 spear-hard-dispose spear-copilot-monitor spear-wartime spear-kill-copilot spear-www spear-planet spear-export spear-fleet-link field-nvtop \
 	  /home/zachary/Desktop/SG/Spear/overlay/usr/local/bin/ 2>/dev/null || true
 	-install -m 0755 spear /usr/local/bin/spear 2>/dev/null || true
 	ln -sfn $(HOME)/.local/bin/spear-planet $(HOME)/.local/bin/spear-planet-live 2>/dev/null || true
 	ln -sfn $(HOME)/.local/bin/spear-fleet-link $(HOME)/.local/bin/spear-rack-guard 2>/dev/null || true
+	ln -sfn $(HOME)/.local/bin/field-nvtop $(HOME)/.local/bin/nv-top 2>/dev/null || true
+	ln -sfn $(HOME)/.local/bin/field-nvtop $(HOME)/.local/bin/nvtop 2>/dev/null || true
+	ln -sfn $(HOME)/.local/bin/field-nvtop $(HOME)/.local/bin/field-gpu 2>/dev/null || true
 
 clean:
-	rm -f spear spear-hard-dispose spear-copilot-monitor spear-wartime spear-kill-copilot spear-www spear-planet spear-export spear-fleet-link
+	rm -f spear spear-hard-dispose spear-copilot-monitor spear-wartime spear-kill-copilot spear-www spear-planet spear-export spear-fleet-link field-nvtop

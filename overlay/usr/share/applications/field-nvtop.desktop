@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=AMOURANTHRTX GPU (field-nvtop)
+Comment=Field GPU top — AMD · NVIDIA · Intel
+Exec=field-terminal -e field-nvtop
+Icon=utilities-system-monitor
+Terminal=false
+Categories=System;Monitor;
