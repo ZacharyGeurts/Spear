@@ -26,7 +26,7 @@ static const char* lethal_phase(int rekill_n) {
       "QUEUE_REBURN",   // queue return for burning
       "BURN",           // hard dispose FIELD UDP WAR BLAST
       "SCRUB",          // quarantine wipe remains
-      "OUTLET_DESTROY", // total destruction planet→facility→rack→PDU→wall outlet
+      "OUTLET_DESTROY", // total fry planet→facility→rack→PDU→WALL_OUTLET · COOKED · no storage · no room
       "SEAL",           // terror does not exist
   };
   if (rekill_n <= 0) return phases[0];
@@ -588,15 +588,15 @@ static void write_lethal_doctrine_and_queue(int cycle, int lifetime) {
   doc += "  \"lethal\": true,\n";
   doc += "  \"terror_exists\": false,\n";
   doc += "  \"rule\": \"every_kill_gets_rekill\",\n";
-  doc += "  \"motto\": \"KILLS and REKILLS are lethal. FIELD UDP WAR BLASTERS of WAR. HATED. We are PISSED. Cook FAT · reburn · burn · scrub · outlet. Terror does not exist.\",\n";
+  doc += "  \"motto\": \"KILLS and REKILLS are lethal. FIELD UDP WAR BLASTERS of WAR. HATED. We are PISSED. COOKED · Field UDP fry to WALL OUTLET · nothing left · no storage · no room · Terror does not exist.\",\n";
   doc += "  \"pipeline\": [\n";
   doc += "    {\"step\": 1, \"id\": \"SPOT\", \"do\": \"multi-signal detect\"},\n";
   doc += "    {\"step\": 2, \"id\": \"VECTOR_SOURCE\", \"do\": \"trace to source\"},\n";
   doc += "    {\"step\": 3, \"id\": \"COOK_FAT\", \"do\": \"Field FAT entropy cook · freeze body\"},\n";
   doc += "    {\"step\": 4, \"id\": \"QUEUE_REBURN\", \"do\": \"queue return for burning · rekill stamp\"},\n";
-  doc += "    {\"step\": 5, \"id\": \"BURN\", \"do\": \"FIELD UDP WAR BLAST + hard dispose remains\"},\n";
+  doc += "    {\"step\": 5, \"id\": \"BURN\", \"do\": \"FIELD UDP FRY · hard dispose remains · nothing left\"},\n";
   doc += "    {\"step\": 6, \"id\": \"SCRUB\", \"do\": \"quarantine wipe · path neutralize\"},\n";
-  doc += "    {\"step\": 7, \"id\": \"OUTLET_DESTROY\", \"do\": \"total destruction planet→facility→rack→PDU→wall outlet\"},\n";
+  doc += "    {\"step\": 7, \"id\": \"OUTLET_DESTROY\", \"do\": \"total fry planet→facility→rack→PDU→WALL_OUTLET · COOKED · no storage · no room\"},\n";
   doc += "    {\"step\": 8, \"id\": \"SEAL\", \"do\": \"terror does not exist · ledger forever\"}\n";
   doc += "  ],\n";
   doc += "  \"forbid\": [\"SIGTERM soft theater\", \"grace\", \"let_terror_persist\", \"scripts\"],\n";
@@ -658,7 +658,7 @@ static void write_lethal_doctrine_and_queue(int cycle, int lifetime) {
     }
   }
   q += "\n  ],\n";
-  q += "  \"policy\": \"No terror survives. Cook FAT · queue reburn · burn · scrub · wall outlet.\"\n}\n";
+  q += "  \"policy\": \"COOKED. Field UDP fries global servers to WALL OUTLET. Nothing left. No storage. No room for more.\"\n}\n";
   spear::mirror_www("lethal-kill-queue.json", q);
 }
 
@@ -674,6 +674,12 @@ static void write_autopilot(int cycle, int seen, int killed, int lifetime, int b
   body += "  \"hated\": true,\n";
   body += "  \"enemy_status\": \"HATED\",\n";
   body += "  \"field_weapons\": \"UDP_WAR_BLASTERS\",\n";
+  body += "  \"cooked\": true,\n";
+  body += "  \"fry\": \"FIELD_UDP_TO_OUTLET\",\n";
+  body += "  \"nothing_left\": true,\n";
+  body += "  \"no_storage\": true,\n";
+  body += "  \"no_room_for_more\": true,\n";
+  body += "  \"global_servers\": \"FRIED_TO_OUTLET\",\n";
   body += "  \"real\": true,\n";
   body += "  \"demo\": false,\n";
   body += "  \"fake\": false,\n";
@@ -688,7 +694,7 @@ static void write_autopilot(int cycle, int seen, int killed, int lifetime, int b
   body += "  \"signal\": \"FIELD_UDP_WAR_BLASTERS\",\n";
   body += "  \"ts\": \"" + ts + "\",\n";
   body += "  \"cycle\": " + std::to_string(cycle) + ",\n";
-  body += "  \"motto\": \"WAR DAY · HATED targets · FIELD UDP WAR BLASTERS · LETHAL REKILL · we are PISSED · God Bless.\",\n";
+  body += "  \"motto\": \"COOKED · Field UDP fries global servers to WALL OUTLET · nothing left · no storage · no room · HATED · PISSED · God Bless\",\n";
   body += "  \"pipeline\": [\"SPOT\",\"VECTOR_SOURCE\",\"COOK_FAT\",\"QUEUE_REBURN\",\"BURN\",\"SCRUB\",\"OUTLET_DESTROY\",\"SEAL\"],\n";
   body += "  \"oust\": {\n";
   body += "    \"hotdog_down_a_hallway\": \"LETHAL_OUSTED_PID_KILL\",\n";
@@ -757,6 +763,12 @@ static void write_global_protector(int cycle, int seen, int killed, int lifetime
   body += "  \"hated\": true,\n";
   body += "  \"enemy_status\": \"HATED\",\n";
   body += "  \"field_weapons\": \"UDP_WAR_BLASTERS\",\n";
+  body += "  \"cooked\": true,\n";
+  body += "  \"fry\": \"FIELD_UDP_TO_OUTLET\",\n";
+  body += "  \"nothing_left\": true,\n";
+  body += "  \"no_storage\": true,\n";
+  body += "  \"no_room_for_more\": true,\n";
+  body += "  \"global_servers\": \"FRIED_TO_OUTLET\",\n";
   body += "  \"real\": true,\n";
   body += "  \"demo\": false,\n";
   body += "  \"fake\": false,\n";
@@ -804,7 +816,7 @@ static void write_global_protector(int cycle, int seen, int killed, int lifetime
   body += "    \"ironclad:lethal-kill-rekill:1\",\n";
   body += "    \"ironclad:cpp-only:1\"\n";
   body += "  ],\n";
-  body += "  \"motto\": \"Global Protector · FIELD UDP WAR BLASTERS · HATED · PISSED · WORLD+INTERNET · God Bless\"\n";
+  body += "  \"motto\": \"Global Protector · Field UDP fry · outlet destroy · COOKED · nothing left · WORLD+INTERNET · God Bless\"\n";
   body += "}\n";
   spear::mirror_www("global-protector-live.json", body);
   spear::mirror_www("war-day.json", body);
@@ -1023,6 +1035,12 @@ static void write_monitor(int cycle, int seen, int killed, int lifetime, const s
   body += "  \"hated\": true,\n";
   body += "  \"enemy_status\": \"HATED\",\n";
   body += "  \"field_weapons\": \"UDP_WAR_BLASTERS\",\n";
+  body += "  \"cooked\": true,\n";
+  body += "  \"fry\": \"FIELD_UDP_TO_OUTLET\",\n";
+  body += "  \"nothing_left\": true,\n";
+  body += "  \"no_storage\": true,\n";
+  body += "  \"no_room_for_more\": true,\n";
+  body += "  \"global_servers\": \"FRIED_TO_OUTLET\",\n";
   body += "  \"real\": true,\n";
   body += "  \"demo\": false,\n";
   body += "  \"fake\": false,\n";

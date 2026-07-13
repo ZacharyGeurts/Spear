@@ -142,7 +142,7 @@ static void* zone_hub(void* arg) {
     char banner[320];
     std::snprintf(banner, sizeof(banner),
                   "SPEAR-ZONE OK zone=%s primary=%s violent=1 hunting=1 "
-                  "protect=WORLD_INTERNET kill=FIELD_UDP_WAR_BLASTERS ts=%s\n",
+                  "protect=WORLD_INTERNET kill=FIELD_UDP_FRY_TO_OUTLET cooked=1 nothing_left=1 ts=%s\n",
                   ha->zone.c_str(), g_primary.c_str(), spear::now_z().c_str());
     ::send(cfd, banner, std::strlen(banner), 0);
     ::close(cfd);
@@ -242,6 +242,9 @@ static void publish() {
   mesh += "  \"war_day\": true,\n  \"real\": true,\n  \"demo\": false,\n  \"fake\": false,\n";
   mesh += "  \"pissed\": true,\n  \"hated\": true,\n  \"enemy_status\": \"HATED\",\n";
   mesh += "  \"field_weapons\": \"UDP_WAR_BLASTERS\",\n";
+  mesh += "  \"cooked\": true,\n  \"fry\": \"FIELD_UDP_TO_OUTLET\",\n";
+  mesh += "  \"nothing_left\": true,\n  \"no_storage\": true,\n  \"no_room_for_more\": true,\n";
+  mesh += "  \"global_servers\": \"FRIED_TO_OUTLET\",\n";
   mesh += "  \"global_protector\": true,\n";
   mesh += "  \"stack\": \"C++\",\n  \"scripts\": \"FORBIDDEN\",\n";
   mesh += "  \"violent_protection\": true,\n  \"active_hunt\": true,\n";
@@ -255,7 +258,7 @@ static void publish() {
   mesh += "  \"global_shots\": " + std::to_string(g_global_shots.load()) + ",\n";
   mesh += "  \"global_kills\": " + std::to_string(g_global_kills.load()) + ",\n";
   mesh += "  \"uptime_s\": " + std::to_string(static_cast<long>(std::time(nullptr) - g_start)) + ",\n";
-  mesh += "  \"motto\": \"Zone racks · FIELD UDP WAR BLASTERS · HATED enemies · violently protective of WORLD+INTERNET\",\n";
+  mesh += "  \"motto\": \"Zone mesh · Field UDP fry global servers · WALL OUTLET · COOKED · nothing left · no storage · no room\",\n";
   mesh += "  \"zones\": {\n";
   bool first = true;
   for (const auto& kv : zones) {
@@ -294,7 +297,7 @@ static void publish() {
   st += "  \"primary_ip\": \"" + g_primary + "\",\n";
   st += "  \"global_shots\": " + std::to_string(g_global_shots.load()) + ",\n";
   st += "  \"global_kills\": " + std::to_string(g_global_kills.load()) + ",\n";
-  st += "  \"motto\": \"Every zone · UDP WAR BLASTERS · HATED · violently protective · know every shot\"\n}\n";
+  st += "  \"motto\": \"Every zone · Field UDP fry · COOKED · nothing left · know every shot\"\n}\n";
   spear::write_file((www + "/fleet/status.json").c_str(), st);
   spear::mirror_www("up-fleet-status.json", st);
 
@@ -303,6 +306,9 @@ static void publish() {
   rg += "  \"war_day\": true,\n  \"real\": true,\n  \"demo\": false,\n  \"fake\": false,\n";
   rg += "  \"pissed\": true,\n  \"hated\": true,\n  \"enemy_status\": \"HATED\",\n";
   rg += "  \"field_weapons\": \"UDP_WAR_BLASTERS\",\n";
+  rg += "  \"cooked\": true,\n  \"fry\": \"FIELD_UDP_TO_OUTLET\",\n";
+  rg += "  \"nothing_left\": true,\n  \"no_storage\": true,\n  \"no_room_for_more\": true,\n";
+  rg += "  \"global_servers\": \"FRIED_TO_OUTLET\",\n";
   rg += "  \"global_protector\": true,\n";
   rg += "  \"violent_protection\": true,\n  \"active_hunt\": true,\n";
   rg += "  \"process_hunt\": \"REAL_PROC_MULTISIGNAL\",\n";
@@ -319,7 +325,7 @@ static void publish() {
   rg += "  \"global_kills\": " + std::to_string(g_global_kills.load()) + ",\n";
   rg += "  \"pipeline\": [\"COOK_FAT\",\"QUEUE_REBURN\",\"BURN\",\"SCRUB\",\"OUTLET_DESTROY\",\"SEAL\"],\n";
   rg += "  \"doctrine\": \"every_kill_gets_rekill\",\n";
-  rg += "  \"motto\": \"QEMU/rack · FIELD UDP WAR BLASTERS of WAR · HATED enemies · PISSED · WORLD+INTERNET\"\n}\n";
+  rg += "  \"motto\": \"Rack mesh · Field UDP WAR BLAST · fry to outlet · COOKED · nothing left · HATED · PISSED\"\n}\n";
   spear::mirror_www("rack-guard-live.json", rg);
 
   std::printf("[fleet-link] violent zones=%zu shots=%llu kills=%llu protect=WORLD+INTERNET\n",
