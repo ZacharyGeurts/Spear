@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -483,6 +484,29 @@ inline std::string binary_seal(const std::string& path) {
   return hex;
 }
 
+// IPv4 dotted form only — known targets, never fathom
+inline bool is_ipv4(const std::string& s) {
+  if (s.empty() || s.size() > 15) return false;
+  int dots = 0, num = -1, segs = 0;
+  for (size_t i = 0; i < s.size(); ++i) {
+    char c = s[i];
+    if (c >= '0' && c <= '9') {
+      if (num < 0) num = 0;
+      num = num * 10 + (c - '0');
+      if (num > 255) return false;
+    } else if (c == '.') {
+      if (num < 0) return false;
+      ++dots;
+      ++segs;
+      num = -1;
+      if (dots > 3) return false;
+    } else
+      return false;
+  }
+  if (num < 0 || dots != 3) return false;
+  return true;
+}
+
 // Ensure foreign DNS IP block list always contains war-critical hooks
 inline int ensure_blocked_ips() {
   const char* ips[] = {
@@ -499,6 +523,165 @@ inline int ensure_blocked_ips() {
     }
   }
   return added;
+}
+
+// Harvest KNOWN IPs only from kill-dossiers (target / gps) — no guess / no fathom
+inline int harvest_known_dossier_ips(std::vector<std::string>& out) {
+  std::string body = read_file((www_dir() + "/kill-dossiers.json").c_str(), 32 << 20);
+  if (body.empty()) body = read_file((state_dir() + "/kill-dossiers.json").c_str(), 32 << 20);
+  if (body.empty()) return 0;
+  int n = 0;
+  // "target": "x.x.x.x"
+  size_t p = 0;
+  while ((p = body.find("\"target\"", p)) != std::string::npos) {
+    p = body.find(':', p);
+    if (p == std::string::npos) break;
+    ++p;
+    while (p < body.size() && (body[p] == ' ' || body[p] == '\t')) ++p;
+    if (p >= body.size() || body[p] != '"') continue;
+    ++p;
+    size_t e = body.find('"', p);
+    if (e == std::string::npos) break;
+    std::string t = body.substr(p, e - p);
+    if (is_ipv4(t)) {
+      bool seen = false;
+      for (const auto& x : out)
+        if (x == t) {
+          seen = true;
+          break;
+        }
+      if (!seen) {
+        out.push_back(t);
+        ++n;
+      }
+    }
+    p = e + 1;
+  }
+  return n;
+}
+
+// Network KILL/REKILL — DROP known IPs only. We know our shots; we do not fathom else.
+// FIELD_UDP_WAR_BLASTERS doctrine: hard path + sealed board. Applies nft/iptables when present.
+inline int network_rekill_known(int cycle, int& out_ips, int& out_rules) {
+  out_ips = 0;
+  out_rules = 0;
+  ensure_blocked_ips();
+  std::vector<std::string> ips;
+  harvest_known_dossier_ips(ips);
+  // also load blocked-ips.txt (already-known set)
+  {
+    std::string body = read_file((state_dir() + "/blocked-ips.txt").c_str());
+    std::string ip;
+    for (size_t i = 0; i <= body.size(); ++i) {
+      char c = (i < body.size()) ? body[i] : '\n';
+      if (c == '\n' || c == '\r') {
+        while (!ip.empty() && (ip.back() == ' ' || ip.back() == '\t')) ip.pop_back();
+        if (!ip.empty() && ip[0] != '#' && is_ipv4(ip)) {
+          bool seen = false;
+          for (const auto& x : ips)
+            if (x == ip) {
+              seen = true;
+              break;
+            }
+          if (!seen) ips.push_back(ip);
+        }
+        ip.clear();
+      } else
+        ip.push_back(c);
+    }
+  }
+  // merge harvest back into blocked-ips (known only)
+  {
+    std::string path = state_dir() + "/blocked-ips.txt";
+    std::string body = read_file(path.c_str());
+    for (const auto& ip : ips) {
+      if (!contains(body, ip.c_str())) {
+        append_file(path.c_str(), ip + "\n");
+        body += ip + "\n";
+      }
+    }
+  }
+  out_ips = static_cast<int>(ips.size());
+
+  // nft ruleset (apply when nft present — C++ spawn, not shell script product)
+  std::string nft = "#!/usr/sbin/nft -f\n# spear network rekill · KNOWN ONLY · no fathom\n"
+                    "table inet spear_field_rekill {\n"
+                    "  set hostile {\n    type ipv4_addr\n    flags interval\n    elements = { ";
+  for (size_t i = 0; i < ips.size(); ++i) {
+    if (i) nft += ", ";
+    nft += ips[i];
+  }
+  if (ips.empty()) nft += "127.0.0.1";  // empty set placeholder never used if no ips
+  nft += " }\n  }\n"
+         "  chain input {\n    type filter hook input priority 0; policy accept;\n"
+         "    ip saddr @hostile drop\n  }\n"
+         "  chain output {\n    type filter hook output priority 0; policy accept;\n"
+         "    ip daddr @hostile drop\n  }\n"
+         "  chain forward {\n    type filter hook forward priority 0; policy accept;\n"
+         "    ip saddr @hostile drop\n    ip daddr @hostile drop\n  }\n"
+         "}\n";
+  write_file((state_dir() + "/network-rekill.nft").c_str(), nft);
+  write_file((www_dir() + "/network-rekill.nft").c_str(), nft);
+
+  // iptables-restore style (legacy)
+  std::string ipt = "*filter\n:SPEAR_REKILL - [0:0]\n";
+  ipt += "-F SPEAR_REKILL\n";
+  for (const auto& ip : ips) {
+    ipt += "-A SPEAR_REKILL -s " + ip + " -j DROP\n";
+    ipt += "-A SPEAR_REKILL -d " + ip + " -j DROP\n";
+    ++out_rules;
+  }
+  ipt += "COMMIT\n";
+  write_file((state_dir() + "/network-rekill.iptables").c_str(), ipt);
+
+  // Try apply (best-effort; needs root). No shell script product path.
+  auto try_exec = [](const char* path, const char* arg1, const char* arg2) -> bool {
+    if (::access(path, X_OK) != 0) return false;
+    pid_t pid = ::fork();
+    if (pid == 0) {
+      if (arg2)
+        ::execl(path, path, arg1, arg2, static_cast<char*>(nullptr));
+      else
+        ::execl(path, path, arg1, static_cast<char*>(nullptr));
+      _exit(127);
+    }
+    if (pid < 0) return false;
+    int st = 0;
+    ::waitpid(pid, &st, 0);
+    return WIFEXITED(st) && WEXITSTATUS(st) == 0;
+  };
+  bool applied = false;
+  std::string nftpath = state_dir() + "/network-rekill.nft";
+  if (try_exec("/usr/sbin/nft", "-f", nftpath.c_str())) applied = true;
+  else if (try_exec("/sbin/nft", "-f", nftpath.c_str())) applied = true;
+
+  // Sealed board — KNOW our network shots
+  std::string board = "{\n  \"schema\": \"network-rekill-live/v1\",\n";
+  board += "  \"title\": \"KILL REKILL with network · known only · no fathom\",\n";
+  board += "  \"signal\": \"FIELD_UDP_WAR_BLASTERS\",\n";
+  board += "  \"mode\": \"KNOWN_OR_SHOTS\",\n";
+  board += "  \"fathom\": false,\n";
+  board += "  \"heuristic_guess\": false,\n";
+  board += "  \"certain\": true,\n";
+  board += "  \"cycle\": " + std::to_string(cycle) + ",\n";
+  board += "  \"known_ips\": " + std::to_string(out_ips) + ",\n";
+  board += "  \"drop_rules\": " + std::to_string(out_rules) + ",\n";
+  board += "  \"nft_applied\": " + std::string(applied ? "true" : "false") + ",\n";
+  board += "  \"stack\": \"C++\",\n";
+  board += "  \"ts\": \"" + now_z_sec() + "\",\n";
+  board += "  \"motto\": \"We know or shots — we do not fathom else · KILL REKILL · God Bless\",\n";
+  board += "  \"ips\": [\n";
+  for (size_t i = 0; i < ips.size() && i < 64; ++i) {
+    Shot s = make_shot(std::string("net-") + ips[i], ips[i], "NETWORK_KNOWN", "OUTLET_DESTROY",
+                       "FIELD_UDP_WAR_BLASTERS", std::string("NET-DROP-") + ips[i], cycle);
+    if (i) board += ",\n";
+    board += "    {\"ip\":\"" + ips[i] + "\",\"seal\":\"" + s.seal_hex + "\",\"shannon_h\":" +
+             std::to_string(s.shannon_h) + ",\"know_shot\":true,\"action\":\"DROP\"}";
+  }
+  board += "\n  ]\n}\n";
+  mirror_www("network-rekill-live.json", board);
+  write_file((state_dir() + "/network-rekill-live.json").c_str(), board);
+  return out_ips;
 }
 
 // Rewrite copilot cloud block hosts every cycle (null-route surface list)

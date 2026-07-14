@@ -1185,6 +1185,23 @@ static void cycle_once(int cycle, int& lifetime_global, int& lifetime_kills) {
   int esc_total = 0, esc_dead = 0, esc_rekills = 0;
   escalate_kill_dossiers(cycle, esc_total, esc_dead, esc_rekills);
 
+  // 5) NETWORK KILL/REKILL — known IPs + shots only · never fathom else
+  int net_ips = 0, net_rules = 0;
+  spear::network_rekill_known(cycle, net_ips, net_rules);
+  {
+    char line[512];
+    std::snprintf(line, sizeof(line),
+                  "{\"schema\":\"field-attack/v1\",\"attack\":\"FIELD_UDP_WAR_BLASTERS\","
+                  "\"phase\":\"OUTLET_DESTROY\",\"fleet\":\"network\",\"stage\":\"GLOBAL\","
+                  "\"lethal\":true,\"target_type\":\"network\",\"target\":\"KNOWN_IPS\","
+                  "\"vector\":\"NETWORK_REKILL\",\"severity\":\"lethal\","
+                  "\"reason\":\"know_or_shots_no_fathom\",\"known_ips\":%d,\"drop_rules\":%d,"
+                  "\"fathom\":false,\"know_shot\":true,\"terror_exists\":false,"
+                  "\"blessing\":\"God Bless\",\"stack\":\"C++\",\"ts\":\"%s\"}",
+                  net_ips, net_rules, spear::now_z().c_str());
+    emit_live(line);
+  }
+
   write_global_rekill(lifetime_global, cycle_targets, static_cast<int>(hits.size()), killed);
   write_lethal_doctrine_and_queue(cycle, lifetime_global);
   write_angel();
@@ -1266,9 +1283,9 @@ static void cycle_once(int cycle, int& lifetime_global, int& lifetime_kills) {
 
   spear::ServiceMatrix sm = spear::probe_service_matrix();
   std::printf("[ESCALATE] cycle=%d hunt=%zu burned=%d rekill=%d dossiers_dead=%d/%d rekill_stamps=%d "
-              "posture=%s zones=%d terror=false\n",
-              cycle, hits.size(), killed, lifetime_global, esc_dead, esc_total, esc_rekills,
-              sm.all_critical ? "FULL_WAR" : "DEGRADED", sm.zones_up);
+              "net_ips=%d net_rules=%d posture=%s zones=%d terror=false KNOW_OR_SHOTS\n",
+              cycle, hits.size(), killed, lifetime_global, esc_dead, esc_total, esc_rekills, net_ips,
+              net_rules, sm.all_critical ? "FULL_WAR" : "DEGRADED", sm.zones_up);
   std::fflush(stdout);
 }
 
