@@ -1,0 +1,23 @@
+{
+  "schema": "spear-field-product/v1",
+  "product": "Spear Field",
+  "version": "22.3.3-field-product",
+  "kind": "field_boot_iso",
+  "underlay": "none",
+  "casper": false,
+  "mint": false,
+  "qemu_required": false,
+  "like_test_boot_drive": true,
+  "field1": "attach CLAIMED FIELD1 or Create Field Drive entry",
+  "iso": "/tmp/Spear-gh/out/spear-field-22.3.3-field-product-20260713.iso",
+  "iso_bytes":   File: /tmp/Spear-gh/out/spear-field-22.3.3-field-product-20260713.iso
+  Size: 18874368
+  Mode: -rw-rw-r-- (664)
+  Uid: 1000  Gid: 1000,
+  "iso_sha256": "464f9548410c01592798b1c93f1d5370c4e7c7dbc9e224aef5ae0a9b07dd06f2",
+  "kernel": "/tmp/Spear-gh/out/vmlinuz",
+  "initrd": "/tmp/Spear-gh/out/initramfs.cpio.gz",
+  "entries": ["Field","Normal","Create Field Drive","War","Debug"],
+  "built_at": "2026-07-14T00:36Z",
+  "motto": "Stack is Field boot · not Mint underlay · God Bless"
+}

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Spear — Field product OS · wartime C++ · FFAT</title>
+  <meta name="description" content="Spear — full stack to the OS. Field product ISO (no Mint underlay), FFAT field storage, Field Memory, wartime C++ swallows and LIVE_PLANET. God Bless." />
+  <meta name="theme-color" content="#0a0c12" />
+  <meta name="author" content="ZacharyGeurts · Spear field stack" />
+  <link rel="canonical" href="https://zacharygeurts.github.io/Spear/" />
+  <meta property="og:title" content="Spear — Field product OS" />
+  <meta property="og:description" content="Field product ISO · FFAT · wartime C++ · stack of record. No Mint underlay." />
+  <meta property="og:url" content="https://zacharygeurts.github.io/Spear/" />
+  <meta property="og:type" content="website" />
+  <link rel="stylesheet" href="releases.css" />
+</head>
+<body>
+  <header class="hero">
+    <p class="kicker">ZacharyGeurts · field stack</p>
+    <h1>Spear</h1>
+    <p class="lede">
+      Full stack to the OS · wartime C++ · field storage · LIVE_PLANET · ISO release.
+      <strong>Stack of record.</strong> Field product boot — not Mint underlay.
+    </p>
+    <p class="meta">
+      Latest <code>v22.3.3-field-product</code>
+      · ~18 MiB Field ISO
+      · casper <strong>off</strong>
+      · mint underlay <strong>off</strong>
+    </p>
+    <nav class="actions">
+      <a class="btn primary" href="https://github.com/ZacharyGeurts/Spear/releases/tag/v22.3.3-field-product">Download ISO</a>
+      <a class="btn" href="https://github.com/ZacharyGeurts/Spear">GitHub</a>
+      <a class="btn" href="https://github.com/ZacharyGeurts/Spear/wiki">Wiki</a>
+      <a class="btn" href="releases.html">Releases · SHA-256</a>
+    </nav>
+  </header>
+
+  <section>
+    <h2>What you get</h2>
+    <table>
+      <thead>
+        <tr><th>Layer</th><th>Role</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Field product ISO</strong></td><td>kernel + initrd + isolinux · <code>make product</code> · test-drive path</td></tr>
+        <tr><td><strong>FFAT / Field1</strong></td><td>SPEARMBR · type <code>0xE0</code> · CHIPs Field Die · never fake ×N</td></tr>
+        <tr><td><strong>Field Memory</strong></td><td>sparse map + PAK over DRAM/VRAM — field-logical memory</td></tr>
+        <tr><td><strong>Autoelevate</strong></td><td>setuid <code>spear</code> allowlist — no polkit theater</td></tr>
+        <tr><td><strong>Field tools</strong></td><td><code>fieldbox</code> · field-obs · field-gimp · field-nvtop</td></tr>
+        <tr><td><strong>Wartime C++</strong></td><td>swallows · fleet mesh · LIVE_PLANET · loopback decks</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Quick start</h2>
+    <pre><code>git clone https://github.com/ZacharyGeurts/Spear.git
+cd Spear
+make product
+# → out/spear-field-latest.iso · field-product-receipt.json</code></pre>
+    <p class="meta">Boot entries: <strong>Field</strong> (default) · Normal · Create Field Drive · War · Debug</p>
+  </section>
+
+  <section>
+    <h2>Boot entries</h2>
+    <table>
+      <thead>
+        <tr><th>Entry</th><th>Intent</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Field</strong></td><td>Fast multi-user Field path (default)</td></tr>
+        <tr><td>Normal</td><td>Full Field path</td></tr>
+        <tr><td>Create Field Drive</td><td>Claim FFAT Field1</td></tr>
+        <tr><td>War</td><td>Max harden mitigations</td></tr>
+        <tr><td>Debug</td><td>Verbose serial audit</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Doctrine (short)</h2>
+    <ul>
+      <li><strong>Field Fat ≠ FAT16/FAT32.</strong> Do not <code>mount -t vfat</code>.</li>
+      <li>Every boot line is <strong>speed + harden</strong>.</li>
+      <li><strong>We know or shots — we do not fathom else.</strong></li>
+      <li>Public KILROY archives are gone. Spear is the product path.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Sibling surfaces</h2>
+    <nav>
+      <a href="https://zacharygeurts.github.io/Hostess7/">Hostess7</a>
+      <a href="https://zacharygeurts.github.io/Big_Grin_Terrorist_Hunter/">Big Grin Terrorist Hunter</a>
+      <a href="https://zacharygeurts.github.io/AmmoOS/">AmmoOS</a>
+      <a href="https://zacharygeurts.github.io/AmmoCode/">AmmoCode</a>
+      <a href="https://zacharygeurts.github.io/Field_Research/">Field Research</a>
+      <a href="https://github.com/ZacharyGeurts">@ZacharyGeurts</a>
+    </nav>
+  </section>
+
+  <footer>
+    <p>God Bless. Enjoy life.</p>
+    <p class="meta">
+      <a href="https://github.com/ZacharyGeurts/Spear">github.com/ZacharyGeurts/Spear</a>
+      ·
+      <a href="https://github.com/ZacharyGeurts/Spear/wiki">Wiki</a>
+      ·
+      <a href="releases.html">Release assets</a>
+    </p>
+  </footer>
+</body>
+</html>

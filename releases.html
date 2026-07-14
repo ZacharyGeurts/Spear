@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spear Releases — SHA-256</title>
+  <meta name="description" content="Spear release assets and SHA-256 checksums." />
+  <meta name="theme-color" content="#0a0c12" />
+  <link rel="canonical" href="https://zacharygeurts.github.io/Spear/releases.html" />
+  <link rel="stylesheet" href="releases.css" />
+</head>
+<body>
+  <nav>
+    <a href="index.html">← Spear home</a>
+    <a href="https://github.com/ZacharyGeurts/Spear/releases">GitHub Releases</a>
+    <a href="https://github.com/ZacharyGeurts/Spear/wiki">Wiki</a>
+  </nav>
+
+  <h1>Spear Releases</h1>
+  <p class="meta">Product path first. Verify ISO hashes before boot.</p>
+
+  <h2>
+    <span class="badge">latest</span>
+    v22.3.3-field-product
+  </h2>
+  <p class="meta">
+    Field product ISO — test-drive stack (no Mint underlay) · built 2026-07-14 ·
+    <a href="https://github.com/ZacharyGeurts/Spear/releases/tag/v22.3.3-field-product">release page</a>
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Asset</th>
+        <th class="num">Size</th>
+        <th>SHA-256</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a href="https://github.com/ZacharyGeurts/Spear/releases/download/v22.3.3-field-product/spear-field-22.3.3-field-product-20260713.iso">
+            spear-field-22.3.3-field-product-20260713.iso
+          </a>
+        </td>
+        <td class="num">18.0 MiB</td>
+        <td class="sha">464f9548410c01592798b1c93f1d5370c4e7c7dbc9e224aef5ae0a9b07dd06f2</td>
+      </tr>
+      <tr>
+        <td>
+          <a href="https://github.com/ZacharyGeurts/Spear/releases/download/v22.3.3-field-product/field-product-receipt.json">
+            field-product-receipt.json
+          </a>
+        </td>
+        <td class="num">891 B</td>
+        <td class="meta">receipt · entries Field/Normal/Create Field Drive/War/Debug</td>
+      </tr>
+      <tr>
+        <td>
+          <a href="https://github.com/ZacharyGeurts/Spear/releases/download/v22.3.3-field-product/spear-field.iso.sha256">
+            spear-field.iso.sha256
+          </a>
+        </td>
+        <td class="num">112 B</td>
+        <td class="meta">checksum file from release</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <pre><code>sha256sum -c spear-field.iso.sha256
+# or:
+echo '464f9548410c01592798b1c93f1d5370c4e7c7dbc9e224aef5ae0a9b07dd06f2  spear-field-22.3.3-field-product-20260713.iso' | sha256sum -c -</code></pre>
+
+  <h2>v22.3.2-field-lean</h2>
+  <p class="meta">
+    First lean casper-class ISO path ·
+    <a href="https://github.com/ZacharyGeurts/Spear/releases/tag/v22.3.2-field-lean">release page</a>
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Asset</th>
+        <th class="num">Size</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <a href="https://github.com/ZacharyGeurts/Spear/releases/download/v22.3.2-field-lean/spear-22.3.2-field-lean-cinnamon-64bit-20260713.iso">
+            spear-22.3.2-field-lean-cinnamon-64bit-20260713.iso
+          </a>
+        </td>
+        <td class="num">~1.73 GiB</td>
+        <td>lean cinnamon live · not Field product of record</td>
+      </tr>
+      <tr>
+        <td>
+          <a href="https://github.com/ZacharyGeurts/Spear/releases/download/v22.3.2-field-lean/spear-22.3.2-field-lean.iso.sha256">
+            spear-22.3.2-field-lean.iso.sha256
+          </a>
+        </td>
+        <td class="num">136 B</td>
+        <td>checksum file</td>
+      </tr>
+      <tr>
+        <td>
+          <a href="https://github.com/ZacharyGeurts/Spear/releases/download/v22.3.2-field-lean/release-receipt.json">
+            release-receipt.json
+          </a>
+        </td>
+        <td class="num">712 B</td>
+        <td>build receipt</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Product vs lean</h2>
+  <table>
+    <thead>
+      <tr><th>Track</th><th>Stack of record?</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>field-product</strong></td>
+        <td>Yes</td>
+        <td>no casper · no Mint underlay · ~18 MiB Field boot</td>
+      </tr>
+      <tr>
+        <td>field-lean</td>
+        <td>No (utility)</td>
+        <td>casper-class live utility path</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <footer>
+    <p>God Bless.</p>
+    <p class="meta"><a href="index.html">← back to Spear home</a></p>
+  </footer>
+</body>
+</html>
