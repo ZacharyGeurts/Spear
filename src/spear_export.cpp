@@ -289,12 +289,34 @@ static std::string extract_array(const std::string& j, const char* key) {
 
 }  // namespace
 
+static bool copy_file(const std::string& src, const std::string& dst) {
+  std::string body = spear::read_file(src.c_str(), 64 << 20);
+  if (body.empty() && ::access(src.c_str(), F_OK) != 0) return false;
+  spear::mkdir_p(dst.substr(0, dst.find_last_of('/')));
+  return spear::write_file(dst.c_str(), body);
+}
+
 int main(int argc, char** argv) {
   std::string www = spear::www_dir();
   std::string outdir = www + "/export";
+  std::string pages;  // optional Big Grin GH Pages tree
   for (int i = 1; i < argc; ++i) {
     if (std::strcmp(argv[i], "--root") == 0 && i + 1 < argc) www = argv[++i];
     else if (std::strcmp(argv[i], "--out") == 0 && i + 1 < argc) outdir = argv[++i];
+    else if (std::strcmp(argv[i], "--pages") == 0 && i + 1 < argc) pages = argv[++i];
+  }
+  // default Pages publish tree when present
+  if (pages.empty()) {
+    const char* cand[] = {
+        "/tmp/Big_Grin_Terrorist_Hunter",
+        "/home/zachary/Desktop/SG/Big_Grin_Terrorist_Hunter",
+        nullptr};
+    for (int i = 0; cand[i]; ++i) {
+      if (::access((std::string(cand[i]) + "/index.html").c_str(), F_OK) == 0) {
+        pages = cand[i];
+        break;
+      }
+    }
   }
   spear::mkdir_p(outdir);
 
@@ -465,6 +487,51 @@ int main(int argc, char** argv) {
   spear::write_file((www + "/export/big-grin-swallows.xlsx").c_str(), xlsx);
   spear::write_file((www + "/export/big-grin-swallows.ods").c_str(), ods);
   spear::write_file((www + "/export/big-grin-swallows-global.csv").c_str(), csv);
+
+  // Publish to Big Grin GH Pages tree (live dossiers + clean export only)
+  if (!pages.empty()) {
+    spear::mkdir_p(pages + "/data");
+    spear::mkdir_p(pages + "/export");
+    // dossiers live pack
+    copy_file(www + "/kill-dossiers.json", pages + "/data/kill-dossiers.json");
+    copy_file(www + "/kill-dossiers.json", pages + "/data/dossiers.json");
+    const char* live_files[] = {
+        "wartime-status.json",       "wartime-rekill-state.json", "planet-live.json",
+        "fleet-mesh-live.json",      "global-protector-live.json","rack-guard-live.json",
+        "live-feed.json",            "threat-catalog.json",       "copilot-global-rekill.json",
+        "copilot-threat-monitor.json","angel-seal-status.json",   "world-dns-dhcp-status.json",
+        "doctrine.json",             "history-recent.json",       "eaten-set.json",
+        "lethal-kill-queue.json",    "lethal-kill-doctrine.json", "entropy-detailer.json",
+        "shots-ledger.json",         "shot-certainty-live.json",  "shot-certainty.json",
+        "surface-audit.json",        "war-day.json",              "operator-gps.json",
+        "autopilot.json",            "kill-escalate.json",        nullptr};
+    for (int i = 0; live_files[i]; ++i) {
+      copy_file(www + "/" + live_files[i], pages + "/data/" + live_files[i]);
+      // also flat name status.json from wartime
+    }
+    copy_file(www + "/wartime-status.json", pages + "/data/status.json");
+    if (::access((www + "/fleet/status.json").c_str(), F_OK) == 0)
+      copy_file(www + "/fleet/status.json", pages + "/data/fleet-status.json");
+    if (::access((www + "/fleet/index.json").c_str(), F_OK) == 0)
+      copy_file(www + "/fleet/index.json", pages + "/data/regions.json");
+    // exports — only the four clean artifacts the deck links
+    copy_file(outdir + "/big-grin-swallows-global.csv", pages + "/export/big-grin-swallows-global.csv");
+    copy_file(outdir + "/big-grin-swallows-global.json", pages + "/export/big-grin-swallows-global.json");
+    copy_file(outdir + "/big-grin-swallows.xlsx", pages + "/export/big-grin-swallows.xlsx");
+    copy_file(outdir + "/big-grin-swallows.ods", pages + "/export/big-grin-swallows.ods");
+    // receipt for Pages
+    long kill_n = json_long_field(killsj, "count", 0);
+    if (kill_n <= 0) kill_n = static_cast<long>(extract_objects(extract_array(killsj, "kills")).size());
+    long dead_n = json_long_field(killsj, "dead", kill_n);
+    std::string rec = "{\n  \"schema\": \"big-grin-pages-publish/v1\",\n  \"ts\": \"" + spear::now_z() +
+                      "\",\n  \"stack\": \"C++\",\n  \"dossiers\": " + std::to_string(kill_n) +
+                      ",\n  \"dead\": " + std::to_string(dead_n) +
+                      ",\n  \"exports\": [\"csv\",\"json\",\"xlsx\",\"ods\"],\n"
+                      "  \"controls\": \"export_only\",\n  \"motto\": \"265 live · DEAD rekill · clean export · God Bless\"\n}\n";
+    spear::write_file((pages + "/data/pages-publish.json").c_str(), rec);
+    std::printf("spear-export published Pages → %s dossiers=%ld dead=%ld\n", pages.c_str(), kill_n,
+                dead_n);
+  }
 
   std::printf("spear-export wrote %s (xlsx %zu ods %zu csv %zu json %zu)\n", outdir.c_str(),
               xlsx.size(), ods.size(), csv.size(), global_json.size());
