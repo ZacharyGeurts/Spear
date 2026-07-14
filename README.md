@@ -38,15 +38,30 @@ Artifacts: `out/spear-latest.iso` · `out/release-receipt.json` · `out/initramf
 
 ---
 
+## Field Linux tools (we own the names)
+
+**C++ multicall** `fieldbox` (~100 KiB) + **field-nvtop** (AMOURANTHRTX GPU).  
+Ironclad floor · CHIPs Field Die · Grok16 field_opt.
+
+| You type | You get |
+|----------|---------|
+| `top` | Field process top |
+| `nvtop` / `nv-top` | AMOURANTHRTX GPU top (AMD/NVIDIA/Intel) |
+| `ls` `ps` `df` `free` `cat` … | Field applets (same ELF) |
+| `field help` | full applet list |
+| `field chips` · `spear chip-*` | CHIPs / Field Die |
+
+Docs: [FIELD-LINUX-TOOLS.md](docs/FIELD-LINUX-TOOLS.md) · [GROK16-FIELD-TOOLS.md](docs/GROK16-FIELD-TOOLS.md) · [FIELD-NVTOP.md](docs/FIELD-NVTOP.md)
+
 ## Layout
 
 ```text
-src/           C++ ELFs (spear, wartime, fleet-link, www, planet, …)
+src/           C++ ELFs (spear, fieldbox, field-nvtop, wartime, …)
 overlay/       OS identity + systemd + desktop + harden (live squashfs layer)
 boot/          limine product boot · init · initrd · QEMU helpers
 iso/           remaster pipeline (fetch · extract · apply · rebuild)
 data/          doctrine + iso-boot menus + shot-certainty
-docs/          BOOT-HARDEN · ISO-RELEASE · NO-ARCHIVES · library
+docs/          BOOT-HARDEN · ISO-RELEASE · Field tools · Grok16 notes
 ```
 
 ---

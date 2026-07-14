@@ -22,6 +22,7 @@ BINS=(
   spear-kill-copilot
   spear-copilot-monitor
   field-nvtop
+  fieldbox
 )
 
 mkdir -p "$OVER" "$LIB" "$SHARE" "$HOME/.local/bin"
@@ -32,10 +33,19 @@ for b in "${BINS[@]}"; do
   install -m 0755 "$SRC/$b" "$HOME/.local/bin/$b"
 done
 
-# AMOURANTHRTX GPU top aliases (take over nvtop / nv-top)
+# AMOURANTHRTX GPU top — we ARE nvtop / nv-top
 for a in nv-top nvtop field-gpu amouranthrtx-gpu; do
   ln -sfn field-nvtop "$OVER/$a"
   ln -sfn "$HOME/.local/bin/field-nvtop" "$HOME/.local/bin/$a"
+done
+
+# Field Linux multicall — we ARE top, ls, ps, …
+ln -sfn fieldbox "$OVER/field"
+ln -sfn "$HOME/.local/bin/fieldbox" "$HOME/.local/bin/field"
+for a in top ls ps df free cat uname id whoami hostname env clear pwd echo head wc which \
+         mkdir rm sleep kill stat uptime true false; do
+  ln -sfn fieldbox "$OVER/$a"
+  ln -sfn "$HOME/.local/bin/fieldbox" "$HOME/.local/bin/$a"
 done
 
 # spear primary may need setuid on real install (optional)
