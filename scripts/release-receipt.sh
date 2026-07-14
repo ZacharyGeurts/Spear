@@ -13,7 +13,7 @@ SHA=""
 SIZE=0
 if [[ -n "${ISO:-}" && -f "$ISO" ]]; then
   SHA=$(sha256sum "$ISO" | awk '{print $1}')
-  SIZE=$(stat -c%s "$ISO")
+  SIZE=$(/usr/bin/stat -c%s "$ISO" 2>/dev/null || wc -c <"$ISO")
 fi
 
 BINS=()

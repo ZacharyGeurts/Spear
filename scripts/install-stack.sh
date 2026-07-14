@@ -23,6 +23,8 @@ BINS=(
   spear-copilot-monitor
   field-nvtop
   fieldbox
+  field-obs
+  field-gimp
 )
 
 mkdir -p "$OVER" "$LIB" "$SHARE" "$HOME/.local/bin"
@@ -47,6 +49,34 @@ for a in top ls ps df free cat uname id whoami hostname env clear pwd echo head 
   ln -sfn fieldbox "$OVER/$a"
   ln -sfn "$HOME/.local/bin/fieldbox" "$HOME/.local/bin/$a"
 done
+# Fun Field rewrites — we ARE obs / gimp (not Electron/GTK piles)
+ln -sfn field-obs "$OVER/obs"
+ln -sfn field-gimp "$OVER/gimp"
+ln -sfn "$HOME/.local/bin/field-obs" "$HOME/.local/bin/obs"
+ln -sfn "$HOME/.local/bin/field-gimp" "$HOME/.local/bin/gimp"
+# desktops
+mkdir -p "$ROOT/overlay/usr/share/applications"
+cat >"$ROOT/overlay/usr/share/applications/field-obs.desktop" <<'E'
+[Desktop Entry]
+Type=Application
+Name=Field OBS
+Comment=Field capture · C++ · no Electron
+Exec=field-terminal -e field-obs status
+Icon=camera-video
+Terminal=false
+Categories=AudioVideo;Recorder;
+E
+cat >"$ROOT/overlay/usr/share/applications/field-gimp.desktop" <<'E'
+[Desktop Entry]
+Type=Application
+Name=Field GIMP
+Comment=Field image tools · C++ · PPM
+Exec=field-terminal -e field-gimp status
+Icon=multimedia-photo-viewer
+Terminal=false
+Categories=Graphics;
+E
+
 
 # spear primary may need setuid on real install (optional)
 if [[ -w /usr/local/bin ]]; then

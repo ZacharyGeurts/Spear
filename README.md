@@ -48,11 +48,13 @@ Ironclad floor · CHIPs Field Die · Grok16 field_opt.
 |----------|---------|
 | `top` | Field process top |
 | `nvtop` / `nv-top` | AMOURANTHRTX GPU top (AMD/NVIDIA/Intel) |
-| `ls` `ps` `df` `free` `cat` … | Field applets (same ELF) |
+| `obs` | **field-obs** — capture rewrite (no Electron) |
+| `gimp` | **field-gimp** — image rewrite (PPM · chips grade) |
+| `ls` `ps` `df` `free` `cat` … | Field applets (fieldbox multicall) |
 | `field help` | full applet list |
 | `field chips` · `spear chip-*` | CHIPs / Field Die |
 
-Docs: [FIELD-LINUX-TOOLS.md](docs/FIELD-LINUX-TOOLS.md) · [GROK16-FIELD-TOOLS.md](docs/GROK16-FIELD-TOOLS.md) · [FIELD-NVTOP.md](docs/FIELD-NVTOP.md)
+Docs: [FIELD-FUN-TOOLS.md](docs/FIELD-FUN-TOOLS.md) · [FIELD-LINUX-TOOLS.md](docs/FIELD-LINUX-TOOLS.md) · [FIELD-NVTOP.md](docs/FIELD-NVTOP.md)
 
 ## Layout
 

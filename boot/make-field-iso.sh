@@ -132,7 +132,7 @@ ln -sfn "$(basename "$ISO_OUT")" "$OUT/spear-field-latest.iso"
 # Prefer product ISO as spear-latest when building field product
 ln -sfn "$(basename "$ISO_OUT")" "$OUT/spear-latest.iso"
 
-BYTES=$(stat -c%s "$ISO_OUT" 2>/dev/null || wc -c <"$ISO_OUT")
+BYTES=$(/usr/bin/stat -c%s "$ISO_OUT" 2>/dev/null || wc -c <"$ISO_OUT")
 SHA=$(sha256sum "$ISO_OUT" | awk '{print $1}')
 echo "$SHA  $(basename "$ISO_OUT")" >"$OUT/spear-field.iso.sha256"
 python3 - "$OUT/field-product-receipt.json" "$VER" "$ISO_OUT" "$BYTES" "$SHA" "$KIMG" "$OUT/initramfs.cpio.gz" <<'PY'

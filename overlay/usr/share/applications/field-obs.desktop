@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Field OBS
+Comment=Field capture · C++ · no Electron
+Exec=field-terminal -e field-obs status
+Icon=camera-video
+Terminal=false
+Categories=AudioVideo;Recorder;

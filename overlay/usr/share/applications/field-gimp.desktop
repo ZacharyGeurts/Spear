@@ -1,7 +1,8 @@
 [Desktop Entry]
-Name=Field GIMP
-Exec=/usr/local/bin/field-gimp %U
-Icon=gimp
-Terminal=false
 Type=Application
+Name=Field GIMP
+Comment=Field image tools · C++ · PPM
+Exec=field-terminal -e field-gimp status
+Icon=multimedia-photo-viewer
+Terminal=false
 Categories=Graphics;

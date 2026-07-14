@@ -8,7 +8,7 @@ CORE_HDRS = spear_ffat.hpp spear_elevate.hpp spear_field1.hpp spear_chip.hpp spe
 
 .PHONY: all clean install wartime field
 
-FIELD_TOOLS = field-nvtop fieldbox
+FIELD_TOOLS = field-nvtop fieldbox field-obs field-gimp
 
 all: spear spear-hard-dispose spear-copilot-monitor spear-wartime spear-kill-copilot spear-www spear-planet spear-export spear-fleet-link $(FIELD_TOOLS)
 
@@ -45,13 +45,21 @@ field-nvtop: field_nvtop.cpp spear_common.hpp
 fieldbox: field_box.cpp spear_common.hpp
 	$(CXX) $(CXXFLAGS) -o $@ field_box.cpp
 
+field-obs: field_obs.cpp spear_common.hpp
+	$(CXX) $(CXXFLAGS) -o $@ field_obs.cpp
+
+field-gimp: field_gimp.cpp spear_common.hpp
+	$(CXX) $(CXXFLAGS) -o $@ field_gimp.cpp
+
 wartime: spear-wartime spear-kill-copilot spear-hard-dispose spear-www spear-planet spear-export spear-fleet-link
 field-all: all
 
 install: all
-	install -m 0755 spear-hard-dispose spear-copilot-monitor spear-wartime spear-kill-copilot spear-www spear-planet spear-export spear-fleet-link field-nvtop fieldbox \
+	install -m 0755 spear-hard-dispose spear-copilot-monitor spear-wartime spear-kill-copilot spear-www spear-planet spear-export spear-fleet-link \
+	  field-nvtop fieldbox field-obs field-gimp \
 	  $(HOME)/.local/bin/ 2>/dev/null || true
-	install -m 0755 spear-hard-dispose spear-copilot-monitor spear-wartime spear-kill-copilot spear-www spear-planet spear-export spear-fleet-link field-nvtop fieldbox \
+	install -m 0755 spear-hard-dispose spear-copilot-monitor spear-wartime spear-kill-copilot spear-www spear-planet spear-export spear-fleet-link \
+	  field-nvtop fieldbox field-obs field-gimp \
 	  /home/zachary/Desktop/SG/Spear/overlay/usr/local/bin/ 2>/dev/null || true
 	-install -m 0755 spear /usr/local/bin/spear 2>/dev/null || true
 	ln -sfn $(HOME)/.local/bin/spear-planet $(HOME)/.local/bin/spear-planet-live 2>/dev/null || true
@@ -60,6 +68,8 @@ install: all
 	ln -sfn $(HOME)/.local/bin/field-nvtop $(HOME)/.local/bin/nvtop 2>/dev/null || true
 	ln -sfn $(HOME)/.local/bin/field-nvtop $(HOME)/.local/bin/field-gpu 2>/dev/null || true
 	ln -sfn $(HOME)/.local/bin/fieldbox $(HOME)/.local/bin/field 2>/dev/null || true
+	ln -sfn $(HOME)/.local/bin/field-obs $(HOME)/.local/bin/obs 2>/dev/null || true
+	ln -sfn $(HOME)/.local/bin/field-gimp $(HOME)/.local/bin/gimp 2>/dev/null || true
 	# Own core names: top, ls, ps, …
 	for a in top ls ps df free cat uname id whoami hostname env clear pwd echo head wc which \
 	         mkdir rm sleep kill stat uptime true false; do \
@@ -67,4 +77,5 @@ install: all
 	done
 
 clean:
-	rm -f spear spear-hard-dispose spear-copilot-monitor spear-wartime spear-kill-copilot spear-www spear-planet spear-export spear-fleet-link field-nvtop fieldbox
+	rm -f spear spear-hard-dispose spear-copilot-monitor spear-wartime spear-kill-copilot spear-www spear-planet spear-export spear-fleet-link \
+	  field-nvtop fieldbox field-obs field-gimp
