@@ -504,7 +504,10 @@ int main(int argc, char** argv) {
         "lethal-kill-queue.json",    "lethal-kill-doctrine.json", "entropy-detailer.json",
         "shots-ledger.json",         "shot-certainty-live.json",  "shot-certainty.json",
         "surface-audit.json",        "war-day.json",              "operator-gps.json",
-        "autopilot.json",            "kill-escalate.json",        nullptr};
+        "autopilot.json",            "kill-escalate.json",
+        "target-grids.json",         "map-points.json",           "heuristics-gathered.json",
+        "grids-heuristics-summary.json", "network-rekill-live.json", "heuristics.tsv",
+        nullptr};
     for (int i = 0; live_files[i]; ++i) {
       copy_file(www + "/" + live_files[i], pages + "/data/" + live_files[i]);
       // also flat name status.json from wartime

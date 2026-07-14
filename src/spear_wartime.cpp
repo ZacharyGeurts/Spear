@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+#include <cmath>
 // spear-wartime — GLOBAL STAGE wartime loop. C++ only. No scripts.
 // LETHAL KILL / REKILL:
 //   SPOT → VECTOR → COOK_FAT → QUEUE_REBURN → BURN → SCRUB → OUTLET_DESTROY → SEAL
@@ -1094,6 +1095,285 @@ static void write_monitor(int cycle, int seen, int killed, int lifetime, const s
   spear::mirror_www("copilot-hunt-engine.json", eng);
 }
 
+// World targeting grids on known enemies + gather heuristics (no fathom)
+static void write_grids_and_heuristics(int cycle) {
+  constexpr int kCell = 10;  // degrees
+  std::string kd = spear::read_file((spear::www_dir() + "/kill-dossiers.json").c_str(), 32 << 20);
+  if (kd.empty()) kd = spear::read_file((spear::state_dir() + "/kill-dossiers.json").c_str(), 32 << 20);
+
+  struct Cell {
+    int ilat = 0, ilon = 0;
+    int n = 0, dead = 0, net = 0;
+    std::string sample_id, sample_target, city, country;
+    double lat_sum = 0, lon_sum = 0;
+  };
+  std::vector<Cell> cells;
+  auto find_cell = [&](int ilat, int ilon) -> Cell* {
+    for (auto& c : cells)
+      if (c.ilat == ilat && c.ilon == ilon) return &c;
+    return nullptr;
+  };
+
+  int pins = 0;
+  // scan kill objects for gps lat/lon
+  size_t p = 0;
+  while ((p = kd.find("\"lat\"", p)) != std::string::npos) {
+    // crude object window
+    size_t obj0 = kd.rfind('{', p);
+    size_t obj1 = kd.find('}', p);
+    if (obj0 == std::string::npos || obj1 == std::string::npos || obj1 <= obj0) {
+      ++p;
+      continue;
+    }
+    std::string o = kd.substr(obj0, obj1 - obj0 + 1);
+    auto grab_num = [&](const char* key) -> double {
+      std::string k = std::string("\"") + key + "\"";
+      size_t q = o.find(k);
+      if (q == std::string::npos) return 9999;
+      q = o.find(':', q);
+      if (q == std::string::npos) return 9999;
+      ++q;
+      while (q < o.size() && (o[q] == ' ' || o[q] == '\t')) ++q;
+      return std::strtod(o.c_str() + q, nullptr);
+    };
+    double lat = grab_num("lat");
+    double lon = grab_num("lon");
+    if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+      p = obj1 + 1;
+      continue;
+    }
+    // only count if looks like gps block (has city or isp nearby)
+    if (o.find("\"city\"") == std::string::npos && o.find("\"country\"") == std::string::npos &&
+        o.find("\"isp\"") == std::string::npos) {
+      p = obj1 + 1;
+      continue;
+    }
+    int ilat = static_cast<int>(std::floor(lat / kCell)) * kCell;
+    int ilon = static_cast<int>(std::floor(lon / kCell)) * kCell;
+    Cell* c = find_cell(ilat, ilon);
+    if (!c) {
+      cells.push_back({});
+      c = &cells.back();
+      c->ilat = ilat;
+      c->ilon = ilon;
+    }
+    c->n += 1;
+    c->lat_sum += lat;
+    c->lon_sum += lon;
+    if (o.find("\"dead\": true") != std::string::npos || o.find("\"status\": \"DEAD\"") != std::string::npos)
+      c->dead += 1;
+    if (c->sample_target.empty()) {
+      // target nearby in parent — climb for "target"
+      size_t tp = kd.rfind("\"target\"", obj0);
+      if (tp != std::string::npos && obj0 - tp < 800) {
+        size_t q = kd.find(':', tp);
+        if (q != std::string::npos) {
+          q = kd.find('"', q);
+          if (q != std::string::npos) {
+            size_t e = kd.find('"', q + 1);
+            if (e != std::string::npos) c->sample_target = kd.substr(q + 1, e - q - 1);
+          }
+        }
+      }
+    }
+    auto grab_str = [&](const char* key) -> std::string {
+      std::string k = std::string("\"") + key + "\"";
+      size_t q = o.find(k);
+      if (q == std::string::npos) return {};
+      q = o.find('"', o.find(':', q) + 1);
+      if (q == std::string::npos) return {};
+      size_t e = o.find('"', q + 1);
+      if (e == std::string::npos) return {};
+      return o.substr(q + 1, e - q - 1);
+    };
+    if (c->city.empty()) c->city = grab_str("city");
+    if (c->country.empty()) c->country = grab_str("country");
+    ++pins;
+    p = obj1 + 1;
+  }
+
+  // network known IPs get synthetic grid from geo if listed in network board
+  std::string net = spear::read_file((spear::www_dir() + "/network-rekill-live.json").c_str(), 1 << 20);
+
+  std::string gjson = "{\n  \"schema\": \"target-grids/v1\",\n";
+  gjson += "  \"title\": \"Grids on 'em · known GPS + network\",\n";
+  gjson += "  \"cell_deg\": " + std::to_string(kCell) + ",\n";
+  gjson += "  \"cycle\": " + std::to_string(cycle) + ",\n";
+  gjson += "  \"pins_gridded\": " + std::to_string(pins) + ",\n";
+  gjson += "  \"grid_count\": " + std::to_string(cells.size()) + ",\n";
+  gjson += "  \"fathom\": false,\n  \"know_shot\": true,\n";
+  gjson += "  \"stack\": \"C++\",\n";
+  gjson += "  \"ts\": \"" + spear::now_z_sec() + "\",\n";
+  gjson += "  \"motto\": \"Grids on known enemies only · shots sealed · God Bless\",\n";
+  gjson += "  \"grids\": [\n";
+  for (size_t i = 0; i < cells.size(); ++i) {
+    const Cell& c = cells[i];
+    double clat = c.n ? c.lat_sum / c.n : c.ilat + kCell / 2.0;
+    double clon = c.n ? c.lon_sum / c.n : c.ilon + kCell / 2.0;
+    char id[48];
+    std::snprintf(id, sizeof(id), "G:%c%02d%c%03d", c.ilat >= 0 ? 'N' : 'S', std::abs(c.ilat),
+                  c.ilon >= 0 ? 'E' : 'W', std::abs(c.ilon));
+    spear::Shot sh =
+        spear::make_shot(id, c.sample_target.empty() ? id : c.sample_target, "GRID_TARGET",
+                         "OUTLET_DESTROY", "FIELD_UDP_WAR_BLASTERS",
+                         std::string("GRID-") + id, c.dead + c.n);
+    if (i) gjson += ",\n";
+    gjson += "    {\"id\":\"";
+    gjson += id;
+    gjson += "\",\"ilat\":";
+    gjson += std::to_string(c.ilat);
+    gjson += ",\"ilon\":";
+    gjson += std::to_string(c.ilon);
+    gjson += ",\"lat\":";
+    gjson += std::to_string(clat);
+    gjson += ",\"lon\":";
+    gjson += std::to_string(clon);
+    gjson += ",\"count\":";
+    gjson += std::to_string(c.n);
+    gjson += ",\"dead\":";
+    gjson += std::to_string(c.dead);
+    gjson += ",\"city\":\"";
+    gjson += c.city;
+    gjson += "\",\"country\":\"";
+    gjson += c.country;
+    gjson += "\",\"target\":\"";
+    gjson += c.sample_target;
+    gjson += "\",\"seal\":\"";
+    gjson += sh.seal_hex;
+    gjson += "\",\"shannon_h\":";
+    gjson += std::to_string(sh.shannon_h);
+    gjson += ",\"know_shot\":true}";
+  }
+  gjson += "\n  ]\n}\n";
+  spear::mirror_www("target-grids.json", gjson);
+
+  // map-points for deck (fleet not included here — deck merges)
+  std::string mp = "{\n  \"schema\": \"map-points/v1\",\n  \"updated\": \"" + spear::now_z_sec() +
+                   "\",\n  \"grids\": " + std::to_string(cells.size()) +
+                   ",\n  \"points\": [\n";
+  for (size_t i = 0; i < cells.size(); ++i) {
+    const Cell& c = cells[i];
+    double clat = c.n ? c.lat_sum / c.n : c.ilat + 5.0;
+    double clon = c.n ? c.lon_sum / c.n : c.ilon + 5.0;
+    char id[48];
+    std::snprintf(id, sizeof(id), "G:%c%02d%c%03d", c.ilat >= 0 ? 'N' : 'S', std::abs(c.ilat),
+                  c.ilon >= 0 ? 'E' : 'W', std::abs(c.ilon));
+    if (i) mp += ",\n";
+    mp += "    {\"kind\":\"threat\",\"threat\":true,\"dead\":true,\"id\":\"";
+    mp += id;
+    mp += "\",\"name\":\"";
+    mp += id;
+    mp += "\",\"lat\":";
+    mp += std::to_string(clat);
+    mp += ",\"lon\":";
+    mp += std::to_string(clon);
+    mp += ",\"title\":\"GRID ";
+    mp += id;
+    mp += "\",\"subtitle\":\"";
+    mp += std::to_string(c.dead);
+    mp += "/";
+    mp += std::to_string(c.n);
+    mp += " DEAD · ";
+    mp += c.city;
+    mp += "\",\"tooltip\":\"Target grid ";
+    mp += id;
+    mp += "\\ncount=";
+    mp += std::to_string(c.n);
+    mp += " dead=";
+    mp += std::to_string(c.dead);
+    mp += "\\n";
+    mp += c.city;
+    mp += ", ";
+    mp += c.country;
+    mp += "\\nKNOW_OR_SHOTS · no fathom\"}";
+  }
+  mp += "\n  ]\n}\n";
+  spear::mirror_www("map-points.json", mp);
+
+  // Gather heuristics — TSV + built-in multi-signal names
+  std::string tsv = spear::read_file((spear::www_dir() + "/heuristics.tsv").c_str(), 1 << 20);
+  if (tsv.empty())
+    tsv = spear::read_file(
+        (spear::home_dir() + "/.local/share/spear/swallows/heuristics.tsv").c_str(), 1 << 20);
+  if (tsv.empty())
+    tsv = spear::read_file("/tmp/Spear-gh/overlay/usr/local/share/spear/swallows/heuristics.tsv",
+                           1 << 20);
+
+  std::string hjson = "{\n  \"schema\": \"heuristics-gathered/v1\",\n";
+  hjson += "  \"title\": \"Heuristics gathered · multi-signal hunt catalog\",\n";
+  hjson += "  \"cycle\": " + std::to_string(cycle) + ",\n";
+  hjson += "  \"stack\": \"C++\",\n";
+  hjson += "  \"fathom\": false,\n";
+  hjson += "  \"policy\": \"score>=3 multi-signal · readers protected · leave-alone AI\",\n";
+  hjson += "  \"ts\": \"" + spear::now_z_sec() + "\",\n";
+  hjson += "  \"builtin_signals\": [\n";
+  const char* builtins[] = {
+      "copilot_process", "hotdog_hallway", "crypto_miner", "reverse_shell", "pipe_dropper",
+      "foreign_dns_hook", "rogue_listener", "spawn_storm", nullptr};
+  for (int i = 0; builtins[i]; ++i) {
+    if (i) hjson += ",\n";
+    hjson += "    {\"id\":\"";
+    hjson += builtins[i];
+    hjson += "\",\"source\":\"spear_common_hunt\",\"certain\":true}";
+  }
+  hjson += "\n  ],\n  \"rows\": [\n";
+  int rows = 0;
+  std::string line;
+  for (size_t i = 0; i <= tsv.size(); ++i) {
+    char c = (i < tsv.size()) ? tsv[i] : '\n';
+    if (c == '\n' || c == '\r') {
+      if (!line.empty() && line[0] != '#') {
+        // pattern \t points \t note
+        size_t t1 = line.find('\t');
+        size_t t2 = t1 == std::string::npos ? std::string::npos : line.find('\t', t1 + 1);
+        std::string pat = t1 == std::string::npos ? line : line.substr(0, t1);
+        std::string pts = (t1 != std::string::npos && t2 != std::string::npos)
+                              ? line.substr(t1 + 1, t2 - t1 - 1)
+                              : "0";
+        std::string note = t2 == std::string::npos ? "" : line.substr(t2 + 1);
+        auto esc = [](std::string s) {
+          std::string o;
+          for (char ch : s) {
+            if (ch == '"' || ch == '\\') o.push_back('\\');
+            if (ch == '\t') {
+              o += " ";
+              continue;
+            }
+            if (static_cast<unsigned char>(ch) < 32) continue;
+            o.push_back(ch);
+          }
+          return o;
+        };
+        if (rows) hjson += ",\n";
+        hjson += "    {\"pattern\":\"";
+        hjson += esc(pat);
+        hjson += "\",\"points\":";
+        hjson += pts.empty() ? "0" : pts;
+        hjson += ",\"note\":\"";
+        hjson += esc(note);
+        hjson += "\",\"gathered\":true}";
+        ++rows;
+      }
+      line.clear();
+    } else
+      line.push_back(c);
+  }
+  hjson += "\n  ],\n  \"row_count\": " + std::to_string(rows) + ",\n";
+  hjson += "  \"motto\": \"Gathered heuristics · multi-signal before kill · God Bless\"\n}\n";
+  spear::mirror_www("heuristics-gathered.json", hjson);
+
+  // compact status line for deck
+  std::string sum = "{\n  \"schema\": \"grids-heuristics-summary/v1\",\n";
+  sum += "  \"grids\": " + std::to_string(cells.size()) + ",\n";
+  sum += "  \"pins_gridded\": " + std::to_string(pins) + ",\n";
+  sum += "  \"heuristic_rows\": " + std::to_string(rows) + ",\n";
+  sum += "  \"builtin_signals\": 8,\n";
+  sum += "  \"cycle\": " + std::to_string(cycle) + ",\n";
+  sum += "  \"ts\": \"" + spear::now_z_sec() + "\"\n}\n";
+  spear::mirror_www("grids-heuristics-summary.json", sum);
+  (void)net;
+}
+
 static void cycle_once(int cycle, int& lifetime_global, int& lifetime_kills) {
   // 1) LETHAL hunt — BURN with FIELD UDP WAR BLAST (no soft TERM)
   std::vector<spear::Hit> hits;
@@ -1201,6 +1481,9 @@ static void cycle_once(int cycle, int& lifetime_global, int& lifetime_kills) {
                   net_ips, net_rules, spear::now_z().c_str());
     emit_live(line);
   }
+
+  // 6) GRIDS ON 'EM + heuristics gathered
+  write_grids_and_heuristics(cycle);
 
   write_global_rekill(lifetime_global, cycle_targets, static_cast<int>(hits.size()), killed);
   write_lethal_doctrine_and_queue(cycle, lifetime_global);
