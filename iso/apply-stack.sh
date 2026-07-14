@@ -77,7 +77,14 @@ UUID=$(grep -oE 'uuid=[^ ]+' "$ISOX/isolinux/live.cfg" 2>/dev/null | head -1 | c
 [[ -n "$UUID" ]] || UUID="6e72f523-dc09-4880-8910-93ffa64401c5"
 
 if [[ -f "$ROOT/data/iso-boot/live.cfg" ]]; then
-  sed "s/uuid=[a-f0-9-]*/uuid=${UUID}/g" "$ROOT/data/iso-boot/live.cfg" >"$ISOX/isolinux/live.cfg"
+  python3 - "$ROOT/data/iso-boot/live.cfg" "$ISOX/isolinux/live.cfg" "$UUID" <<'PY'
+import re, sys
+src, dst, uuid = sys.argv[1], sys.argv[2], sys.argv[3].strip()
+text = open(src, encoding="utf-8", errors="replace").read()
+text = re.sub(r"uuid=[0-9a-fA-F-]+", "uuid=" + uuid, text)
+open(dst, "w", encoding="utf-8").write(text)
+print("live.cfg uuid ->", uuid)
+PY
 fi
 for f in splash.png splash-classic.png isolinux.cfg vesamenu.cfg; do
   [[ -f "$ROOT/data/iso-boot/$f" ]] && cp -f "$ROOT/data/iso-boot/$f" "$ISOX/isolinux/$f" 2>/dev/null || true
