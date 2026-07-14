@@ -13,28 +13,29 @@ FFAT is **not** Microsoft FAT. Live planet + Big Grin deck + zone mesh offload.
 
 ---
 
-## Quick start — full stack
+## Product = test boot drive stack (not Mint underlay)
+
+**Stack of record:** Field init + spear + Field1 — same path as the physical test boot drive.  
+**Not product:** casper Mint remaster (optional utility only). **Not required:** QEMU underlay.
 
 ```bash
 git clone https://github.com/ZacharyGeurts/Spear.git
 cd Spear
-make release          # C++ stack → overlay + initrd + receipt
-make iso              # full live ISO remaster (long)
-# or, with existing work tree:
-# make iso-stamp
+make product          # Field ISO · no casper · no Mint underlay
+# → out/spear-field-*.iso · out/spear-field-latest.iso · field-product-receipt.json
 ```
 
 | Target | Does |
 |--------|------|
+| **`make product`** | **PRODUCT** Field ISO (test-drive path) |
 | `make all` / `make stack` | Build all C++ ELFs |
-| `make install` | Install ELFs into `overlay/` + `~/.local/bin` |
-| `make initrd` | Field initramfs → `out/initramfs.cpio.gz` |
-| `make pack` | Product boot image staging (limine paths) |
-| `make iso` | Fetch Mint source → extract → apply → ISO |
-| `make iso-stamp` | Apply stack to existing `work/` → rebuild ISO |
-| `make release` | install + initrd + receipt (+ iso-stamp if work ready) |
+| `make install` | Install ELFs → overlay + `~/.local/bin` |
+| `make initrd` | Field initramfs |
+| `make pack` | Product boot disk image `out/spear-boot.img` |
+| `make iso` | Optional Mint casper remaster (**not** stack of record) |
+| `make release` | = `make product` + receipt |
 
-Artifacts: `out/spear-latest.iso` · `out/release-receipt.json` · `out/initramfs.cpio.gz`
+See [docs/PRODUCT-BOOT.md](docs/PRODUCT-BOOT.md).
 
 ---
 

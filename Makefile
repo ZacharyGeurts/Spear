@@ -1,22 +1,21 @@
 # SPDX-License-Identifier: MIT
 # Spear — full stack to the OS · ISO release
 # Product path: C++ and lower. Scripts are build helpers only (not runtime commander).
-.PHONY: all stack install wartime initrd pack iso iso-stamp release receipt clean help
+.PHONY: all stack install wartime initrd pack product field-iso iso iso-stamp release receipt clean help
 
 ROOT := $(abspath .)
 export SPEAR_ROOT := $(ROOT)
 VERSION := $(shell cat $(ROOT)/VERSION 2>/dev/null || echo 22.3.1-field)
 
 help:
-	@echo "Spear $(VERSION) — full stack"
+	@echo "Spear $(VERSION) — Field product = test boot drive stack"
+	@echo "  make product     PRODUCT Field ISO (no Mint underlay · no casper)"
 	@echo "  make all|stack   build C++ ELFs"
 	@echo "  make install     install ELFs → overlay + ~/.local/bin"
-	@echo "  make initrd      field initramfs (out/initramfs.cpio.gz)"
-	@echo "  make pack        limine product image (self-contained out/)"
-	@echo "  make iso         full remaster: fetch → extract → apply → rebuild ISO"
-	@echo "  make iso-stamp   apply overlay+bins to existing work/ then rebuild ISO"
-	@echo "  make release     stack + install + initrd + receipt (+ iso-stamp if work ready)"
-	@echo "  make receipt     write out/release-receipt.json"
+	@echo "  make initrd      field initramfs"
+	@echo "  make pack        product boot disk out/spear-boot.img"
+	@echo "  make iso         optional Mint casper (NOT product)"
+	@echo "  make release     = make product"
 	@echo "  make clean       remove built ELFs"
 
 all stack wartime:
@@ -31,26 +30,27 @@ initrd: all
 pack: initrd
 	@bash boot/pack.sh
 
+# Product of record — same path as Field1 test boot drive (no casper/Mint underlay)
+product field-iso: install initrd
+	@bash boot/make-field-iso.sh
+	@bash scripts/release-receipt.sh "$$(readlink -f $(ROOT)/out/spear-field-latest.iso 2>/dev/null || true)" || true
+	@echo "PRODUCT Field ISO ready (not Mint underlay) · docs/PRODUCT-BOOT.md"
+
+# Optional: Mint casper utility live only — NOT the stack of record
 iso:
+	@echo "NOTE: casper Mint remaster is optional utility — product is: make product"
 	@bash iso/build-all.sh
 
 iso-stamp: install
+	@echo "NOTE: casper stamp is optional — product is: make product"
 	@bash iso/apply-stack.sh
 	@bash iso/rebuild-iso.sh
 
 receipt:
 	@bash scripts/release-receipt.sh
 
-release: install initrd receipt
-	@if [ -d "$(ROOT)/work/edit/usr" ] || [ -d "$${SPEAR_WORK}/edit/usr" ] || [ -d /home/zachary/Desktop/SG/NewLatest/Spear/work/edit/usr ]; then \
-	  echo "== work root present — iso-stamp =="; \
-	  $(MAKE) iso-stamp; \
-	else \
-	  echo "== no work/edit yet — skip ISO rebuild =="; \
-	  echo "   Link upstream work or: make iso  (full extract + remaster)"; \
-	  echo "   Existing live ISO (if any): out/spear-latest.iso or SPEAR_ISO"; \
-	fi
-	@echo "RELEASE ready · version $(VERSION) · see out/release-receipt.json"
+release: product
+	@echo "RELEASE ready · version $(VERSION) · Field product ISO · docs/PRODUCT-BOOT.md"
 
 clean:
 	$(MAKE) -C src clean
